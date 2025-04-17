@@ -1,0 +1,341 @@
+:root {
+    --primary-color: #0A4B3C;
+    --secondary-color: #E8F0ED;
+    --text-color: #333;
+    --border-color: #ddd;
+    --spacing-unit: 1rem;
+}
+
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f5f5f5;
+    padding: 2rem;
+} */
+
+.invoice-container {
+    margin-block: 3rem !important;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styles */
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    /* border-bottom: 2px solid var(--border-color); */
+}
+
+.brand h1 {
+    color: var(--primary-color);
+    font-size: 2.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.brand p {
+    color: var(--primary-color);
+    font-size: 28px;
+}
+
+.blockchain-details {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    gap: 1rem;
+}
+
+.chain-icon {
+    font-size: 1.5rem;
+}
+
+.blockchain-details h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.blockchain-details p {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Parties Container */
+.parties-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* grid-template-columns: 1fr; */
+    gap: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.parties-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 1px solid var(--border-color);
+    transform: translateX(-50%);
+}
+
+.party {
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.party-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.party-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.party h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.party p {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+}
+
+/* Table Styles */
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.invoice-table th,
+.invoice-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.invoice-table thead th {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.invoice-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Summary Section */
+.invoice-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+div.calculations {
+    padding: 1.5rem;
+    /* background-color: var(--secondary-color); */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.calc-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.calc-row.total {
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-top: 2px solid var(--primary-color);
+    border-bottom: none;
+    padding-top: 1rem;
+}
+
+.invoice-details {
+    padding: 1.5rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+}
+
+.details-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.document-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-top: 0.2rem;
+}
+
+.details-content p {
+    margin: 0;
+    line-height: 1.5;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+i.fas.fa-file-invoice {
+    font-size: 40px;
+}
+
+i.fas.fa-user-tie {
+    font-size: 40px;
+}
+
+i.fas.fa-building {
+    font-size: 40px;
+}
+
+/* Footer Styles */
+.invoice-footer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    /* border-top: 2px solid var(--border-color); */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.blockchain-proof {
+    text-align: left;
+    background-color: var(--secondary-color);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.blockchain-proof h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.proof-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.qr-code {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blockchain-proof p {
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.qr-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: var(--secondary-color);
+    margin: 1rem auto;
+    border-radius: 8px;
+}
+
+.signatures {
+    text-align: center;
+}
+
+.signature-line {
+    width: 100%;
+    height: 2px;
+    background-color: var(--border-color);
+    margin: 2rem 0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .invoice-container {
+        padding: 1rem;
+    }
+
+    .invoice-header {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .invoice-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-footer {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .brand h1 {
+        font-size: 2rem;
+    }
+
+    .blockchain-details {
+        flex-direction: column;
+    }
+
+    .calc-row {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+.printbutton-container{
+width: 100%;
+text-align: center;
+padding-block: 2rem;
+}
+.print-button{
+ color: white;
+ background: #24A0ED ;
+ padding: 8px 23px;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+}

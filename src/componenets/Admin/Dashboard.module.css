@@ -1,0 +1,310 @@
+.dashboardContainer {
+    padding: 2rem;
+    background: #f9f9f9;
+    font-family: Arial, sans-serif;
+}
+
+.titleBar {
+    margin-bottom: 2rem;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    text-align: center;
+}
+
+.counter {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #175B42;
+}
+
+.section {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.primaryBtn {
+    background: #175B42;
+    border: none;
+    padding: 0.5rem 1rem;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.centerText {
+    text-align: center;
+    padding: 1rem;
+    color: #888;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 95%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+    margin-bottom: 1rem;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modalActions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.modalActions button:first-child {
+    background: #ccc;
+}
+
+.modalActions button:last-child {
+    background: #175B42;
+    color: #fff;
+}
+
+/* Existing styles remain unchanged */
+
+.usersGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .usersGrid {
+        flex-direction: row;
+    }
+}
+
+.rolesCard {
+    flex: 1;
+    background: #fdfdfd;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.usersTableWrapper {
+    flex: 2;
+}
+
+.boxTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.tableResponsive {
+    overflow-x: auto;
+}
+
+.rolesTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.rolesTable th,
+.rolesTable td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.label {
+    display: inline-block;
+    padding: 0.30rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.info {
+    background-color: #17a2b8;
+}
+
+.success {
+    background-color: #28a745;
+}
+
+.warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.danger {
+    background-color: #dc3545;
+}
+
+.primary {
+    background-color: #007bff;
+}
+
+.searchInput {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 10px;
+    font-size: 14px;
+    max-width: 200px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px;
+    gap: 6px;
+}
+
+.pagination button {
+    padding: 4px 8px;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.activePage {
+    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+}
+
+.editButton {
+    background: transparent;
+    border: none;
+    color: green;
+    /* border: 1px solid red; */
+
+    >img {
+        width: 20px;
+        color: green;
+        cursor: pointer;
+        /* font-size: 10px; */
+    }
+}
+
+.qrModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.qrModal {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  position: relative;
+  width: 28%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qrModalImg {
+  /* max-width: 300px;
+  max-height: 300px; */
+      width: 90%;
+    height: 95%;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}

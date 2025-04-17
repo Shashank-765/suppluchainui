@@ -32,7 +32,22 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+
+/* .appcontainer{
+height: 100vh;
+    display: flex
+;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #FEF7F0;  } */
+
+.appcontainerbakground {
+  background: #FEF7F0;
+
 }

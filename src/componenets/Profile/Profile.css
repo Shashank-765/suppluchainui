@@ -1,0 +1,82 @@
+.profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 20px 0;
+}
+
+.profile-edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  text-align: left;
+}
+
+.profile-edit-form input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Buttons */
+.profile-edit-btn,
+.profile-save-btn,
+.profile-cancel-btn,
+.profile-logout-btn {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.profile-edit-btn {
+  background-color: #007bff;
+  color: white;
+  margin: 10px;
+}
+
+.profile-save-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.profile-cancel-btn {
+  background-color: #6c757d;
+  color: white;
+
+}
+
+.profile-logout-btn {
+  background-color: crimson;
+  color: white;
+  margin: 10px;
+}
+.profile-edit-buttons{
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.my-products-only{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.no-product-container-profile{
+ width: 95vw;
+ /* border: 1px solid red; */
+ text-align: center;
+ height: 30vh;
+}

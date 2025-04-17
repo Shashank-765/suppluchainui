@@ -1,0 +1,250 @@
+.batchViewContainer {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f9fc;
+    color: #333;
+    padding-bottom: 40px;
+}
+
+.header {
+    background-color: #263238;
+    padding: 20px;
+    color: white;
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.subBrand {
+    font-size: 14px;
+    margin-top: -5px;
+    opacity: 0.7;
+}
+
+.pageTitle {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.profileCard {
+    background: white;
+    margin: 20px auto;
+    width: 100%;
+    /* max-width: 1000px; */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.profileBanner {
+    background: #caa3f3;
+    height: 150px;
+    background-image: url('https://via.placeholder.com/800x150?text=Banner');
+    background-size: cover;
+    background-position: center;
+}
+
+.profileContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+.profileImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid white;
+    margin-top: -100px;
+    background-color: #eee;
+}
+
+.contactInfo,
+.roleInfo {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 30px;
+    text-align: right;
+}
+
+.editBtn {
+    background-color: white;
+    border: 1px solid #00bcd4;
+    color: #00bcd4;
+    border-radius: 20px;
+    padding: 5px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.editBtn:hover {
+    background-color: #00bcd4;
+    color: white;
+}
+
+.batchesOverview {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.batchTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.batchTable th,
+.batchTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.batchTable th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+.noData {
+    color: #777;
+    font-style: italic;
+    padding: 20px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px 10px;
+    font-size: 13px;
+    color: #666;
+}
+
+.footer a {
+    color: #00bcd4;
+    text-decoration: none;
+}
+
+.profileDetails {
+    justify-content: space-around;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.label {
+    display: inline-block;
+    padding: 0.30rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.info {
+    background-color: #17a2b8;
+}
+
+.success {
+    background-color: #28a745;
+}
+
+.warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.danger {
+    background-color: #dc3545;
+}
+
+.primary {
+    background-color: #007bff;
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popupForm {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 500px;
+  max-height: 90vh;
+  z-index: 1000;
+  overflow-y: none;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.popupForm h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #333;
+}
+
+.popupForm form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.popupForm label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #444;
+}
+
+.popupForm input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.formActions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.formActions button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.formActions button[type="button"] {
+  background-color: #f44336;
+  color: white;
+}
+.popupForm::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}

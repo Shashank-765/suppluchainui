@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Counter = require('./counterModel'); // import counter model
+const Counter = require('./counterModel'); 
 
 const FarmerRecordSchema = new mongoose.Schema({
   batchId: { type: Number, unique: true },
@@ -13,6 +13,11 @@ const FarmerRecordSchema = new mongoose.Schema({
   importerName: { type: String, required: true },
   coffeeType: { type: String, required: true },
   qrCode: { type: String},
+  farmInspectionId: { type: String, },
+  harvesterId: { type: String, },
+  processorId: { type: String, },
+  exporterId: { type: String, },
+  importerId: { type: String, },
 }, { timestamps: true });
 
 // auto-increment logic

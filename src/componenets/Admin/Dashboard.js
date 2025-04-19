@@ -16,13 +16,19 @@ const Dashboard = () => {
     const [searchBatchTerm, setSearchBatchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isBlocked, setIsBlocked] = useState(false);
+    const [toatalUser, setTotalUser] = useState(0);
+    const [totalRoles, setTotalRoles] = useState(0);
+    const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
-    const [usersPerPage] = useState(7);
+    const [usersPerPage] = useState(5);
     const [totalPages, setTotalPages] = useState(0);
     const [totalBatchPage, setTotalBatchPage] = useState(0);
     const [allBatch, setAllBatch] = useState([]);
     const [currnetBatchPage, setCurrentBatchPage] = useState(1);
     const [roles, setRoles] = useState([]);
+
+    const user = JSON.parse(localStorage.getItem('user')) || null;
+
 
     const [allUser, setAllUser] = useState([]);
     const [userForm, setUserForm] = useState({
@@ -35,7 +41,7 @@ const Dashboard = () => {
 
 
     const HandleBatchviewPage = (batch) => {
-    console.log(batch);
+        console.log(batch);
         navigate('/batchprogress')
     }
 
@@ -215,6 +221,7 @@ const Dashboard = () => {
             });
             setAllUser(response.data.users);
             setTotalPages(response.data.totalPages);
+            setTotalUser(response.data.totalUsers);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -230,6 +237,7 @@ const Dashboard = () => {
                 },
             });
             setAllBatch(response.data.batches);
+            setTotalBatch(response.data.totalBatches);
             setTotalBatchPage(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching batches:', error);
@@ -251,6 +259,7 @@ const Dashboard = () => {
             const res = await axios.get('http://localhost:5000/api/users/getRoles');
             if (res.data?.roles) {
                 setRoles(res.data?.roles);
+                setTotalRoles(res?.data?.totalCount)
             }
         } catch (err) {
             console.error('Error fetching roles:', err);
@@ -260,29 +269,6 @@ const Dashboard = () => {
     useEffect(() => {
         fetchRoles();
     }, []);
-    const roleMap = {
-        FARM_INSPECTION: {
-            name: 'Farm Inspection',
-            className: `${styles.label} ${styles.info}`,
-        },
-        HARVESTER: {
-            name: 'Harvester',
-            className: `${styles.label} ${styles.success}`,
-        },
-        EXPORTER: {
-            name: 'Exporter',
-            className: `${styles.label} ${styles.warning}`,
-        },
-        IMPORTER: {
-            name: 'Importer',
-            className: `${styles.label} ${styles.danger}`,
-        },
-        PROCESSOR: {
-            name: 'Processor',
-            className: `${styles.label} ${styles.primary}`,
-        },
-    };
-
 
     return (
         <div className={styles.dashboardContainer}>
@@ -293,15 +279,15 @@ const Dashboard = () => {
             <div className={styles.cards}>
                 <div className={styles.card}>
                     <h3>Users</h3>
-                    <p className={styles.counter}>0</p>
+                    <p className={styles.counter}>{toatalUser}</p>
                 </div>
                 <div className={styles.card}>
                     <h3>Total Roles</h3>
-                    <p className={styles.counter}>5</p>
+                    <p className={styles.counter}>{totalRoles}</p>
                 </div>
                 <div className={styles.card}>
                     <h3>Total Batches</h3>
-                    <p className={styles.counter}>0</p>
+                    <p className={styles.counter}>{totalBatch}</p>
                 </div>
             </div>
 
@@ -329,8 +315,8 @@ const Dashboard = () => {
                             <th>Coffee Type</th>
                             <th>Farm Inspector</th>
                             <th>Harvester</th>
-                            <th>Exporter</th>
                             <th>Importer</th>
+                            <th>Exporter</th>
                             <th>Processor</th>
                             <th>Actions</th>
                         </tr>
@@ -354,11 +340,135 @@ const Dashboard = () => {
                                         )}
                                     </td>
                                     <td>{batch.coffeeType}</td>
-                                    <td>{batch.farmInspectionName}</td>
-                                    <td>{batch.harvesterName}</td>
-                                    <td>{batch.exporterName}</td>
-                                    <td>{batch.importerName}</td>
-                                    <td>{batch.processorName}</td>
+                                    <td>
+                                        {/* {batch?.farmInspectionName} */}
+
+                                        {
+
+                                            batch?.tracking?.isInspexted ? <button
+                                                className={styles.completeBtn}
+                                            >Complete</button> :
+                                                <>
+                                                    <button
+                                                        className={styles.pendingBtn}
+                                                    >
+                                                        Pending
+                                                    </button>
+                                                    {/* <button
+                              className={styles.progressBtn}
+                              style={{
+                                cursor: user?.role?.label === 'Farm Inspection' ? 'pointer' : 'not-allowed'
+                              }}
+                              onClick={user?.role?.label === 'Farm Inspection' ? () => toggleForm(batch?.batchId) : undefined}
+                            >Progress</button> */}
+                                                </>
+
+                                        }
+
+                                        {/* <button className={styles.verifyBtn}>✅</button> */}
+                                    </td>
+                                    <td>
+                                        {/* {batch?.harvesterName} */}
+                                        {
+
+                                            batch?.tracking?.isHarvested ? <button
+                                                className={styles.completeBtn}
+                                            >Complete</button> :
+                                                <>
+                                                    <button
+                                                        className={styles.pendingBtn}
+
+
+                                                    >
+                                                        Pending
+                                                    </button>
+                                                    {/* <button
+                              className={styles.progressBtn}
+                              style={{
+                                cursor: user?.role?.label === 'Harvester' ? 'pointer' : 'not-allowed'
+                              }}
+                              onClick={user?.role?.label === 'Harvester' ? () => toggleForm(batch?.batchId) : undefined}
+                            >Progress</button> */}
+                                                </>
+
+                                        }
+                                    </td>
+                                    <td>
+                                        {/* {batch?.importerName} */}
+                                        {
+
+                                            batch?.tracking?.isImported ? <button
+                                                className={styles.completeBtn}
+                                            >Complete</button> :
+                                                <>
+                                                    <button
+                                                        className={styles.pendingBtn}
+
+                                                    >
+                                                        Pending
+                                                    </button>
+                                                    {/* <button
+                              className={styles.progressBtn}
+                              style={{
+                                cursor: user?.role?.label === 'Importer' ? 'pointer' : 'not-allowed'
+                              }}
+                              onClick={user?.role?.label === 'Importer' ? () => toggleForm(batch?.batchId) : undefined}
+                            >Progress</button> */}
+                                                </>
+
+                                        }
+                                    </td>
+                                    <td>
+                                        {/* {batch?.exporterName} */}
+                                        {
+
+                                            batch?.tracking?.isExported ? <button
+                                                className={styles.completeBtn}
+                                            >Complete</button> :
+                                                <>
+                                                    <button
+                                                        className={styles.pendingBtn}
+
+                                                    >
+                                                        Pending
+                                                    </button>
+                                                    {/* <button
+                              className={styles.progressBtn}
+                              style={{
+                                cursor: user?.role?.label === 'Exporter' ? 'pointer' : 'not-allowed'
+                              }}
+                              onClick={user?.role?.label === 'Exporter' ? () => toggleForm(batch?.batchId) : undefined}
+                            >Progress</button> */}
+                                                </>
+
+                                        }
+                                    </td>
+                                    <td>
+                                        {/* {batch?.processorName} */}
+                                        {
+
+                                            batch?.tracking?.isProcessed ? <button
+                                                className={styles.completeBtn}
+                                            >Complete</button> :
+                                                <>
+                                                    <button
+                                                        className={styles.pendingBtn}
+
+
+                                                    >
+                                                        Pending
+                                                    </button>
+                                                    {/* <button
+                              className={styles.progressBtn}
+                              style={{
+                                cursor: user?.role?.label === 'Processor' ? 'pointer' : 'not-allowed'
+                              }}
+                              onClick={user?.role?.label === 'Processor' ? () => toggleForm(batch?.batchId) : undefined}
+                            >Progress</button> */}
+                                                </>
+
+                                        }
+                                    </td>
                                     <td>
                                         <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
                                             <img src={view} />
@@ -555,46 +665,67 @@ const Dashboard = () => {
                                 value={formData.farmerAddress}
                                 onChange={handleChange}
                             />
-                            <input
-                                type="text"
-                                name="farmInspectionName"
-                                placeholder="Farm Inspection Name"
-                                required
+                            <select
                                 value={formData.farmInspectionName}
+                                name="farmInspectionName"
                                 onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="harvesterName"
-                                placeholder="Harvester Name"
-                                required
+                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
+                            >
+                                <option value="" disabled >Select a farmInspection Name</option>
+                                {allUser.map((user) => (
+                                    user?.role?.label === 'Farm Inspection' && (<option key={user._id} style={{ color: "black" }}>
+                                        {user?.role?.label === 'Farm Inspection' && user?.name}
+                                    </option>)
+                                ))}
+                            </select>
+                            <select
                                 value={formData.harvesterName}
+                                name="harvesterName"
                                 onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="processorName"
-                                placeholder="Processor Name"
-                                required
+                            >
+                                <option value="" disabled>Select a harvesterName Name</option>
+                                {allUser.map((user) => (
+                                    (user?.role?.label === 'Harvester' && <option key={user._id}>
+                                        {user?.role?.label === 'Harvester' && user?.name}
+                                    </option>)
+                                ))}
+                            </select>
+                            <select
                                 value={formData.processorName}
+                                name="processorName"
                                 onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="exporterName"
-                                placeholder="Exporter Name"
-                                required
+                            >
+                                <option value="" disabled>Select a processorName Name</option>
+                                {allUser.map((user) => (
+                                    (user?.role?.label === 'Processor' && <option key={user._id}>
+                                        {user?.role?.label === 'Processor' && user?.name}
+                                    </option>)
+                                ))}
+                            </select>
+                            <select
                                 value={formData.exporterName}
+                                name="exporterName"
                                 onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="importerName"
-                                placeholder="Importer Name"
-                                required
+                            >
+                                <option value="" disabled>Select a exporterName Name</option>
+                                {allUser.map((user) => (
+                                    (user?.role?.label === 'Exporter' && <option key={user._id}>
+                                        {user?.role?.label === 'Exporter' && user?.name}
+                                    </option>)
+                                ))}
+                            </select>
+                            <select
                                 value={formData.importerName}
+                                name="importerName"
                                 onChange={handleChange}
-                            />
+                            >
+                                <option value="" disabled>Select a importerName Name</option>
+                                {allUser.map((user) => (
+                                    (user?.role?.label === 'Importer' && <option key={user._id}>
+                                        {user?.role?.label === 'Importer' && user?.name}
+                                    </option>)
+                                ))}
+                            </select>
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowBatchModal(false)}>Cancel</button>
                                 <button type="submit">Submit</button>

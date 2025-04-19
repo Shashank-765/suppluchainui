@@ -196,7 +196,7 @@ router.get('/getProducts', async (req, res) => {
       }
       const products = await Fruit.find({ ownerId: userProducts._id });
       if (products.length === 0) {
-        return res.status(404).json({ message: 'No products found for this user' });
+        return res.status(201).json({products:[], message: 'No products found for this user' });
       }
       return res.status(200).json({ products, message: 'Products fetched successfully' });
     }
@@ -252,12 +252,14 @@ router.get('/fetchalluser', async (req, res) => {
     const users = await User.find(query)
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
-
+      
+  const allUsers = await User.find();
     res.status(200).json({
       users,
-      totalUsers,
+      totalUsers, 
+      allUsers,
       totalPages: Math.ceil(totalUsers / limit),
-      currentPage: parseInt(page),
+      currentPage: Math.max(parseInt(page), 1)
     });
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -357,8 +359,9 @@ router.post('/createBatch', async (req, res) => {
     await newBatch.save();
 
     if (newBatch) {
-      const frontendBaseUrl = 'http://localhost:3000/'; 
-      const qrData = `${frontendBaseUrl}scanresult/${newBatch.batchId}`;
+      const frontendBaseUrl = 'http://192.168.1.120:3000/'; 
+      const qrData = `${frontendBaseUrl}`;
+      // scanresult/${newBatch.batchId}
       const qrCode = await QRCode.toDataURL(qrData);
 
       newBatch.qrCode = qrCode;
@@ -435,7 +438,7 @@ router.post('/createBatch', async (req, res) => {
     }
 
     const totalBatches = await BatchModel.countDocuments(query);
-    const currentPage = parseInt(page);
+    const currentPage =  Math.max(parseInt(page), 1);
     const perPage = parseInt(limit);
     const totalPages = Math.ceil(totalBatches / perPage);
     const skip = (currentPage - 1) * perPage;
@@ -495,25 +498,31 @@ router.get('/getRoles', async (req, res) => {
 router.get('/getBatchById', async (req, res) => {
   try {
     const { id } = req.query;
-    console.log('req.body', req.query)
 
-    if (id) {
-      const batch = await BatchModel.findOne({ batchId: id });
-      if (!batch) {
-        return res.status(404).json({ message: 'Batch not found' });
-      }
-      return res.status(200).json({ batch, message: 'Batch fetched successfully' });
+    if (!id) {
+      return res.status(400).json({ message: 'Batch ID is required' });
     }
+
+    const batch = await BatchModel.findOne({ batchId: id }).lean(); 
+
+    if (!batch) {
+      return res.status(404).json({ batch: null, message: 'Batch not found' });
+    }
+
+    const tracking = await TrackingModel.findOne({ batchId: id }).lean();
+    batch.tracking = tracking || null;
+
+    return res.status(200).json({ batch, message: 'Batch fetched successfully' });
   } catch (error) {
     console.error('Error fetching batch:', error);
     return res.status(500).json({ message: 'Server error while fetching batch' });
   }
-}
-);
+});
+
 router.get('/getBatchByUserId', async (req, res) => {
   try {
     const { id, search = '', page = 1, limit = 5 } = req.query;
-
+     console.log('req.body', req.query)
     if (!id) {
       return res.status(400).json({ message: 'ID is required in query parameters.' });
     }
@@ -544,7 +553,7 @@ router.get('/getBatchByUserId', async (req, res) => {
     }
 
     const totalBatches = await BatchModel.countDocuments(finalMatch);
-    const currentPage = parseInt(page);
+    const currentPage = Math.max(parseInt(page), 1);
     const perPage = parseInt(limit);
     const totalPages = Math.ceil(totalBatches / perPage);
     const skip = (currentPage - 1) * perPage;

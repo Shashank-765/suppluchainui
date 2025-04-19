@@ -66,6 +66,13 @@
 .roleInfo {
     text-align: center;
     margin-top: 10px;
+    .contactInformation{ 
+    background-color: white;
+    border: 1px solid #00bcd4;
+    color: #00bcd4;
+    border-radius: 20px;
+    padding: 2px 15px;
+    }
 }
 
 .settings {
@@ -73,7 +80,8 @@
     flex-direction: column;
     text-align: center;
     margin-top: 30px;
-    text-align: right;
+    justify-content: center;
+    align-items: center;
 }
 
 .editBtn {
@@ -81,14 +89,7 @@
     border: 1px solid #00bcd4;
     color: #00bcd4;
     border-radius: 20px;
-    padding: 5px 15px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.editBtn:hover {
-    background-color: #00bcd4;
-    color: white;
+    padding: 5px 10px;
 }
 
 .batchesOverview {
@@ -264,7 +265,7 @@
 }
 
 .completeBtn {
-    background-color: #189420;
+    background-color: #4caf50;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -290,7 +291,7 @@
     background-color: #e0a800;
 } */
 .progressBtn {
-    background-color: orange;
+    background-color: #ffc107;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -332,4 +333,18 @@
     font-size: 14px;
     max-width: 200px;
     align-self: flex-end;
+}
+
+.editButton {
+    background: transparent;
+    border: none;
+    color: green;
+    /* border: 1px solid red; */
+
+    >img {
+        width: 20px;
+        color: green;
+        cursor: pointer;
+        /* font-size: 10px; */
+    }
 }

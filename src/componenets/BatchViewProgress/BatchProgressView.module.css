@@ -39,9 +39,10 @@
 
 .timelineItem {
   position: relative;
-  width: 50%;
-  padding: 2rem 2rem;
+  width: 53%;
+  padding: 2rem 0.5rem;
   box-sizing: border-box;
+  margin-left: -4%;
 }
 
 .left {
@@ -50,7 +51,7 @@
 }
 
 .right {
-  left: 50%;
+  left: 56%;
   text-align: left;
 }
 
@@ -68,8 +69,9 @@
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  left: 100%;
+  left: 102%;
 }
+
 .circle2 {
   width: 30px;
   height: 30px;
@@ -84,7 +86,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  left: 0;
+  left: -4%;
 }
 
 .left .circle {
@@ -116,4 +118,70 @@
 .batchesdatavalue {
   font-weight: 400;
   color: #666;
+}
+
+.qrCode {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 60px;
+  height: auto;
+  cursor: pointer;
+}
+
+.bottomImage {
+    position: relative;
+    bottom: 20px;
+    left: 83%;
+    width: 64px;
+    height: auto;
+}
+
+.qrModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.qrModal {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  position: relative;
+  width: 28%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qrModalImg {
+  /* max-width: 300px;
+  max-height: 300px; */
+  width: 90%;
+  height: 100%;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+.checkIcon{
+width: 30px;
 }

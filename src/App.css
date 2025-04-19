@@ -49,5 +49,5 @@ height: 100vh;
 
 .appcontainerbakground {
   background: #FEF7F0;
-
+  overflow: hidden;
 }

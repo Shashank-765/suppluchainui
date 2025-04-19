@@ -15,7 +15,8 @@ import Profile from './componenets/Profile/Profile';
 import Dashboard from './componenets/Admin/Dashboard';
 import EditUser from './componenets/EditUser/EditUser';
 import UserDashBoard from './componenets/User/UserDashbord';
-import BatchProgressView from './componenets/ScanPage/BatchProgressView';
+import BatchProgressView from './componenets/BatchViewProgress/BatchProgressView';
+import ScreeningPage from './componenets/QrscanerPage/ScreeningPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -66,6 +67,7 @@ function App() {
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/userdashboard" element={<UserDashBoard />} />
                <Route path="/batchprogress" element={<BatchProgressView />} />
+              <Route path="/screening" element={<ScreeningPage />} />
               <Route
                 path="/profile"
                 element={<Profile setIsAuthenticated={setIsAuthenticated} />}

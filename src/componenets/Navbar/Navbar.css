@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   z-index: 2;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   background: #FEF7F0;
   border-bottom: 3px solid #51947a;
@@ -24,8 +24,9 @@
 }
 
 .navbarleftlog {
-  width: 50%;
+  width: 20%;
   z-index: 2;
+
   /* border: 1px solid red; */
   >img {
     margin-left: 10%;
@@ -76,8 +77,9 @@
   padding: 5px 10px;
 
   border-radius: 8px;
-  >a{
-      color: white !important;
+
+  >a {
+    color: white !important;
   }
 }
 
@@ -86,6 +88,92 @@
   width: 30px;
   height: 30px;
   margin-right: 30px;
+}
+
+@media screen and (max-width:940px) {
+  .navbarleftlog {
+    width: 50%;
+    z-index: 2;
+
+    /* border: 1px solid red; */
+    >img {
+      margin-left: 10%;
+    }
+  }
+
+  .navbarsection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* background: rgba(0, 0, 0,.8); */
+    background: #FEF7F0;
+  }
+
+  .navafterbutton {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    z-index: 1;
+    border-bottom: 3px solid #51947a;
+    margin-top: 39%;
+    /* background: rgba(0, 0, 0,.8); */
+    background: #FEF7F0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: black;
+
+    >ul {
+      /* margin-right: 7%; */
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
+
+      >li {
+        /* margin-left: 30px; */
+        list-style: none;
+        cursor: pointer;
+        font-family: Bold;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        margin-top: 1rem;
+
+        >a {
+          text-decoration: none;
+          color: black;
+        }
+      }
+    }
+  }
+
+  .navbarrightside {
+    display: none;
+    /* border: 1px solid red; */
+  }
+
+  .menubutton {
+    display: block;
+    margin-left: 38%;
+    z-index: 2;
+  }
+
+  .navbarsection {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+  }
+
+  .navbarleftlog {
+    /* border: 1px solid red; */
+    margin-left: 0;
+
+    >img {
+      margin-left: 0;
+    }
+  }
 }
 
 @media screen and (max-width:740px) {
@@ -197,7 +285,7 @@
   display: none;
   position: absolute;
   background-color: #FEF7F0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   list-style: none;
   padding: 10px 0;
   min-width: 150px;
@@ -223,4 +311,3 @@
   text-decoration: none;
   color: #333;
 }
-  

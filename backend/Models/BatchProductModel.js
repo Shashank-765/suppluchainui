@@ -4,6 +4,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Farm Inspection fields
     farmInspectionId: { type: String },
     farmInspectionName: { type: String },
+    productName: { type: String },
     certificateNo: { type: String },
     certificateFrom: { type: String },
     typeOfFertilizer: { type: String },
@@ -18,7 +19,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     temperatureLevel: { type: String },
     humidity: { type: String },
     isHarvested: { type: Boolean, default: false },
-    harvestDate: { type: Date},
+    harvestDate: { type: Date },
 
     // Exporter fields
     exporterId: { type: String },
@@ -56,9 +57,12 @@ const trackingDetailsSchema = new mongoose.Schema({
     destination: { type: String },
     isProcessed: { type: Boolean, default: false },
     processedDate: { type: Date },
-
+    images: [{ type: String, },],
+    price:{ type: String, },
+    miniQuantity:{ type: String, },
+    maxiQuantity:{ type: String, },
     // Common fields
-    batchId: { type: String, required: true }, 
+    batchId: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
 

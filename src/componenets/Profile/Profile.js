@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import './Profile.css';
 import axios from 'axios';
 
-function Profile({ setIsAuthenticated }) {
+function Profile({ setIsAuthenticated, setUser }) {
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
@@ -29,7 +30,7 @@ function Profile({ setIsAuthenticated }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/users/getProducts?id=${user._id}`);
+            const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getProducts?id=${user._id}`);
             if (response.data) {
                 setProducts(response.data.products);
             } else {
@@ -48,6 +49,7 @@ function Profile({ setIsAuthenticated }) {
         localStorage.removeItem('user');
         setIsAuthenticated(false);
         navigate('/auth');
+        showSuccess('Logout successful!');
     };
 
     const handleEditToggle = () => {
@@ -135,14 +137,14 @@ function Profile({ setIsAuthenticated }) {
                 <div className='productmaincontainer'>
                     {
 
-                  products.length > 0  ?    products?.map((ele, i) => {
+                        products.length > 0 ? products?.map((ele, i) => {
                             return (
                                 <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                     <div className='productimagecontianer'>
 
                                         {ele?.images?.length > 0 && (
                                             <img
-                                                src={`http://localhost:5000${ele.images[0]}`}
+                                                src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${ele.images[0]}`}
                                                 alt={`product-${i}-img`}
                                                 className="product-image"
                                             />
@@ -159,10 +161,10 @@ function Profile({ setIsAuthenticated }) {
                                 </div>
                             )
                         })
-                        :
-                        <div className='no-product-container-profile'>
-                           <p>No Product Available </p>
-                        </div>
+                            :
+                            <div className='no-product-container-profile'>
+                                <p>No Product Available </p>
+                            </div>
 
                     }
                 </div>

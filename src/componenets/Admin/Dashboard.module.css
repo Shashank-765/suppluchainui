@@ -282,29 +282,27 @@
     border-radius: 12px;
     position: relative;
     width: 28%;
-    height: 50%;
+    height: 70%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .qrModalImg {
-    /* max-width: 300px;
-  max-height: 300px; */
-    width: 90%;
-    height: 100%;
+    width: 100%;
+    height: 80%;
 }
 
 .closeBtn {
     position: absolute;
-    top: -12px;
-    right: -12px;
+    top: -17px;
+    right: -17px;
     background-color: red;
     color: white;
     border: none;
     border-radius: 100%;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     font-size: 18px;
     cursor: pointer;
 }

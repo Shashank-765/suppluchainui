@@ -13,11 +13,11 @@ function Product() {
     const [data, setData] = React.useState([]);
     const fetchallproducts = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/users/getAllProducts');
-            console.log(response.data.products, 'response')
+            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getproducttomarkiting');
+            console.log(response.data.trackingDetails, 'response')
 
             if (response.data) {
-                setData(response.data.products);
+                setData(response.data.trackingDetails);
             }
             else {
                 console.error('Error fetching products:', response.data.message);
@@ -45,12 +45,12 @@ function Product() {
                             return (
                                 <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                     <div className='productimagecontianer'>
-                                        <img src={`http://localhost:5000${ele?.images[0]}`} />
+                                        <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${ele?.images[0]}`} />
                                     </div>
                                     <div className='productdetailscontainer'>
                                         <div className='productdetailscontainerdetails'>
-                                            <p>{ele?.fruitName}</p>
-                                            <p>QTY : <span className='pricevalueproduct'>{ele?.quantity}</span></p>
+                                            <p>{ele?.productName}</p>
+                                            <p>Min QTY : <span className='pricevalueproduct'>{ele?.miniQuantity}</span></p>
                                         </div>
                                         <p className='prices'>Price : <span className='pricevalueproduct'>{ele?.price}</span></p>
                                     </div>

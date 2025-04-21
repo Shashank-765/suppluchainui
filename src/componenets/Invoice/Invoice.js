@@ -1,7 +1,11 @@
 import React from 'react'
 import './Invoice.css'
 import qrcode from '../../Imges/qrcode.jpg'
+import { useLocation } from 'react-router-dom'
 function Invoice() {
+const location = useLocation();
+const { quantity,price,realprice,productname } = location.state || {};
+console.log(quantity,price,realprice,productname,'price and quantity')
   return (
     <div>
       <div className="invoice-container">
@@ -66,23 +70,23 @@ function Invoice() {
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Organic Tomatoes</td>
-                <td>500 kg</td>
-                <td>₹20/kg</td>
-                <td>₹10,000</td>
+                <td>{productname}</td>
+                <td>{quantity} Qtl</td>
+                <td>₹{realprice}/Qtl</td>
+                <td>₹{price}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td>2</td>
                 <td>Baby Potatoes</td>
                 <td>300 kg</td>
                 <td>₹18/kg</td>
                 <td>₹5,400</td>
-              </tr>
+              </tr> */}
             </tbody>
             <tfoot>
               <tr>
                 <td colSpan="4">Total</td>
-                <td>₹17,060</td>
+                <td>₹{price}</td>
               </tr>
             </tfoot>
           </table>
@@ -91,23 +95,23 @@ function Invoice() {
             <div className="calculations">
               <div className="calc-row">
                 <span>Subtotal</span>
-                <span>₹15,400</span>
+                <span>₹{price}</span>
               </div>
               <div className="calc-row">
                 <span>Logistics Charges</span>
-                <span>₹800</span>
+                <span>₹00</span>
               </div>
               <div className="calc-row">
-                <span>GST (5%)</span>
-                <span>₹810</span>
+                <span>GST (0%)</span>
+                <span>₹00</span>
               </div>
               <div className="calc-row">
                 <span>Blockchain Validation Fee</span>
-                <span>₹50</span>
+                <span>₹0</span>
               </div>
               <div className="calc-row total">
                 <span>Grand Total</span>
-                <span>₹17,060</span>
+                <span>₹{price}</span>
               </div>
             </div>
 

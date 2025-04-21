@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../../Imges/companylogo.png';
 import menu from '../../Imges/menus.png';
 import cross from '../../Imges/cross.png';
 
-function Navbar({ isAuthenticated, setIsAuthenticated }) {
+function Navbar({ isAuthenticated }) {
+ const data = (JSON.parse(localStorage.getItem('user')));
   const [navstae, setNavState] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
-    navigate('/auth');
-  };
-
   return (
     <div className='navbarsection'>
       <div className='navbarleftlog'>
@@ -32,9 +25,15 @@ function Navbar({ isAuthenticated, setIsAuthenticated }) {
 
           {/* Protected: Dashboard */}
           {isAuthenticated && (
-            <li onClick={() => setNavState('navbarrightside')}>
-              <Link to='/dashboard'>Dashboard</Link>
-            </li>
+            <>
+              {data?.userType === 'admin' ? <li onClick={() => setNavState('navbarrightside')}>
+                <Link to='/dashboard'>Dashboard</Link>
+              </li>
+                :
+                <li onClick={() => setNavState('navbarrightside')}>
+                  <Link to='/userdashboard'>Dashboard</Link>
+                </li>}
+            </>
           )}
 
           {/* Protected: Product Dropdown */}
@@ -57,7 +56,7 @@ function Navbar({ isAuthenticated, setIsAuthenticated }) {
                         setIsDropdownOpen(false);
                       }}
                     >
-                      Products
+                      Explore
                     </Link>
                   </li>
                   <li>
@@ -78,9 +77,6 @@ function Navbar({ isAuthenticated, setIsAuthenticated }) {
 
           <li onClick={() => setNavState('navbarrightside')}>
             <Link to='/contact'>Contact</Link>
-          </li>
-          <li onClick={() => setNavState('navbarrightside')}>
-            <Link to='/userdashboard'>Dashboard</Link>
           </li>
           <li onClick={() => setNavState('navbarrightside')} className='faqbutton'>
             <Link to='/faqs'>FAQs</Link>

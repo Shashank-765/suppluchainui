@@ -51,3 +51,6 @@ height: 100vh;
   background: #FEF7F0;
   overflow: hidden;
 }
+.custom-toast-container {
+  margin-top: 10rem;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from './UserDashboard.module.css';
 import axios from 'axios';
 import view from '../../Imges/eye.png'
@@ -13,8 +13,10 @@ function UserDashBoard() {
   const [currnetBatchPage, setCurrentBatchPage] = useState(1);
   const [searchBatchTerm, setSearchBatchTerm] = useState('');
   const [totalBatchPage, setTotalBatchPage] = useState(0);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const fileInputRef = useRef();
 
   const { userdata } = location.state || {};
   const [formData, setFormData] = useState({
@@ -22,6 +24,7 @@ function UserDashBoard() {
     // Common fields
     farmInspectionId: '',
     farmInspectionName: '',
+    productName: '',
     certificateNo: '',
     certificateFrom: '',
     typeOfFertilizer: '',
@@ -60,8 +63,61 @@ function UserDashBoard() {
     warehouse: '',
     warehouseAddress: '',
     destination: '',
+    price: '',
+    miniQuantity: '',
+    maxiQuantity: '',
+    images: [],
   });
+  if(user?.role?.label){
+  
+    if(user?.role?.label==='Farm Inspection'){
+      formData.farmInspectionId=user?._id;
+      formData.farmInspectionName = user?.name;
+    }
+      
+    if(user?.role?.label==='Harvester'){
+      formData.harvesterId=user?._id;
+      formData.harvesterName = user?.name;
+    }
+      
+    if(user?.role?.label==='Importer'){
+      formData.importerId=user?._id;
+      formData.importerName = user?.name;
+    }
+      
+    if(user?.role?.label==='Exporter'){
+      formData.exporterId=user?._id;
+      formData.exporterName = user?.name;
+    }
+     
+    if(user?.role?.label==='Processor'){
+      formData.processorId=user?._id;
+      formData.processorName = user?.name;
+    }
+  
+  }
+  const handleImageChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const updatedImages = [...formData.images, ...newFiles];
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file));
 
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, ...newFiles] // File objects must go here
+    }));
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+
+    // Reset to allow re-selection of same files
+    fileInputRef.current.value = '';
+  };
+
+  const handleRemoveImage = (index) => {
+    const updatedImages = formData.images.filter((_, i) => i !== index);
+    const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+
+    setFormData(prev => ({ ...prev, images: updatedImages }));
+    setImagePreviews(updatedPreviews);
+  };
 
   const handleSearchBatchChange = (e) => {
     setSearchBatchTerm(e.target.value);
@@ -77,7 +133,7 @@ function UserDashBoard() {
     formData.batchId = id;
     setShowForm(!showForm)
   };
-
+  console.log(formData.images); 
   const HandleBatchviewPage = (batch) => {
     navigate('/batchprogress', { state: { batch } });
   }
@@ -95,7 +151,7 @@ function UserDashBoard() {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/getBatchByUserId?id=${userdata ? userdata?._id : user?._id}`, {
+      const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatchByUserId?id=${userdata ? userdata?._id : user?._id}`, {
         params: {
           page: currnetBatchPage,
           limit: usersPerPage,
@@ -104,8 +160,6 @@ function UserDashBoard() {
       });
 
       if (response.data) {
-        console.log(response.data);
-
         setBatchData(response?.data?.batches);
         setTotalBatchPage(response.data.totalPages);
       }
@@ -125,7 +179,20 @@ function UserDashBoard() {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/api/users/updateBatch', formData);
+
+      const payload = new FormData();
+
+      for (const key in formData) {
+        if (key === 'images') {
+          formData.images.forEach((image) => {
+            payload.append('images', image);
+          });
+        } else {
+          payload.append(key, formData[key]);
+        }
+      }
+      console.log(payload, 'payload');
+      const res = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/updateBatch', payload);
       console.log(res.data, 'res.data');
       toggleForm();
     } catch (err) {
@@ -189,8 +256,11 @@ function UserDashBoard() {
             <form onSubmit={handleSubmit}>
               {user?.role?.label === 'Farm Inspection' && (
                 <>
+                    <label>Farm Inspection Id: <input type="text" name="farmInspectionId" value={formData.farmInspectionId} disabled='true' onChange={handleChange} /></label>
+                       <label>Farm Inspection Name: <input type="text" name="farmInspectionName" value={formData.farmInspectionName} disabled='true' onChange={handleChange} /></label>
                   <label>Certificate No: <input type="text" name="certificateNo" value={formData.certificateNo} onChange={handleChange} /></label>
                   <label>Certificate From: <input type="text" name="certificateFrom" value={formData.certificateFrom} onChange={handleChange} /></label>
+                   <label>Product Name: <input type="text" name="productName" value={formData.productName} onChange={handleChange} /></label>
                   <label>Type of Fertilizer: <input type="text" name="typeOfFertilizer" value={formData.typeOfFertilizer} onChange={handleChange} /></label>
                   <label>Fertilizer Used: <input type="text" name="fertilizerUsed" value={formData.fertilizerUsed} onChange={handleChange} /></label>
                 </>
@@ -198,6 +268,8 @@ function UserDashBoard() {
 
               {user?.role?.label === 'Harvester' && (
                 <>
+                 <label>Harvester Id: <input type="text" name="harvesterId" value={formData.harvesterId} disabled='true' onChange={handleChange} /></label>
+                    <label>Harvester Name: <input type="text" name="harvesterName" value={formData.harvesterName} disabled='true' onChange={handleChange} /></label>
                   <label>Crop Sampling: <input type="text" name="cropSampling" value={formData.cropSampling} onChange={handleChange} /></label>
                   <label>Temperature Level: <input type="text" name="temperatureLevel" value={formData.temperatureLevel} onChange={handleChange} /></label>
                   <label>Humidity: <input type="text" name="humidity" value={formData.humidity} onChange={handleChange} /></label>
@@ -206,7 +278,8 @@ function UserDashBoard() {
 
               {user?.role?.label === 'Exporter' && (
                 <>
-                  <label>Exporter ID: <input type="text" name="exporterId" value={formData.exporterId} onChange={handleChange} /></label>
+                  <label>Exporter ID: <input type="text" name="exporterId" value={formData.exporterId} disabled='true' onChange={handleChange} /></label>
+                  <label>Exporter Name: <input type="text" name="exporterName" value={formData.exporterName} disabled='true' onChange={handleChange} /></label>
                   <label>Coordination Address: <input type="text" name="coordinationAddress" value={formData.coordinationAddress} onChange={handleChange} /></label>
                   <label>Ship Name: <input type="text" name="shipName" value={formData.shipName} onChange={handleChange} /></label>
                   <label>Ship No: <input type="text" name="shipNo" value={formData.shipNo} onChange={handleChange} /></label>
@@ -218,7 +291,8 @@ function UserDashBoard() {
 
               {user?.role?.label === 'Importer' && (
                 <>
-                  <label>Importer ID: <input type="text" name="importerId" value={formData.importerId} onChange={handleChange} /></label>
+                  <label>Importer ID: <input type="text" name="importerId" value={formData.importerId} disabled='true' onChange={handleChange} /></label>
+                  <label>Importer Name: <input type="text" name="importerName" value={formData.importerName} disabled='true' onChange={handleChange} /></label>
                   <label>Quantity: <input type="text" name="quantityImported" value={formData.quantityImported} onChange={handleChange} /></label>
                   <label>Ship Storage: <input type="text" name="shipStorage" value={formData.shipStorage} onChange={handleChange} /></label>
                   <label>Arrival Date: <input type="date" name="arrivalDate" value={formData.arrivalDate} onChange={handleChange} /></label>
@@ -230,7 +304,8 @@ function UserDashBoard() {
 
               {user?.role?.label === 'Processor' && (
                 <>
-                  <label>Processor ID: <input type="text" name="processorId" value={formData.processorId} onChange={handleChange} /></label>
+                  <label>Processor ID: <input type="text" name="processorId" value={formData.processorId} disabled='true' onChange={handleChange} /></label>
+                  <label>Processor Name: <input type="text" name="processorName" value={formData.processorName} disabled='true' onChange={handleChange} /></label>
                   <label>Quantity: <input type="text" name="quantityProcessed" value={formData.quantityProcessed} onChange={handleChange} /></label>
                   <label>Processing Method: <input type="text" name="processingMethod" value={formData.processingMethod} onChange={handleChange} /></label>
                   <label>Packaging: <input type="text" name="packaging" value={formData.packaging} onChange={handleChange} /></label>
@@ -238,6 +313,39 @@ function UserDashBoard() {
                   <label>Warehouse: <input type="text" name="warehouse" value={formData.warehouse} onChange={handleChange} /></label>
                   <label>Warehouse Address: <input type="text" name="warehouseAddress" value={formData.warehouseAddress} onChange={handleChange} /></label>
                   <label>Destination: <input type="text" name="destination" value={formData.destination} onChange={handleChange} /></label>
+                  <label>Price: <input type="text" name="price" value={formData.price} onChange={handleChange} /></label>
+                  <label>miniQuantity: <input type="text" name="miniQuantity" value={formData.miniQuantity} onChange={handleChange} /></label>
+                  <label>maxQuantity: <input type="text" name="maxiQuantity" value={formData.maxiQuantity} onChange={handleChange} /></label>
+                  <div className='custom-file-upload'>
+                    <label htmlFor='fruit-images' className='upload-button'>
+                      {formData.images.length === 0
+                        ? 'Choose images'
+                        : `${formData.images.length} image${formData.images.length > 1 ? 's' : ''} selected`}
+                    </label>
+                    <input
+                      id='fruit-images'
+                      type='file'
+                      multiple
+                      accept='image/*'
+                      onChange={handleImageChange}
+                      ref={fileInputRef}
+                      className={styles.custom_file_input}
+                    />
+                  </div>
+
+                  <div className='preview-container'>
+                    {imagePreviews.map((src, idx) => (
+                      <div key={idx} className='preview-item'>
+                        <img src={src} alt={`fruit-${idx}`} className='preview-image' />
+                        <span
+                          className='remove-icon'
+                          onClick={() => handleRemoveImage(idx)}
+                        >
+                          &times;
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </>
               )}
 
@@ -285,7 +393,7 @@ function UserDashBoard() {
                         (batch?.tracking?.isInspexted) ? <button
                           className={styles.completeBtn}
                         >Complete</button> :
-                          (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                          (!batch?.tracking?.isInspexted) ?
                             <button
                               className={styles.progressBtn}
                               style={{
@@ -337,7 +445,7 @@ function UserDashBoard() {
                         >Complete</button> :
 
 
-                          (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                          ( batch?.tracking?.isInspexted) ?
                             <button
                               className={styles.progressBtn}
                               style={{
@@ -387,7 +495,7 @@ function UserDashBoard() {
                         (batch?.tracking?.isImported) ? <button
                           className={styles.completeBtn}
                         >Complete</button> :
-                          (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                          (batch?.tracking?.isHarvested ) ?
                             <button
                               className={styles.progressBtn}
                               style={{
@@ -440,7 +548,7 @@ function UserDashBoard() {
                         (batch?.tracking?.isExported) ? <button
                           className={styles.completeBtn}
                         >Complete</button> :
-                          (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                          ( batch?.tracking?.isImported ) ?
                             <button
                               className={styles.progressBtn}
                               style={{
@@ -496,7 +604,7 @@ function UserDashBoard() {
                         (batch?.tracking?.isProcessed) ? <button
                           className={styles.completeBtn}
                         >Complete</button> :
-                          (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                          ( batch?.tracking?.isExported ) ?
                             <button
                               className={styles.progressBtn}
                               style={{

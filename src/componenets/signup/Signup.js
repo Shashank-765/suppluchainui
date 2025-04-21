@@ -26,33 +26,34 @@ function SignupLogin({ setIsAuthenticated }) {
             console.log('formData', formData);
 
             try {
-                const registeredUser = await axios.post('http://localhost:5000/api/users/register', formData, {
+                const registeredUser = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/register', formData, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
                 console.log('registeredUser.data', registeredUser.data);
                 if (registeredUser && registeredUser.data) {
-                   showSuccess('Signup successful!');
+                    showSuccess('Signup successful!');
                     setIsSignup(false);
                 }
             } catch (error) {
                 console.error(error);
-               showError(error.response?.data?.message || 'Signup failed. Please try again.');
+                showError(error.response?.data?.message || 'Signup failed. Please try again.');
             }
         } else {
             try {
-                const loggedInUser = await axios.post('http://localhost:5000/api/users/login', formData, {
+                const loggedInUser = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/login', formData, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
                 console.log('loggedInUser.data', loggedInUser.data);
                 if (loggedInUser && loggedInUser.data) {
-                showSuccess('Login successful!');
+
                     setIsAuthenticated(true);
                     localStorage.setItem('user', JSON.stringify(loggedInUser.data.user));
                     navigate('/home');
+                    showSuccess('Login successful!');
                 }
             } catch (error) {
                 console.error(error);
@@ -124,17 +125,17 @@ function SignupLogin({ setIsAuthenticated }) {
                 </button>
             </form>
 
-           {           
-            isSignup ? ( <p className='toggle-text'>
-                {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <span
-                    className='toggle-link'
-                    onClick={() => setIsSignup(!isSignup)}
-                >
-                    {isSignup ? 'Login' : 'Signup'}
-                </span>
-            </p>) : ''
-           }
+            {
+                isSignup ? (<p className='toggle-text'>
+                    {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
+                    <span
+                        className='toggle-link'
+                        onClick={() => setIsSignup(!isSignup)}
+                    >
+                        {isSignup ? 'Login' : 'Signup'}
+                    </span>
+                </p>) : ''
+            }
         </div>
     );
 }

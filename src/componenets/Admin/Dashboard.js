@@ -104,7 +104,7 @@ const Dashboard = () => {
         e.preventDefault();
 
         try {
-            const res = await axios.post("http://localhost:5000/api/users/createBatch", formData);
+            const res = await axios.post("https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/createBatch", formData);
 
             console.log("Saved successfully:", res.data);
             setShowBatchModal(false); // close modal
@@ -139,7 +139,7 @@ const Dashboard = () => {
 
         // Example POST request
         try {
-            const response = await axios.post('http://localhost:5000/api/users/register', userForm);
+            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/register', userForm);
             if (response.data) {
                 console.log('User created!');
                 setShowUserModal(false);
@@ -167,7 +167,7 @@ const Dashboard = () => {
 
     const blockhandler = async (user) => {
         try {
-            const response = await axios.post(`http://localhost:5000/api/users/blockUser?id=${user._id}`);
+            const response = await axios.post(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/blockUser?id=${user._id}`);
             if (response.data) {
                 // console.log('User blocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User Blocked Succefully')
@@ -185,7 +185,7 @@ const Dashboard = () => {
 
     const unblockhandler = async (user) => {
         try {
-            const response = await axios.post(`http://localhost:5000/api/users/unblockUser?id=${user?._id}`,);
+            const response = await axios.post(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/unblockUser?id=${user?._id}`,);
             if (response.data) {
                 // console.log('User unblocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User unblocked successfully!');
@@ -226,13 +226,14 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/users/fetchalluser', {
+            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/fetchalluser', {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
                     search: searchTerm,
                 },
             });
+            console.log(response.data, 'response.data')
             setAllUser(response.data.allUsers);
             setTotalPages(response.data.totalPages);
             setTotalUser(response.data.totalUsers);
@@ -243,7 +244,7 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/users/getBatch', {
+            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatch', {
                 params: {
                     page: currnetBatchPage,
                     limit: usersPerPage,
@@ -270,7 +271,7 @@ const Dashboard = () => {
 
     const fetchRoles = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/users/getRoles');
+            const res = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getRoles');
             if (res.data?.roles) {
                 setRoles(res.data?.roles);
                 setTotalRoles(res?.data?.totalCount)
@@ -326,7 +327,7 @@ const Dashboard = () => {
                         <tr>
                             <th>Batch ID</th>
                             <th>QR Code</th>
-                            <th>Coffee Type</th>
+                            <th>Food Type</th>
                             <th>Farm Inspector</th>
                             <th>Harvester</th>
                             <th>Importer</th>
@@ -363,7 +364,7 @@ const Dashboard = () => {
                                             (batch?.tracking?.isInspexted) ? <button
                                                 className={styles.completeBtn}
                                             >Complete</button> :
-                                                (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                                                (!batch?.tracking?.isInspexted) ?
                                                     <button className={styles.progressBtn}>
                                                         Progress</button>
                                                     :
@@ -384,7 +385,7 @@ const Dashboard = () => {
                                             >Complete</button> :
 
 
-                                                (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                                                (batch?.tracking?.isInspexted) ?
                                                     <button className={styles.progressBtn}>
                                                         Progress</button>
                                                     :
@@ -402,7 +403,7 @@ const Dashboard = () => {
                                             (batch?.tracking?.isImported) ? <button
                                                 className={styles.completeBtn}
                                             >Complete</button> :
-                                                (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                                                (batch?.tracking?.isHarvested ) ?
                                                     <button className={styles.progressBtn}>
                                                         Progress</button>
                                                     :
@@ -419,7 +420,7 @@ const Dashboard = () => {
                                             (batch?.tracking?.isExported) ? <button
                                                 className={styles.completeBtn}
                                             >Complete</button> :
-                                                (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                                                ( batch?.tracking?.isImported) ?
                                                     <button className={styles.progressBtn}>
                                                         Progress</button>
                                                     :
@@ -436,7 +437,7 @@ const Dashboard = () => {
                                             (batch?.tracking?.isProcessed) ? <button
                                                 className={styles.completeBtn}
                                             >Complete</button> :
-                                                (batch?.tracking?.isProcessed || batch?.tracking?.isImported || batch?.tracking?.isHarvested || batch?.tracking?.isExported || batch?.tracking?.isInspexted) ?
+                                                ( batch?.tracking?.isExported) ?
                                                     <button className={styles.progressBtn}>
                                                         Progress</button>
                                                     :
@@ -467,6 +468,7 @@ const Dashboard = () => {
                             <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
                                 <img src={selectedQr} alt="Full QR Code" className={styles.qrModalImg} />
                                 <button onClick={closeQrModal} className={styles.closeBtn}>×</button>
+                                <button className={styles.qrdawnloadbutton}>Dawnload</button>
                             </div>
                         </div>
                     )}
@@ -626,7 +628,7 @@ const Dashboard = () => {
                             <input
                                 type="text"
                                 name="coffeeType"
-                                placeholder="cofeeType"
+                                placeholder="Food Type"
                                 required
                                 value={formData.coffeeType}
                                 onChange={handleChange}

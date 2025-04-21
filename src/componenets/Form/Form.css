@@ -61,7 +61,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 10px;
 }
 
 .preview-item {
@@ -70,8 +69,8 @@
 }
 
 .preview-image {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -80,8 +79,8 @@
 /* Unique class for delete icon to avoid conflict */
 .remove-icon {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: 0px;
+  right: 0px;
   background: #ff3b3b;
   color: white;
   border-radius: 50%;

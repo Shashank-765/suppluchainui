@@ -68,7 +68,7 @@ const handleSubmit = async (e) => {
 
   try {
      console.log(formDataToSend,'fomentdased')
-    const productdata = await axios.post('http://localhost:5000/api/users/addProduct', formDataToSend, {
+    const productdata = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/addProduct', formDataToSend, {
       headers: {
         'Content-Type': 'multipart/form-data',  // Important: set this for file uploads
       },

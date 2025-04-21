@@ -30,10 +30,9 @@ import {
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
+    const data = (JSON.parse(localStorage.getItem('user')));
+    if (data) {
       setIsAuthenticated(true);
     }
   }, []);
@@ -44,7 +43,6 @@ function App() {
       <div className='appcontainerbakground'>
         <Navbar
           isAuthenticated={isAuthenticated}
-          setIsAuthenticated={setIsAuthenticated}
         />
 
         <Routes>
@@ -66,7 +64,7 @@ function App() {
               <Route path="/form" element={<Form />} />
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/userdashboard" element={<UserDashBoard />} />
-               <Route path="/batchprogress" element={<BatchProgressView />} />
+              <Route path="/batchprogress" element={<BatchProgressView />} />
               <Route path="/screening" element={<ScreeningPage />} />
               <Route
                 path="/profile"
@@ -76,19 +74,20 @@ function App() {
           )}
 
           <Route path="*" element={<NotFound />} />
-         
+
         </Routes>
 
         <Footer />
         <ToastContainer
           position="top-right"
-          autoClose={1000}            
-          hideProgressBar={false}      
+          autoClose={1000}
+          hideProgressBar={false}
           newestOnTop={true}
           closeOnClick
           pauseOnHover={false}
           draggable={false}
-          theme="colored"            
+          theme="colored"
+          style={{ marginTop: '80px' }}
         />
       </div>
     </Router>

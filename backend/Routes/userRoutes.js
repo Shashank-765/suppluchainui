@@ -196,7 +196,7 @@ router.get('/getProducts', async (req, res) => {
       }
       const products = await Fruit.find({ ownerId: userProducts._id });
       if (products.length === 0) {
-        return res.status(201).json({products:[], message: 'No products found for this user' });
+        return res.status(201).json({ products: [], message: 'No products found for this user' });
       }
       return res.status(200).json({ products, message: 'Products fetched successfully' });
     }
@@ -211,7 +211,7 @@ router.get('/getProductById', async (req, res) => {
     console.log('req.query', req.query)
     const is_id = req.query.id
     if (is_id) {
-      const product = await Fruit.findOne({ _id: is_id });
+      const product = await TrackingModel.findOne({ _id: is_id });
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
@@ -240,7 +240,10 @@ router.get('/getAllProducts', async (req, res) => {
 router.get('/fetchalluser', async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
+
+    // Shared query to apply filters
     const query = {
+      userType: 'user', // Only users with userType === "user"
       $or: [
         { name: { $regex: search, $options: 'i' } },
         { walletAddress: { $regex: search, $options: 'i' } },
@@ -248,18 +251,19 @@ router.get('/fetchalluser', async (req, res) => {
       ],
     };
 
-    const totalUsers = await User.countDocuments(query);
-    const users = await User.find(query)
-      .skip((page - 1) * limit)
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const allUsers = await User.find(query)
+      .skip(skip)
       .limit(parseInt(limit));
-      
-  const allUsers = await User.find();
+
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+
     res.status(200).json({
-      users,
-      totalUsers, 
       allUsers,
-      totalPages: Math.ceil(totalUsers / limit),
-      currentPage: Math.max(parseInt(page), 1)
+      totalUsers,
+      totalPages,
+      currentPage: parseInt(page)
     });
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -319,23 +323,23 @@ router.post('/createBatch', async (req, res) => {
     let exporterId = null;
     let importerId = null;
 
-    if(farmInspectionName){
-       farmInspectionId = await User.findOne({ name: farmInspectionName });
+    if (farmInspectionName) {
+      farmInspectionId = await User.findOne({ name: farmInspectionName });
       console.log('farm', farmInspectionId)
     }
-    if(harvesterName){
+    if (harvesterName) {
       harvesterId = await User.findOne({ name: harvesterName });
       console.log('harvester', harvesterId)
     }
-    if(processorName){
-      processorId = await User.findOne({ name: processorName });  
+    if (processorName) {
+      processorId = await User.findOne({ name: processorName });
       console.log('processor', processorId)
     }
-    if(exporterName){
+    if (exporterName) {
       exporterId = await User.findOne({ name: exporterName });
       console.log('exporter', exporterId)
     }
-    if(importerName){
+    if (importerName) {
       importerId = await User.findOne({ name: importerName });
       console.log('importer', importerId)
     }
@@ -359,7 +363,7 @@ router.post('/createBatch', async (req, res) => {
     await newBatch.save();
 
     if (newBatch) {
-      const frontendBaseUrl = 'http://192.168.1.120:3000/'; 
+      const frontendBaseUrl = 'http://192.168.1.120:3000/';
       const qrData = `${frontendBaseUrl}`;
       // scanresult/${newBatch.batchId}
       const qrCode = await QRCode.toDataURL(qrData);
@@ -376,7 +380,6 @@ router.post('/createBatch', async (req, res) => {
     return res.status(500).json({ message: 'Server error while creating batch' });
   }
 });
-
 // router.post('/insertRoles', async (req, res) => {
 //   const roleMap = {
 //     FARM_INSPECTION: {
@@ -418,8 +421,7 @@ router.post('/createBatch', async (req, res) => {
 //     }
 //   }
 // });
- 
- router.get('/getBatch', async (req, res) => {
+router.get('/getBatch', async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
 
@@ -438,7 +440,7 @@ router.post('/createBatch', async (req, res) => {
     }
 
     const totalBatches = await BatchModel.countDocuments(query);
-    const currentPage =  Math.max(parseInt(page), 1);
+    const currentPage = Math.max(parseInt(page), 1);
     const perPage = parseInt(limit);
     const totalPages = Math.ceil(totalBatches / perPage);
     const skip = (currentPage - 1) * perPage;
@@ -477,7 +479,6 @@ router.post('/createBatch', async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching batches' });
   }
 });
-
 router.get('/getRoles', async (req, res) => {
   try {
     const roles = await Role.find({});
@@ -503,7 +504,7 @@ router.get('/getBatchById', async (req, res) => {
       return res.status(400).json({ message: 'Batch ID is required' });
     }
 
-    const batch = await BatchModel.findOne({ batchId: id }).lean(); 
+    const batch = await BatchModel.findOne({ batchId: id }).lean();
 
     if (!batch) {
       return res.status(404).json({ batch: null, message: 'Batch not found' });
@@ -518,11 +519,10 @@ router.get('/getBatchById', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batch' });
   }
 });
-
 router.get('/getBatchByUserId', async (req, res) => {
   try {
     const { id, search = '', page = 1, limit = 5 } = req.query;
-     console.log('req.body', req.query)
+    console.log('req.body', req.query)
     if (!id) {
       return res.status(400).json({ message: 'ID is required in query parameters.' });
     }
@@ -592,17 +592,19 @@ router.get('/getBatchByUserId', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batches.' });
   }
 });
-router.post('/updateBatch', async (req, res) => {
+router.post('/updateBatch',upload, async (req, res) => {
+console.log('req.body', req.body)
   try {
     const {
       batchId,
       farmInspectionId,
       farmInspectionName,
+      productName,
       certificateNo,
       certificateFrom,
       typeOfFertilizer,
       fertilizerUsed,
-      
+
       harvesterId,
       harvesterName,
       cropSampling,
@@ -635,7 +637,10 @@ router.post('/updateBatch', async (req, res) => {
       packagedDate,
       warehouse,
       warehouseAddress,
-      destination
+      destination,
+      price,
+      miniQuantity,
+      maxiQuantity,
     } = req.body;
 
     if (!batchId) {
@@ -647,9 +652,12 @@ router.post('/updateBatch', async (req, res) => {
     const updatedFields = {};
 
     // FARM INSPECTION LOGIC
-    if (farmInspectionId ||  farmInspectionName  ||certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed) {
+    if (farmInspectionId || farmInspectionName || certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed || productName) {
       updatedFields.certificateNo = certificateNo;
       updatedFields.certificateFrom = certificateFrom;
+      updatedFields.productName = productName;
+      updatedFields.farmInspectionId=farmInspectionId;
+      updatedFields.farmInspectionName=farmInspectionName;
       updatedFields.typeOfFertilizer = typeOfFertilizer;
       updatedFields.fertilizerUsed = fertilizerUsed;
       updatedFields.isInspexted = true;
@@ -657,7 +665,9 @@ router.post('/updateBatch', async (req, res) => {
     }
 
     // HARVESTER LOGIC
-    if (harvesterId ||  harvesterName  || cropSampling || temperatureLevel || humidity) {
+    if (harvesterId || harvesterName || cropSampling || temperatureLevel || humidity) {
+      updatedFields.harvesterId=harvesterId;
+      updatedFields.harvesterName=harvesterName;
       updatedFields.cropSampling = cropSampling;
       updatedFields.temperatureLevel = temperatureLevel;
       updatedFields.humidity = humidity;
@@ -693,8 +703,15 @@ router.post('/updateBatch', async (req, res) => {
       updatedFields.importDate = new Date();
     }
 
+
+
     // PROCESSOR LOGIC
-    if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination) {
+    if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination || miniQuantity || maxiQuantity || price) {
+
+      const imagePaths = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+      updatedFields.price = price;
+      updatedFields.miniQuantity = miniQuantity;
+      updatedFields.maxiQuantity = maxiQuantity;
       updatedFields.processorId = processorId;
       updatedFields.processorName = processorName;
       updatedFields.quantityProcessed = quantityProcessed;
@@ -706,6 +723,7 @@ router.post('/updateBatch', async (req, res) => {
       updatedFields.destination = destination;
       updatedFields.isProcessed = true;
       updatedFields.processedDate = new Date();
+      updatedFields.images = imagePaths; // Save image paths in the database
     }
 
     // Always ensure batchId is in the update set (required for upsert)
@@ -727,9 +745,9 @@ router.post('/updateBatch', async (req, res) => {
     return res.status(500).json({ message: 'Server error while updating batch' });
   }
 });
-router.get('/getTrackingDetails', async (req, res) => {
+router.get('/getproducttomarkiting', async (req, res) => {
   try {
-    const trackingDetails = await TrackingModel.find({});
+    const trackingDetails = await TrackingModel.find({isProcessed: true})
     if (!trackingDetails) {
       return res.status(404).json({ message: 'Tracking details not found' });
     }
@@ -740,7 +758,8 @@ router.get('/getTrackingDetails', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching tracking details' });
   }
 }
-);  
+);
+
 
 
 

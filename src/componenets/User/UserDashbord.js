@@ -68,33 +68,33 @@ function UserDashBoard() {
     maxiQuantity: '',
     images: [],
   });
-  if(user?.role?.label){
-  
-    if(user?.role?.label==='Farm Inspection'){
-      formData.farmInspectionId=user?._id;
+  if (user?.role?.label) {
+
+    if (user?.role?.label === 'Farm Inspection') {
+      formData.farmInspectionId = user?._id;
       formData.farmInspectionName = user?.name;
     }
-      
-    if(user?.role?.label==='Harvester'){
-      formData.harvesterId=user?._id;
+
+    if (user?.role?.label === 'Harvester') {
+      formData.harvesterId = user?._id;
       formData.harvesterName = user?.name;
     }
-      
-    if(user?.role?.label==='Importer'){
-      formData.importerId=user?._id;
+
+    if (user?.role?.label === 'Importer') {
+      formData.importerId = user?._id;
       formData.importerName = user?.name;
     }
-      
-    if(user?.role?.label==='Exporter'){
-      formData.exporterId=user?._id;
+
+    if (user?.role?.label === 'Exporter') {
+      formData.exporterId = user?._id;
       formData.exporterName = user?.name;
     }
-     
-    if(user?.role?.label==='Processor'){
-      formData.processorId=user?._id;
+
+    if (user?.role?.label === 'Processor') {
+      formData.processorId = user?._id;
       formData.processorName = user?.name;
     }
-  
+
   }
   const handleImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
@@ -133,7 +133,7 @@ function UserDashBoard() {
     formData.batchId = id;
     setShowForm(!showForm)
   };
-  console.log(formData.images); 
+  console.log(formData.images);
   const HandleBatchviewPage = (batch) => {
     navigate('/batchprogress', { state: { batch } });
   }
@@ -207,47 +207,6 @@ function UserDashBoard() {
 
   return (
     <div className={styles.batchViewContainer}>
-      <div className={styles.header}>
-        <h2 className={styles.pageTitle}>Dashboard</h2>
-      </div>
-
-      <div className={styles.profileCard}>
-        <div className={styles.profileBanner}></div>
-        <div className={styles.profileContent}>
-          <img className={styles.profileImage} src={profileImage} alt="Profile" />
-          <div className={styles.profileDetails}>
-            <div className={styles.contactInfo}>
-              <p> Contact No</p>
-              <span className={styles.contactInformation}>{userdata ? userdata?.contact : user?.contact}</span>
-            </div>
-            <div className={styles.roleInfo}>
-              <p> Role</p>
-              <span
-                className={
-
-                  userdata ?
-                    userdata?.role?.className.split(' ')
-                      .map(cn => styles[cn])
-                      .join(' ') :
-
-                    user.role.className
-                      .split(' ')
-                      .map(cn => styles[cn])
-                      .join(' ')
-                }
-              >
-                {userdata ? userdata?.role?.slug : user?.role?.slug}
-              </span>
-            </div>
-            <div className={styles.settings}>
-              <span>{userdata ? userdata?.role?.label : user?.role?.label} Id</span>
-              <span className={styles.editBtn} >
-                {userdata ? userdata?._id : user?._id}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {showForm && (
         <div className={styles.popupOverlay}>
@@ -256,11 +215,11 @@ function UserDashBoard() {
             <form onSubmit={handleSubmit}>
               {user?.role?.label === 'Farm Inspection' && (
                 <>
-                    <label>Farm Inspection Id: <input type="text" name="farmInspectionId" value={formData.farmInspectionId} disabled='true' onChange={handleChange} /></label>
-                       <label>Farm Inspection Name: <input type="text" name="farmInspectionName" value={formData.farmInspectionName} disabled='true' onChange={handleChange} /></label>
+                  <label>Farm Inspection Id: <input type="text" name="farmInspectionId" value={formData.farmInspectionId} disabled='true' onChange={handleChange} /></label>
+                  <label>Farm Inspection Name: <input type="text" name="farmInspectionName" value={formData.farmInspectionName} disabled='true' onChange={handleChange} /></label>
                   <label>Certificate No: <input type="text" name="certificateNo" value={formData.certificateNo} onChange={handleChange} /></label>
                   <label>Certificate From: <input type="text" name="certificateFrom" value={formData.certificateFrom} onChange={handleChange} /></label>
-                   <label>Product Name: <input type="text" name="productName" value={formData.productName} onChange={handleChange} /></label>
+                  <label>Product Name: <input type="text" name="productName" value={formData.productName} onChange={handleChange} /></label>
                   <label>Type of Fertilizer: <input type="text" name="typeOfFertilizer" value={formData.typeOfFertilizer} onChange={handleChange} /></label>
                   <label>Fertilizer Used: <input type="text" name="fertilizerUsed" value={formData.fertilizerUsed} onChange={handleChange} /></label>
                 </>
@@ -268,8 +227,8 @@ function UserDashBoard() {
 
               {user?.role?.label === 'Harvester' && (
                 <>
-                 <label>Harvester Id: <input type="text" name="harvesterId" value={formData.harvesterId} disabled='true' onChange={handleChange} /></label>
-                    <label>Harvester Name: <input type="text" name="harvesterName" value={formData.harvesterName} disabled='true' onChange={handleChange} /></label>
+                  <label>Harvester Id: <input type="text" name="harvesterId" value={formData.harvesterId} disabled='true' onChange={handleChange} /></label>
+                  <label>Harvester Name: <input type="text" name="harvesterName" value={formData.harvesterName} disabled='true' onChange={handleChange} /></label>
                   <label>Crop Sampling: <input type="text" name="cropSampling" value={formData.cropSampling} onChange={handleChange} /></label>
                   <label>Temperature Level: <input type="text" name="temperatureLevel" value={formData.temperatureLevel} onChange={handleChange} /></label>
                   <label>Humidity: <input type="text" name="humidity" value={formData.humidity} onChange={handleChange} /></label>
@@ -367,305 +326,307 @@ function UserDashBoard() {
           onChange={handleSearchBatchChange}
           className={styles.searchInput}
         />
-        <table className={styles.batchTable}>
-          <thead>
-            <tr>
-              <th>Batch ID</th>
-              <th>Farm Inspector</th>
-              <th>Harvester</th>
-              <th>Importer</th>
-              <th>Exporter</th>
-              <th>Processor</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              batchData?.length > 0 ?
-                batchData?.map((batch, index) => (
-                  <tr key={index}>
-                    <td>{batch?.batchId}</td>
-                    <td>
-                      {/* {batch?.farmInspectionName} */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.batchTable}>
+            <thead>
+              <tr>
+                <th>Batch ID</th>
+                <th>Farm Inspector</th>
+                <th>Harvester</th>
+                <th>Importer</th>
+                <th>Exporter</th>
+                <th>Processor</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                batchData?.length > 0 ?
+                  batchData?.map((batch, index) => (
+                    <tr key={index}>
+                      <td>{batch?.batchId}</td>
+                      <td>
+                        {/* {batch?.farmInspectionName} */}
 
-                      {
+                        {
 
-                        (batch?.tracking?.isInspexted) ? <button
-                          className={styles.completeBtn}
-                        >Complete</button> :
-                          (!batch?.tracking?.isInspexted) ?
-                            <button
-                              className={styles.progressBtn}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Farm Inspection'
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Farm Inspection'
-                                    ? ''
-                                    : 'rgb(245 208 142)',
-                              }}
+                          (batch?.tracking?.isInspexted) ? <button
+                            className={styles.completeBtn}
+                          >Complete</button> :
+                            (!batch?.tracking?.isInspexted) ?
+                              <button
+                                className={styles.progressBtn}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Farm Inspection'
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(245 208 142)'
+                                    : user?.role?.label === 'Farm Inspection'
+                                      ? ''
+                                      : 'rgb(245 208 142)',
+                                }}
 
-                              onClick={!userdata && user?.role?.label === 'Farm Inspection' ? () => toggleForm(batch?.batchId) : undefined}
-                            >Progress</button>
-                            :
-                            <button
-                              className={styles.pendingBtn}
-                              onClick={!userdata && user?.role?.label === 'Farm Inspection' ? () => toggleForm(batch?.batchId) : undefined}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Farm Inspection'
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Farm Inspection'
-                                    ? ''
-                                    : 'rgb(237 200 193)',
-                              }}
+                                onClick={!userdata && user?.role?.label === 'Farm Inspection' ? () => toggleForm(batch?.batchId) : undefined}
+                              >Progress</button>
+                              :
+                              <button
+                                className={styles.pendingBtn}
+                                onClick={!userdata && user?.role?.label === 'Farm Inspection' ? () => toggleForm(batch?.batchId) : undefined}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Farm Inspection'
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(237, 200, 193)'
+                                    : user?.role?.label === 'Farm Inspection'
+                                      ? ''
+                                      : 'rgb(237 200 193)',
+                                }}
 
-                            >
-                              Pending
-                            </button>
+                              >
+                                Pending
+                              </button>
 
-                      }
+                        }
 
-                      {/* <button className={styles.verifyBtn}>✅</button> */}
-                    </td>
-                    <td>
-                      {/* {batch?.harvesterName} */}
-                      {
+                        {/* <button className={styles.verifyBtn}>✅</button> */}
+                      </td>
+                      <td>
+                        {/* {batch?.harvesterName} */}
+                        {
 
-                        (batch?.tracking?.isHarvested) ? <button
-                          className={styles.completeBtn}
-                        >Complete</button> :
-
-
-                          ( batch?.tracking?.isInspexted) ?
-                            <button
-                              className={styles.progressBtn}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Harvester'
-                                    ? ''
-                                    : 'rgb(245 208 142)',
-                              }}
-
-                              onClick={(!userdata && user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                            >Progress</button>
-                            :
-                            <button
-                              className={styles.pendingBtn}
-                              onClick={(!userdata && user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Harvester'
-                                    ? ''
-                                    : 'rgb(237 200 193)',
-                              }}
+                          (batch?.tracking?.isHarvested) ? <button
+                            className={styles.completeBtn}
+                          >Complete</button> :
 
 
-                            >
-                              Pending
-                            </button>
+                            (batch?.tracking?.isInspexted) ?
+                              <button
+                                className={styles.progressBtn}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(245 208 142)'
+                                    : user?.role?.label === 'Harvester'
+                                      ? ''
+                                      : 'rgb(245 208 142)',
+                                }}
+
+                                onClick={(!userdata && user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                              >Progress</button>
+                              :
+                              <button
+                                className={styles.pendingBtn}
+                                onClick={(!userdata && user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(237, 200, 193)'
+                                    : user?.role?.label === 'Harvester'
+                                      ? ''
+                                      : 'rgb(237 200 193)',
+                                }}
 
 
-                      }
-                    </td>
-                    <td>
-                      {/* {batch?.importerName} */}
-                      {
-
-                        (batch?.tracking?.isImported) ? <button
-                          className={styles.completeBtn}
-                        >Complete</button> :
-                          (batch?.tracking?.isHarvested ) ?
-                            <button
-                              className={styles.progressBtn}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Importer' &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Importer'
-                                    ? ''
-                                    : 'rgb(245 208 142)',
-                              }}
-
-                              onClick={(!userdata && user?.role?.label === 'Importer' && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                            >Progress</button>
-                            :
-                            <button
-                              className={styles.pendingBtn}
-                              onClick={(!userdata && user?.role?.label === 'Importer' && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Importer' &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Importer'
-                                    ? ''
-                                    : 'rgb(237 200 193)',
-                              }}
+                              >
+                                Pending
+                              </button>
 
 
-                            >
-                              Pending
-                            </button>
+                        }
+                      </td>
+                      <td>
+                        {/* {batch?.importerName} */}
+                        {
 
-                      }
-                    </td>
-                    <td>
-                      {/* {batch?.exporterName} */}
-                      {
+                          (batch?.tracking?.isImported) ? <button
+                            className={styles.completeBtn}
+                          >Complete</button> :
+                            (batch?.tracking?.isHarvested) ?
+                              <button
+                                className={styles.progressBtn}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Importer' &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(245 208 142)'
+                                    : user?.role?.label === 'Importer'
+                                      ? ''
+                                      : 'rgb(245 208 142)',
+                                }}
 
-                        (batch?.tracking?.isExported) ? <button
-                          className={styles.completeBtn}
-                        >Complete</button> :
-                          ( batch?.tracking?.isImported ) ?
-                            <button
-                              className={styles.progressBtn}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Exporter' &&
-                                    batch?.tracking?.isImported &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Exporter'
-                                    ? ''
-                                    : 'rgb(245 208 142)',
-                              }}
-
-
-                              onClick={(!userdata && user?.role?.label === 'Exporter' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                            >Progress</button>
-                            :
-                            <button
-                              className={styles.pendingBtn}
-                              onClick={(!userdata && user?.role?.label === 'Exporter' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Exporter' &&
-                                    batch?.tracking?.isImported &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Exporter'
-                                    ? ''
-                                    : 'rgb(237 200 193)',
-                              }}
+                                onClick={(!userdata && user?.role?.label === 'Importer' && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                              >Progress</button>
+                              :
+                              <button
+                                className={styles.pendingBtn}
+                                onClick={(!userdata && user?.role?.label === 'Importer' && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Importer' &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(237, 200, 193)'
+                                    : user?.role?.label === 'Importer'
+                                      ? ''
+                                      : 'rgb(237 200 193)',
+                                }}
 
 
-                            >
-                              Pending
-                            </button>
+                              >
+                                Pending
+                              </button>
 
-                      }
-                    </td>
-                    <td>
-                      {/* {batch?.processorName} */}
-                      {
+                        }
+                      </td>
+                      <td>
+                        {/* {batch?.exporterName} */}
+                        {
 
-                        (batch?.tracking?.isProcessed) ? <button
-                          className={styles.completeBtn}
-                        >Complete</button> :
-                          ( batch?.tracking?.isExported ) ?
-                            <button
-                              className={styles.progressBtn}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Processor' &&
-                                    batch?.tracking?.isImported &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isExported &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Processor'
-                                    ? ''
-                                    : 'rgb(245 208 142)',
-                              }}
-
-                              onClick={(!userdata && user?.role?.label === 'Processor' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isExported && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                            >Progress</button>
-                            :
-                            <button
-                              className={styles.pendingBtn}
-                              onClick={(!userdata && user?.role?.label === 'Processor' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isExported && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
-                              style={{
-                                cursor: userdata
-                                  ? 'not-allowed'
-                                  : user?.role?.label === 'Processor' &&
-                                    batch?.tracking?.isImported &&
-                                    batch?.tracking?.isHarvested &&
-                                    batch?.tracking?.isExported &&
-                                    batch?.tracking?.isInspexted
-                                    ? 'pointer'
-                                    : 'not-allowed',
-                                backgroundColor: userdata
-                                  ? 'rgb(245 208 142)'
-                                  : user?.role?.label === 'Processor'
-                                    ? ''
-                                    : 'rgb(237 200 193)',
-                              }}
+                          (batch?.tracking?.isExported) ? <button
+                            className={styles.completeBtn}
+                          >Complete</button> :
+                            (batch?.tracking?.isImported) ?
+                              <button
+                                className={styles.progressBtn}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Exporter' &&
+                                      batch?.tracking?.isImported &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(245 208 142)'
+                                    : user?.role?.label === 'Exporter'
+                                      ? ''
+                                      : 'rgb(245 208 142)',
+                                }}
 
 
-                            >
-                              Pending
-                            </button>
-                      }
-                    </td>
-                    <td>
-                      <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
-                        <img src={view} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-                :
-                <td colSpan="7" className={styles.noData}>No Data Available</td>
-            }
-          </tbody>
+                                onClick={(!userdata && user?.role?.label === 'Exporter' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                              >Progress</button>
+                              :
+                              <button
+                                className={styles.pendingBtn}
+                                onClick={(!userdata && user?.role?.label === 'Exporter' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Exporter' &&
+                                      batch?.tracking?.isImported &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(237, 200, 193)'
+                                    : user?.role?.label === 'Exporter'
+                                      ? ''
+                                      : 'rgb(237 200 193)',
+                                }}
 
-        </table>
+
+                              >
+                                Pending
+                              </button>
+
+                        }
+                      </td>
+                      <td>
+                        {/* {batch?.processorName} */}
+                        {
+
+                          (batch?.tracking?.isProcessed) ? <button
+                            className={styles.completeBtn}
+                          >Complete</button> :
+                            (batch?.tracking?.isExported) ?
+                              <button
+                                className={styles.progressBtn}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Processor' &&
+                                      batch?.tracking?.isImported &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isExported &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(245 208 142)'
+                                    : user?.role?.label === 'Processor'
+                                      ? ''
+                                      : 'rgb(245 208 142)',
+                                }}
+
+                                onClick={(!userdata && user?.role?.label === 'Processor' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isExported && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                              >Progress</button>
+                              :
+                              <button
+                                className={styles.pendingBtn}
+                                onClick={(!userdata && user?.role?.label === 'Processor' && batch?.tracking?.isImported && batch?.tracking?.isHarvested && batch?.tracking?.isExported && batch?.tracking?.isInspexted) ? () => toggleForm(batch?.batchId) : undefined}
+                                style={{
+                                  cursor: userdata
+                                    ? 'not-allowed'
+                                    : user?.role?.label === 'Processor' &&
+                                      batch?.tracking?.isImported &&
+                                      batch?.tracking?.isHarvested &&
+                                      batch?.tracking?.isExported &&
+                                      batch?.tracking?.isInspexted
+                                      ? 'pointer'
+                                      : 'not-allowed',
+                                  backgroundColor: userdata
+                                    ? 'rgb(237, 200, 193)'
+                                    : user?.role?.label === 'Processor'
+                                      ? ''
+                                      : 'rgb(237 200 193)',
+                                }}
+
+
+                              >
+                                Pending
+                              </button>
+                        }
+                      </td>
+                      <td>
+                        <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
+                          <img src={view} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                  :
+                  <td colSpan="7" className={styles.noData}>No Data Available</td>
+              }
+            </tbody>
+
+          </table>
+        </div>
         <div className={styles.pagination}>
           <button onClick={handlePreviousBatchPage} disabled={currnetBatchPage === 1}>
             ◀

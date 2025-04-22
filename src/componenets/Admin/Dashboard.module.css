@@ -1,5 +1,5 @@
 .dashboardContainer {
-    padding: 2rem;
+padding: 1rem;
     background: #f9f9f9;
     font-family: Arial, sans-serif;
 }
@@ -37,7 +37,6 @@
 
 .section {
     background: #fff;
-    padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 2rem;
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
@@ -46,6 +45,12 @@
 .sectionHeader {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.sectionHeader1{
+    display: flex;
+    justify-content: end;
     align-items: center;
     margin-bottom: 1rem;
 }
@@ -60,6 +65,45 @@
     font-weight: bold;
 }
 
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 740px) {
+    .tableWrapper, .usersTableWrapper,.cards {
+        overflow-x: scroll;
+    }
+
+    .table {
+        min-width: 900px;
+        /* Set this based on your actual table's column width */
+    }
+}
+@media (max-width: 540px) {
+    .sectionHeader{
+      flex-direction: column;
+      >div{
+         >input{
+           width: 100%;
+           margin-bottom: 10px;
+         }
+      }
+    }
+}
+@media (max-width: 420px) {
+   .tableheader{
+    flex-direction: column;
+   }
+   .sectionHeader1{
+   flex-direction: column;
+
+   >input{
+    margin-bottom: 10px;
+    width: 100%;
+   }
+   }
+}
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -71,6 +115,7 @@
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+
 
 .centerText {
     text-align: center;
@@ -165,7 +210,13 @@
 .usersTableWrapper {
     flex: 2;
 }
-
+.usersTableWrapper1 {
+    flex: 2;
+}
+.tableheader{
+ display: flex;
+ justify-content: space-between;
+}
 .boxTitle {
     font-size: 1.25rem;
     font-weight: bold;
@@ -269,43 +320,103 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .qrModal {
-    background: #fff;
-    padding: 1rem;
-    border-radius: 12px;
-    position: relative;
-    width: 28%;
-    height: 70%;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s ease-in-out;
+
+    >h3 {
+        margin: 0;
+        font-size: 30px;
+    }
 }
 
 .qrModalImg {
     width: 100%;
-    height: 80%;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    object-fit: contain;
 }
 
 .closeBtn {
     position: absolute;
-    top: -17px;
-    right: -17px;
-    background-color: red;
+    top: -15px;
+    right: -15px;
+    background-color: #ff4d4f;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s;
+}
+
+.closeBtn:hover {
+    background-color: #d9363e;
+}
+
+.qrDownloadButton {
+    margin-top: 0.5rem;
+    padding: 10px 20px;
+    background-color: #4caf50;
     color: white;
     border: none;
-    border-radius: 100%;
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
+
+.qrDownloadButton:hover {
+    background-color: #45a049;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 
 .completeBtn {
     background-color: #4caf50;

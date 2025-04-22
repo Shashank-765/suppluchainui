@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import edit from '../../Imges/edit (1).png'
 import view from '../../Imges/eye.png'
@@ -20,7 +20,7 @@ const Dashboard = () => {
     const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
-    const [usersPerPage] = useState(5);
+    const [usersPerPage] = useState(8);
     const [totalPages, setTotalPages] = useState(0);
     const [totalBatchPage, setTotalBatchPage] = useState(0);
     const [allBatch, setAllBatch] = useState([]);
@@ -28,6 +28,8 @@ const Dashboard = () => {
     const [roles, setRoles] = useState([]);
 
     const user = JSON.parse(localStorage.getItem('user')) || null;
+    const qrImageRef = useRef(null);
+
 
 
     const [allUser, setAllUser] = useState([]);
@@ -242,6 +244,20 @@ const Dashboard = () => {
         }
     };
 
+    const downloadQrImage = () => {
+        const imageElement = qrImageRef.current;
+        if (!imageElement) return;
+        const imageURL = imageElement.src;
+
+        const link = document.createElement('a');
+        link.href = imageURL;
+        link.download = 'qr-code.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
     const fetchbatch = async () => {
         try {
             const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatch', {
@@ -322,157 +338,169 @@ const Dashboard = () => {
                         </button>
                     </div>
                 </div>
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Batch ID</th>
-                            <th>QR Code</th>
-                            <th>Food Type</th>
-                            <th>Farm Inspector</th>
-                            <th>Harvester</th>
-                            <th>Importer</th>
-                            <th>Exporter</th>
-                            <th>Processor</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {allBatch?.length > 0 ? (
-                            allBatch.map((batch, index) => (
-                                <tr key={index}>
-                                    <td>{batch.batchId}</td>
-                                    <td>
-                                        {batch.qrCode ? (
-                                            <img
-                                                src={batch.qrCode}
-                                                alt="QR Code"
-                                                width="40"
-                                                margin='0'
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => openQrModal(batch.qrCode)}
-                                            />
-                                        ) : (
-                                            '---'
-                                        )}
-                                    </td>
-                                    <td>{batch.coffeeType}</td>
-                                    <td>
-                                        {/* {batch?.farmInspectionName} */}
+                <div className={styles.tableWrapper}>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>Batch ID</th>
+                                <th>QR Code</th>
+                                <th>Food Type</th>
+                                <th>Farm Inspector</th>
+                                <th>Harvester</th>
+                                <th>Importer</th>
+                                <th>Exporter</th>
+                                <th>Processor</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {allBatch?.length > 0 ? (
+                                allBatch.map((batch, index) => (
+                                    <tr key={index}>
+                                        <td>{batch.batchId}</td>
+                                        <td>
+                                            {batch.qrCode ? (
+                                                <img
+                                                    src={batch.qrCode}
+                                                    alt="QR Code"
+                                                    width="40"
+                                                    margin='0'
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => openQrModal(batch.qrCode)}
+                                                />
+                                            ) : (
+                                                '---'
+                                            )}
+                                        </td>
+                                        <td>{batch.coffeeType}</td>
+                                        <td>
+                                            {/* {batch?.farmInspectionName} */}
 
-                                        {
+                                            {
 
-                                            (batch?.tracking?.isInspexted) ? <button
-                                                className={styles.completeBtn}
-                                            >Complete</button> :
-                                                (!batch?.tracking?.isInspexted) ?
-                                                    <button className={styles.progressBtn}>
-                                                        Progress</button>
-                                                    :
-                                                    <button className={styles.pendingBtn}>
-                                                        Pending
-                                                    </button>
+                                                (batch?.tracking?.isInspexted) ? <button
+                                                    className={styles.completeBtn}
+                                                >Complete</button> :
+                                                    (!batch?.tracking?.isInspexted) ?
+                                                        <button className={styles.progressBtn}>
+                                                            Progress</button>
+                                                        :
+                                                        <button className={styles.pendingBtn}>
+                                                            Pending
+                                                        </button>
 
-                                        }
+                                            }
 
-                                        {/* <button className={styles.verifyBtn}>✅</button> */}
-                                    </td>
-                                    <td>
-                                        {/* {batch?.harvesterName} */}
-                                        {
+                                            {/* <button className={styles.verifyBtn}>✅</button> */}
+                                        </td>
+                                        <td>
+                                            {/* {batch?.harvesterName} */}
+                                            {
 
-                                            (batch?.tracking?.isHarvested) ? <button
-                                                className={styles.completeBtn}
-                                            >Complete</button> :
-
-
-                                                (batch?.tracking?.isInspexted) ?
-                                                    <button className={styles.progressBtn}>
-                                                        Progress</button>
-                                                    :
-                                                    <button className={styles.pendingBtn}>
-                                                        Pending
-                                                    </button>
+                                                (batch?.tracking?.isHarvested) ? <button
+                                                    className={styles.completeBtn}
+                                                >Complete</button> :
 
 
-                                        }
-                                    </td>
-                                    <td>
-                                        {/* {batch?.importerName} */}
-                                        {
+                                                    (batch?.tracking?.isInspexted) ?
+                                                        <button className={styles.progressBtn}>
+                                                            Progress</button>
+                                                        :
+                                                        <button className={styles.pendingBtn}>
+                                                            Pending
+                                                        </button>
 
-                                            (batch?.tracking?.isImported) ? <button
-                                                className={styles.completeBtn}
-                                            >Complete</button> :
-                                                (batch?.tracking?.isHarvested ) ?
-                                                    <button className={styles.progressBtn}>
-                                                        Progress</button>
-                                                    :
-                                                    <button className={styles.pendingBtn}>
-                                                        Pending
-                                                    </button>
 
-                                        }
-                                    </td>
-                                    <td>
-                                        {/* {batch?.exporterName} */}
-                                        {
+                                            }
+                                        </td>
+                                        <td>
+                                            {/* {batch?.importerName} */}
+                                            {
 
-                                            (batch?.tracking?.isExported) ? <button
-                                                className={styles.completeBtn}
-                                            >Complete</button> :
-                                                ( batch?.tracking?.isImported) ?
-                                                    <button className={styles.progressBtn}>
-                                                        Progress</button>
-                                                    :
-                                                    <button className={styles.pendingBtn}>
-                                                        Pending
-                                                    </button>
+                                                (batch?.tracking?.isImported) ? <button
+                                                    className={styles.completeBtn}
+                                                >Complete</button> :
+                                                    (batch?.tracking?.isHarvested) ?
+                                                        <button className={styles.progressBtn}>
+                                                            Progress</button>
+                                                        :
+                                                        <button className={styles.pendingBtn}>
+                                                            Pending
+                                                        </button>
 
-                                        }
-                                    </td>
-                                    <td>
-                                        {/* {batch?.processorName} */}
-                                        {
+                                            }
+                                        </td>
+                                        <td>
+                                            {/* {batch?.exporterName} */}
+                                            {
 
-                                            (batch?.tracking?.isProcessed) ? <button
-                                                className={styles.completeBtn}
-                                            >Complete</button> :
-                                                ( batch?.tracking?.isExported) ?
-                                                    <button className={styles.progressBtn}>
-                                                        Progress</button>
-                                                    :
-                                                    <button className={styles.pendingBtn}>
-                                                        Pending
-                                                    </button>
-                                        }
-                                    </td>
-                                    <td>
-                                        <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
-                                            <img src={view} />
-                                        </button>
+                                                (batch?.tracking?.isExported) ? <button
+                                                    className={styles.completeBtn}
+                                                >Complete</button> :
+                                                    (batch?.tracking?.isImported) ?
+                                                        <button className={styles.progressBtn}>
+                                                            Progress</button>
+                                                        :
+                                                        <button className={styles.pendingBtn}>
+                                                            Pending
+                                                        </button>
+
+                                            }
+                                        </td>
+                                        <td>
+                                            {/* {batch?.processorName} */}
+                                            {
+
+                                                (batch?.tracking?.isProcessed) ? <button
+                                                    className={styles.completeBtn}
+                                                >Complete</button> :
+                                                    (batch?.tracking?.isExported) ?
+                                                        <button className={styles.progressBtn}>
+                                                            Progress</button>
+                                                        :
+                                                        <button className={styles.pendingBtn}>
+                                                            Pending
+                                                        </button>
+                                            }
+                                        </td>
+                                        <td>
+                                            <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
+                                                <img src={view} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="9" className={styles.centerText}>
+                                        No Batches Found
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="9" className={styles.centerText}>
-                                    No Batches Found
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
+                            )}
+                        </tbody>
 
-                    {/* QR Modal */}
-                    {qrModalOpen && (
-                        <div className={styles.qrModalOverlay} onClick={closeQrModal}>
-                            <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
-                                <img src={selectedQr} alt="Full QR Code" className={styles.qrModalImg} />
-                                <button onClick={closeQrModal} className={styles.closeBtn}>×</button>
-                                <button className={styles.qrdawnloadbutton}>Dawnload</button>
+                        {/* QR Modal */}
+                        {qrModalOpen && (
+                            <div className={styles.qrModalOverlay} onClick={closeQrModal}>
+                                <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+                                    <img
+                                        ref={qrImageRef}
+                                        src={selectedQr}
+                                        alt="Full QR Code"
+                                        className={styles.qrModalImg}
+                                    />
+                                    <button onClick={closeQrModal} className={styles.closeBtn}>×</button>
+                                    <button onClick={downloadQrImage} className={styles.qrDownloadButton}>
+                                        Download
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </table>
+                        )}
+
+
+                    </table>
+                </div>
+
                 <div className={styles.pagination}>
                     <button onClick={handlePreviousBatchPage} disabled={currnetBatchPage === 1}>
                         ◀
@@ -488,19 +516,6 @@ const Dashboard = () => {
 
             <div className={styles.section}>
                 <div className={styles.sectionHeader}>
-                    <h3>Users</h3>
-                    <div className={styles.sectionHeader}>
-                        <input
-                            type="text"
-                            placeholder="Search user..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className={styles.searchInput}
-                        />
-                        <button className={styles.primaryBtn} onClick={() => setShowUserModal(true)}>
-                            Create User
-                        </button>
-                    </div>
                 </div>
                 <div className={styles.usersGrid}>
                     <div className={styles.rolesCard}>
@@ -535,7 +550,23 @@ const Dashboard = () => {
                             </table>
                         </div>
                     </div>
-                    <div className={styles.usersTableWrapper}>
+                    <div className={styles.usersTableWrapper1}>
+                      <div className={styles.tableheader}>
+                           <h3>Users</h3>
+                    <div className={styles.sectionHeader1}>
+                        <input
+                            type="text"
+                            placeholder="Search user..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            className={styles.searchInput}
+                        />
+                        <button className={styles.primaryBtn} onClick={() => setShowUserModal(true)}>
+                            Create User
+                        </button>
+                    </div>
+                      </div>
+                        <div className={styles.usersTableWrapper}>
                         <table className={styles.table}>
                             <thead>
                                 <tr>
@@ -589,7 +620,9 @@ const Dashboard = () => {
                                 )}
                             </tbody>
                         </table>
-                        <div className={styles.pagination}>
+                        
+                    </div>
+                    <div className={styles.pagination}>
                             <button onClick={handlePreviousPage} disabled={currentPage === 1}>
                                 ◀
                             </button>
@@ -599,8 +632,9 @@ const Dashboard = () => {
                             <button onClick={handleNextPage} disabled={currentPage === totalPages}>
                                 ▶
                             </button>
-                        </div>
                     </div>
+                    </div>
+                    
                 </div>
             </div>
 

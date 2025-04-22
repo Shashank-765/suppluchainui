@@ -86,7 +86,7 @@ function App() {
           closeOnClick
           pauseOnHover={false}
           draggable={false}
-          theme="colored"
+          theme="light"
           style={{ marginTop: '80px' }}
         />
       </div>

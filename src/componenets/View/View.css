@@ -48,44 +48,114 @@
   padding-block: 5rem;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-
 }
 
+/* Keep accordion cards clickable */
 .description-container {
   border-radius: 10px;
   cursor: pointer;
 }
 
+/* Main scrollable container */
 .descriptiop-containeriew {
-  width: 45%;
-  padding-bottom: 4rem;
-  border: 1px solid #235f48;
-  border-radius: 10px;
-  /* margin-left: 20px; */
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  width: 40%;
+  height: 450px;
+  /* border: 1px solid #235f48; */
+  border-radius: 20px;
+  box-shadow: 0 0 10px #7cb4a4;
   display: flex;
-  text-align: center;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  overflow-y: auto;
+  /* scroll only when content exceeds height */
+  padding: 1rem;
+  gap: 1rem;
+
+  >h2 {
+    text-align: center;
+    margin: 0;
+  }
 }
 
+/* Each accordion block */
 .imagedescription {
-  /* margin-left: 1.5rem; */
-  width: 90%;
+  width: 100%;
   height: auto;
-  text-align: center;
-  /* margin-left: 10px; */
-  /* border: 1px solid red; */
   border-radius: 5px;
+}
+
+/* Header section of each accordion */
+.about-vegitable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e7f4f0;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+}
+
+/* Icon and heading */
+.iconvegtble {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.descriptionimage {
+  font-weight: bold;
+}
+
+/* Right-side arrow icon */
+.righticon img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Accordion content */
+.about-vegitabledescription {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
+  margin-top: 0.5rem;
+  border-radius: 5px;
+}
+
+/* Inner content layout */
+.descriptionmanagaersection p {
+  margin: 0.25rem 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.descriptionmanagaersection span:first-child {
+  font-weight: 500;
+  color: #235f48;
+}
+
+.tesxtjustify {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.descriptiop-containeriew::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, and Opera */
 }
 
 .rightviewdiv {
   /* border: 1px solid red; */
-  width: 45%;
-  height: 600px;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 40%;
+  height: 500px;
   display: flex;
   justify-content: space-between;
+  box-shadow: 0 0 10px #7cb4a4;
   align-items: center;
   font-family: Lexend;
   font-weight: 300;
@@ -94,8 +164,18 @@
 .rightviewfirstdiv {
   width: 100%;
   height: 100%;
-  >h2{
-    >img{
+  padding: 1rem;
+  border-radius: 10px;
+
+  .nameofproductowner {
+    font-size: 30px;
+    margin: 0;
+  }
+
+  >h2 {
+    font-size: 20px;
+
+    >img {
       width: 20px;
       margin-right: 10px;
       margin-top: 2px;
@@ -112,6 +192,7 @@
 
 .priceproduct {
   font-weight: 300;
+  color: #235f48;
 }
 
 .quantitytext {
@@ -140,7 +221,7 @@
 }
 
 .about-vegitable {
-  width: 100%;
+  width: 93%;
   height: 50px;
   margin-top: 10px;
   display: flex;
@@ -182,8 +263,8 @@
 
 .about-vegitabledescription {
   display: none;
-  width: 100%;
-  height: 23vh;
+  width: 93%;
+  height: auto;
   border: 1px solid black;
   border-radius: 10px;
   margin-top: 2px;
@@ -220,18 +301,26 @@
       width: 45%;
       /* border: 1px solid red; */
       text-align: start;
-      font-size: 15px;
+      font-size: 18px;
     }
   }
 }
 
 .rightsidedescriptionimage {
   width: 45%;
-  border: 1px solid #235f48;
-  height: 27rem;
-  border-radius: 10px;
+  /* height: 500px; */
+  /* border: 1px solid #235f48; */
+  box-shadow: 0 0 10px #7cb4a4;
+  border-radius: 20px;
   text-align: center;
   overflow: hidden;
+
+  table td,
+  table th {
+    padding: 18px 11px;
+    text-align: left;
+    font-size: 20px;
+  }
 }
 
 @media screen and (max-width:740px) {
@@ -248,7 +337,7 @@
       margin-top: 5rem;
 
       .rightviewfirstdiv {
-        text-align: center;
+        text-align: start;
       }
     }
   }
@@ -274,6 +363,7 @@
   .parentdesciptionofboth {
     display: flex;
     flex-direction: column;
+    align-items: center;
 
     .descriptiop-containeriew {
       width: 80%;
@@ -284,13 +374,15 @@
 
 
 .carousel-wrapper {
-  width: 45%;
+  padding: 2rem;
+  width: 37%;
   position: relative;
-  height: 600px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  height: 500px;
+  box-shadow: 0 0 10px #7cb4a4;
   border-radius: 20px;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  /* background: #e7f4f0; */
 }
 
 .leftviewdiv {
@@ -318,7 +410,7 @@
 
 .imagecontainerview img {
   width: 100%;
-  height: 100%;
+  height: 95%;
   object-fit: cover;
   border-radius: 20px;
 }
@@ -326,8 +418,8 @@
 .dot-indicators {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
-  padding-block: 10px
+  /* margin-top: 6px; */
+  /* padding-block: 10px */
 }
 
 .dot {
@@ -349,8 +441,9 @@
 
     table td,
     table th {
-      padding: 10px 10px;
+      padding: 18px 11px;
       text-align: left;
+      font-size: 25px;
     }
   }
 }
@@ -361,6 +454,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  >div {
+    width: 250px;
+    text-align: start;
+
+    >h3 {
+      margin: 0;
+      margin-left: 10px;
+    }
+
+    >input {
+      width: 50%;
+    }
+  }
 }
 
 .viewtablehistory {

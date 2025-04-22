@@ -284,10 +284,6 @@ i.fas.fa-building {
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {
-    body {
-        padding: 1rem;
-    }
-
     .invoice-container {
         padding: 1rem;
     }

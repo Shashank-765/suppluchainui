@@ -363,7 +363,7 @@ router.post('/createBatch', async (req, res) => {
     await newBatch.save();
 
     if (newBatch) {
-      const frontendBaseUrl = 'http://192.168.1.120:3000/';
+      const frontendBaseUrl = 'https://lfgkx3p7-3000.inc1.devtunnels.ms/';
       const qrData = `${frontendBaseUrl}`;
       // scanresult/${newBatch.batchId}
       const qrCode = await QRCode.toDataURL(qrData);

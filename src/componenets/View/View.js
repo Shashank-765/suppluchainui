@@ -156,31 +156,63 @@ function View() {
       processorId: productData?.processorId,
       processorName: productData?.processorName,
       processedDate: productData?.processedDate,
-      processorAddress: productData?.warehouseAddress
+      processorAddress: productData?.warehouseAddress,
+      quantityProcessed: productData?.quantityProcessed,
+      processingMethod: productData?.processingMethod,
+      packaging: productData?.packaging,
+      packagedDate: productData?.packagedDate,
+      warehouse: productData?.warehouse,
+      destination: productData?.destination,
+      processedDate: productData?.processedDate,
     },
     {
       id: '2',
       heading: "Exporter",
       exporterId: productData?.exporterId,
-      exporterName: productData?.exporterName
+      exporterName: productData?.exporterName,
+      coordinationAddress: productData?.coordinationAddress,
+      shipName: productData?.shipName,
+      shipNo: productData?.shipNo,
+      departureDate: productData?.departureDate,
+      estimatedDate: productData?.estimatedDate,
+      exportedTo: productData?.exportedTo,
+      exportDate: productData?.exportDate,
     },
     {
       id: '3',
       heading: "Importer",
       importerId: productData?.importerId,
-      importerName: productData?.importerName
+      importerName: productData?.importerName,
+      quantityImported: productData?.quantityImported,
+      shipStorage: productData?.shipStorage,
+      arrivalDate: productData?.arrivalDate,
+      warehouseLocation: productData?.warehouseLocation,
+      warehouseArrivalDate: productData?.warehouseArrivalDate,
+      importerAddress: productData?.importerAddress,
+      importDate: productData?.importDate,
+
     },
     {
       id: '4',
       heading: "Harvester",
       harvesterId: productData?.harvesterId,
-      harvesterName: productData?.harvesterName
+      harvesterName: productData?.harvesterName,
+      cropSampling: productData?.cropSampling,
+      temperatureLevel: productData?.temperatureLevel,
+      humidity: productData?.humidity,
+      harvestDate: productData?.harvestDate
     },
     {
       id: '5',
       heading: "Inspection",
       farmInspectionId: productData?.farmInspectionId,
-      farmInspectionName: productData?.farmInspectionName
+      farmInspectionName: productData?.farmInspectionName,
+      productName: productData?.productName,
+      certificateNo: productData?.certificateNo,
+      certificateFrom: productData?.certificateFrom,
+      typeOfFertilizer: productData?.typeOfFertilizer,
+      fertilizerUsed: productData?.fertilizerUsed,
+      inspectionDate: productData?.inspectionDate,
     }
 
   ];
@@ -211,9 +243,9 @@ function View() {
           <div className='rightviewdiv'>
             <div className='rightviewfirstdiv'>
               <h2><img src={locationImage} />{productData?.warehouseAddress}</h2>
-              <h2>{productData?.productName}</h2>
-              <h2>Price : <span className='priceproduct'>{productData?.price}</span></h2>
-              <h2>Mini Qty : <span className='priceproduct'>{productData?.miniQuantity}</span></h2>
+              <h2 className='nameofproductowner'>{productData?.productName}</h2>
+              <h2>Price : <span className='priceproduct'>₹ {productData?.price}</span></h2>
+              <h2>Mini Qty : <span className='priceproduct'>{productData?.miniQuantity} Qtl</span></h2>
               <div className='buynowbuttoncover'>
                 {
                   productData?.ownerId === user?._id ? (
@@ -238,7 +270,8 @@ function View() {
                      </div> */}
 
                       <div className='quantitypricecover'>
-                        Qunaity
+                       <div>
+                          <h3>Total Qunaity</h3>
                         <input
                           className='quantitytext'
                           placeholder='Enter Quantity'
@@ -247,7 +280,9 @@ function View() {
                           min='0'
                           onChange={handleQuantityChange}
                         />
-                        price
+                       </div>
+                       <div>
+                         <h3>Total Price</h3>
                         <input
                           className='quantitytext'
                           placeholder='Enter Price'
@@ -256,6 +291,7 @@ function View() {
                           min='0'
                           onChange={handlePriceChange}
                         />
+                       </div>
                       </div>
                       <button onClick={() => handlebuynow(quantity, price, productData?.price)} className='buynowbutton'>Buy Now</button>
                     </div>
@@ -301,19 +337,53 @@ function View() {
                     <div className='descriptionmanagaersection'>
                       <p className='tesxtjustify'>
                         <div className='tesxtjustify'>
-                          {item?.processorId && <p> <span>Id </span><span> {item?.processorId}</span></p>}
-                          {item?.processorName && <p><span>Name </span> <span>{item?.processorName}</span></p>}
-                          {item?.processedDate && <p><span>Date </span><span> {item?.processedDate}</span></p>}
-                          {item?.processorAddress && <p><span>Address </span><span> {item.processorAddress}</span></p>}
-                          {item?.exporterId && <p><span>Id </span><span> {item.exporterId}</span></p>}
-                          {item?.exporterName && <p><span>Name </span><span> {item.exporterName}</span></p>}
-                          {item?.exporterAddress && <p><span>Address </span><span> {item.exporterAddress}</span></p>}
-                          {item?.importerId && <p><span>Id </span><span> {item.importerId}</span></p>}
-                          {item?.importerName && <p><span>Name </span><span> {item.importerName}</span></p>}
-                          {item?.harvesterId && <p><span>Id </span><span> {item.harvesterId}</span></p>}
-                          {item?.harvesterName && <p><span>Name </span><span> {item.harvesterName}</span></p>}
-                          {item?.farmInspectionId && <p><span>Id </span><span> {item.farmInspectionId}</span></p>}
-                          {item?.farmInspectionName && <p><span>Name </span><span> {item.farmInspectionName}</span></p>}
+                          {/* {item?.processorId && <p><span>Id </span><span>{item.processorId}</span></p>} */}
+                          {item?.processorName && <p><span>Name </span><span>{item.processorName}</span></p>}
+                          {item?.processedDate && <p><span>Processed Date </span><span>{item.processedDate}</span></p>}
+                          {item?.processorAddress && <p><span>Address </span><span>{item.processorAddress}</span></p>}
+                          {item?.quantityProcessed && <p><span>Quantity Processed </span><span>{item.quantityProcessed}</span></p>}
+                          {item?.processingMethod && <p><span>Processing Method </span><span>{item.processingMethod}</span></p>}
+                          {item?.packaging && <p><span>Packaging </span><span>{item.packaging}</span></p>}
+                          {item?.packagedDate && <p><span>Packaged Date </span><span>{item.packagedDate}</span></p>}
+                          {item?.warehouse && <p><span>Warehouse </span><span>{item.warehouse}</span></p>}
+                          {item?.destination && <p><span>Destination </span><span>{item.destination}</span></p>}
+
+                          {/* {item?.exporterId && <p><span>Id </span><span>{item.exporterId}</span></p>} */}
+                          {item?.exporterName && <p><span>Name </span><span>{item.exporterName}</span></p>}
+                          {item?.coordinationAddress && <p><span>Coordination Address </span><span>{item.coordinationAddress}</span></p>}
+                          {item?.shipName && <p><span>Ship Name </span><span>{item.shipName}</span></p>}
+                          {item?.shipNo && <p><span>Ship No </span><span>{item.shipNo}</span></p>}
+                          {item?.departureDate && <p><span>Departure Date </span><span>{item.departureDate}</span></p>}
+                          {item?.estimatedDate && <p><span>Estimated Arrival </span><span>{item.estimatedDate}</span></p>}
+                          {item?.exportedTo && <p><span>Exported To </span><span>{item.exportedTo}</span></p>}
+                          {item?.exportDate && <p><span>Export Date </span><span>{item.exportDate}</span></p>}
+
+                          {/* {item?.importerId && <p><span>Id </span><span>{item.importerId}</span></p>} */}
+                          {item?.importerName && <p><span>Name </span><span>{item.importerName}</span></p>}
+                          {item?.quantityImported && <p><span>Quantity Imported </span><span>{item.quantityImported}</span></p>}
+                          {item?.shipStorage && <p><span>Ship Storage </span><span>{item.shipStorage}</span></p>}
+                          {item?.arrivalDate && <p><span>Arrival Date </span><span>{item.arrivalDate}</span></p>}
+                          {item?.warehouseLocation && <p><span>Warehouse Location </span><span>{item.warehouseLocation}</span></p>}
+                          {item?.warehouseArrivalDate && <p><span>Warehouse Arrival Date </span><span>{item.warehouseArrivalDate}</span></p>}
+                          {item?.importerAddress && <p><span>Importer Address </span><span>{item.importerAddress}</span></p>}
+                          {item?.importDate && <p><span>Import Date </span><span>{item.importDate}</span></p>}
+
+                          {/* {item?.harvesterId && <p><span>Id </span><span>{item.harvesterId}</span></p>} */}
+                          {item?.harvesterName && <p><span>Name </span><span>{item.harvesterName}</span></p>}
+                          {item?.cropSampling && <p><span>Crop Sampling </span><span>{item.cropSampling}</span></p>}
+                          {item?.temperatureLevel && <p><span>Temperature Level </span><span>{item.temperatureLevel}</span></p>}
+                          {item?.humidity && <p><span>Humidity </span><span>{item.humidity}</span></p>}
+                          {item?.harvestDate && <p><span>Harvest Date </span><span>{item.harvestDate}</span></p>}
+
+                          {/* {item?.farmInspectionId && <p><span>Id </span><span>{item.farmInspectionId}</span></p>} */}
+                          {item?.farmInspectionName && <p><span>Name </span><span>{item.farmInspectionName}</span></p>}
+                          {item?.productName && <p><span>Product Name </span><span>{item.productName}</span></p>}
+                          {item?.certificateNo && <p><span>Certificate No </span><span>{item.certificateNo}</span></p>}
+                          {item?.certificateFrom && <p><span>Certificate From </span><span>{item.certificateFrom}</span></p>}
+                          {item?.typeOfFertilizer && <p><span>Type of Fertilizer </span><span>{item.typeOfFertilizer}</span></p>}
+                          {item?.fertilizerUsed && <p><span>Fertilizer Used </span><span>{item.fertilizerUsed}</span></p>}
+                          {item?.inspectionDate && <p><span>Inspection Date </span><span>{item.inspectionDate}</span></p>}
+
                         </div>
                       </p>
                     </div>

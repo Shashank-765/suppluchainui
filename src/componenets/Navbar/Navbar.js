@@ -59,8 +59,8 @@ function Navbar({ isAuthenticated }) {
                       Explore
                     </Link>
                   </li>
-                  <li>
-                    <Link
+                  {/* <li> */}
+                    {/* <Link
                       to='/form'
                       onClick={() => {
                         setNavState('navbarrightside');
@@ -68,8 +68,8 @@ function Navbar({ isAuthenticated }) {
                       }}
                     >
                       Add Product
-                    </Link>
-                  </li>
+                    </Link> */}
+                  {/* </li> */}
                 </ul>
               )}
             </li>

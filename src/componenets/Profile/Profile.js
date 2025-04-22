@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
+import profileImage from '../../Imges/portrait-322470_1280.jpg';
 import './Profile.css';
 import axios from 'axios';
 
@@ -8,19 +9,19 @@ function Profile({ setIsAuthenticated, setUser }) {
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
-    const [formData, setFormData] = useState({ name: '', email: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', userType: '' });
 
     const user = JSON.parse(localStorage.getItem('user')) || null;
-    console.log(user, 'user')
     const navigate = useNavigate();
-    const handleClick = (ele) => {
-        navigate('/viewpage', { state: { product: ele } });
-    }
+
+    const handleClick = (product) => {
+        navigate('/viewpage', { state: { product } });
+    };
 
     useEffect(() => {
-        const user = localStorage.getItem('user');
-        if (user) {
-            const parsedUser = JSON.parse(user);
+        const localUser = localStorage.getItem('user');
+        if (localUser) {
+            const parsedUser = JSON.parse(localUser);
             setUserData(parsedUser);
             setFormData(parsedUser);
         } else {
@@ -34,16 +35,16 @@ function Profile({ setIsAuthenticated, setUser }) {
             if (response.data) {
                 setProducts(response.data.products);
             } else {
-                console.error('Error fetching products:', response.data.message);
+                showError('Failed to fetch products');
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
+            showError('Error fetching products');
         }
-    }
+    };
 
     useEffect(() => {
         fetchProducts();
-    }, [])
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -58,121 +59,126 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSave = () => {
         setUserData(formData);
         localStorage.setItem('user', JSON.stringify(formData));
         setIsEditing(false);
+        showSuccess('Profile updated!');
     };
 
     return (
-        <>
-            <div className="profile-container">
-                {userData ? (
-                    <>
-                        <h1>Welcome, {userData.name}</h1>
-
-                        {isEditing ? (
-                            <div className="profile-edit-form">
+        <div className="profile-container">
+            {userData ? (
+                <>
+                    {isEditing ? (
+                        <div className="profile-edit-form">
+                            <div className="editformcontianer">
                                 <label>
                                     Name:
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                    />
+                                    <input type="text" name="name" value={formData.name} onChange={handleChange} />
                                 </label>
-
                                 <label>
                                     Email:
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        disabled='true'
-                                    />
+                                    <input type="email" name="email" value={formData.email} onChange={handleChange} disabled />
                                 </label>
                                 <label>
+                                    User Type:
                                     <select
-                                        name='userType'
-                                        className='authtext'
+                                        name="userType"
+                                        className="authtext"
                                         value={formData.userType}
                                         onChange={handleChange}
                                         required
                                     >
-                                        <option value='buyer'>Buyer</option>
-                                        <option value='seller'>Seller</option>
-                                        <option value='retailer'>Retailer</option>
+                                        <option value="buyer">Buyer</option>
+                                        <option value="seller">Seller</option>
+                                        <option value="retailer">Retailer</option>
                                     </select>
                                 </label>
-
-
                                 <button onClick={handleSave} className="profile-save-btn">Save</button>
                                 <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
-
-
                             </div>
-                        ) : (
-                            <>
-                                <p><strong>Email:</strong> {userData.email}</p>
-                                <div className='profile-edit-buttons'>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="profile-card">
+                                <div className="profile-banner">
+                                    <h1>Welcome, {userData.name}</h1>
+                                </div>
+                                <div className="profile-content">
+                                    <img className="profile-image" src={profileImage} alt="Profile" />
+                                    <div className="profile-details">
+                                        <div className="contact-info">
+                                            <p>Contact No</p>
+                                            <span className="contact-information">{user?.contact}</span>
+                                        </div>
+                                        <div className="role-info">
+                                            <p>Role</p>
+                                            <span className={user?.role?.className}>
+                                                {user?.role?.slug}
+                                            </span>
+                                        </div>
+                                        <div className="settings">
+                                            <p>{user?.role?.label} Email</p>
+                                            <span className="edit-btn">{user?.email}</span>
+                                        </div>
+                                        <div className="settings">
+                                            <p>Wallet Address</p>
+                                            <span className="edit-btn">
+                                                {user?.walletAddress
+                                                    ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
+                                                    : ''}
+                                            </span>
+                                        </div>
+                                    </div>
                                     <button onClick={handleEditToggle} className="profile-edit-btn">Edit Profile</button>
                                     <button onClick={handleLogout} className="profile-logout-btn">Logout</button>
                                 </div>
-
-                            </>
-                        )}
-                    </>
-                ) : (
-                    <p>Loading user data...</p>
-                )}
-            </div>
-
-            <div className='my-product-continer'>
-                <h2 className='my-products-only'>My Products</h2>
-                <div className='productmaincontainer'>
-                    {
-
-                        products.length > 0 ? products?.map((ele, i) => {
-                            return (
-                                <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
-                                    <div className='productimagecontianer'>
-
-                                        {ele?.images?.length > 0 && (
-                                            <img
-                                                src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${ele.images[0]}`}
-                                                alt={`product-${i}-img`}
-                                                className="product-image"
-                                            />
-                                        )}
-                                    </div>
-
-                                    <div className='productdetailscontainer'>
-                                        <div className='productdetailscontainerdetails'>
-                                            <p>{ele?.fruitName}</p>
-                                            <p>QTY : <span className='pricevalueproduct'>{ele?.quantity}</span></p>
-                                        </div>
-                                        <p className='prices'>Price : <span className='pricevalueproduct'>{ele?.price}</span></p>
-                                    </div>
-                                </div>
-                            )
-                        })
-                            :
-                            <div className='no-product-container-profile'>
-                                <p>No Product Available </p>
                             </div>
 
-                    }
-                </div>
-
-            </div>
-        </>
-
-
+                            <div className="my-product-continer">
+                                <h2 className="my-products-only">My Products</h2>
+                                <div className="productmaincontainer">
+                                    {products.length > 0 ? (
+                                        products.map((product, i) => (
+                                            <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
+                                                <div className="productimagecontianer">
+                                                    {product?.images?.length > 0 && (
+                                                        <img
+                                                            src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${product.images[0]}`}
+                                                            alt={`product-${i}`}
+                                                            className="product-image"
+                                                        />
+                                                    )}
+                                                </div>
+                                                <div className="productdetailscontainer">
+                                                    <div className="productdetailscontainerdetails">
+                                                        <p>{product?.fruitName}</p>
+                                                        <p>QTY: <span className="pricevalueproduct">{product?.quantity}</span></p>
+                                                    </div>
+                                                    <p className="prices">
+                                                        Price: <span className="pricevalueproduct">{product?.price}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="no-product-container-profile">
+                                            <p>No Product Available</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </>
+            ) : (
+                <p>Loading user data...</p>
+            )}
+        </div>
     );
 }
 

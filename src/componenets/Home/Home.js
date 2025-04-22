@@ -1,7 +1,7 @@
 import React from 'react'
 import "./Home.css"
 import section2 from '../../Imges/BG.png'
-import Image10 from '../../Imges/Image 10.png'
+import Image10 from '../../Imges/Multicropping.webp'
 import icon1 from '../../Imges/Icon.png'
 import icon2 from '../../Imges/Icon2.png'
 import image1 from '../../Imges/Image6.png'
@@ -21,10 +21,11 @@ function Home() {
     <>
       <div className='main-container'>
         <div className='upper-container'>
-          <h1>Revolutionizing Supply Chain Management for...</h1>
-          <p>Welcome to our innovative platform designed to streamline the supply chain for agricultural crops</p>
+          <h1>🌾 Welcome to AgriChain – Blockchain-Powered Crop Supply Chain</h1>
+          <h3>Built on Hyperledger Fabric for Secure, Transparent, and Trusted Agriculture</h3>
+          <p>AgriChain is an enterprise-grade crop supply chain management platform that leverages the power of Hyperledger Fabric to ensure transparency, traceability, and trust across all agricultural processes — from sowing to sale.</p>
           <div className='greenleasvehorizontl'><img src={image14} /></div>
-          <button className='button-explore'>Explore Now</button>
+          <Link className='button-explore' to="/product">Get Started</Link>
           <div className='greenleasveverticle'><img src={image13} /></div>
           <div className='reddotimage'><img src={image12} /></div>
         </div>
@@ -35,55 +36,74 @@ function Home() {
             <img src={image11} />
           </div>
           <div className='imagesectionblock'>
-            <p>Empowering Farmers, Enhancing Efficiency</p>
-            <h1>Transforming Agricult...</h1>
-            <p>At the heart of our platform lies a decentralized infrastructure built on Hyperledger Fabric. This cutting-edge technology enables seamless collaboration, transparency, and traceability across the entire supply chain</p>
-            <div className='getstartedbuttoncontainer'>
-              <Link className='getstartedbutton' to="/product">Get Started</Link>
-            </div>
+            <h1>🔐 Why Hyperledger Fabric?</h1>
+            {/* <p>At the heart of our platform lies a decentralized infrastructure built on Hyperledger Fabric. This cutting-edge technology enables seamless collaboration, transparency, and traceability across the entire supply chain</p> */}
+            <ul>
+              <li>Permissioned Blockchain Network</li>
+              <p>Only authorized participants can join and interact, ensuring security and trust among all stakeholders.</p>
+              <li>Private Channels for Confidential Deals</li>
+              <p>Enable confidential transactions between specific parties (e.g., farmers and buyers) without exposing data network-wide.</p>
+              <li>Smart Contracts (Chaincode) for Automation</li>
+              <p>Automate processes like crop registration, quality verification, logistics tracking, and payments with customizable chaincode.</p>
+              <li>Immutable Ledger for End-to-End Traceability</li>
+              <p>Every action is recorded on a tamper-proof ledger, enabling full traceability of crops at every stage.</p>
+            </ul>
+            {/* <div className='getstartedbuttoncontainer'>
+              <Link classNa
+              me='getstartedbutton' to="/product">Get Started</Link>
+            </div> */}
 
           </div>
         </div>
 
         <div className='section-2'>
           <p>Streamlining the Supply Chain</p>
-          <h1>Elevating Productivity and Profitability</h1>
+          <h1>🚜 Platform Highlights</h1>
         </div>
 
         <div className='boxes_container'>
           <div className='boxes'>
             <div className='image-container2'>
-              <div className='image-container2img'>
+              {/* <div className='image-container2img'>
                 <img src={icon1} />
-              </div>
+              </div> */}
             </div>
-            <h1>Optimize Inventory Management</h1>
-            <p>Enhance Traceability</p>
+            <h1>Farmer Onboarding & Crop Lifecycle Management</h1>
+            <p>Register crops, track growth stages, and manage resources all from a single interface.</p>
           </div>
           <div className='boxes1'>
             <div className='image-container2'>
-              <div className='image-container2img'>
+              {/* <div className='image-container2img'>
                 <img src={icon2} />
-              </div>
+              </div> */}
             </div>
-            <h1>Reduce Operational Costs</h1>
-            <p>Enhance Traceability</p>
+            <h1>Transparent Procurement & Distribution</h1>
+            <p>From warehouses to retailers, every handoff is digitally recorded and traceable.</p>
           </div>
           <div className='boxes2'>
             <div className='image-container2'>
-              <div className='image-container2img'>
+              {/* <div className='image-container2img'>
                 <img src={icon1} />
-              </div>
+              </div> */}
             </div>
-            <h1>Optimize Inventory Management</h1>
-            <p>Enhance Traceability</p>
+            <h1>Quality Assurance via Integrated Labs</h1>
+            <p>Third-party lab reports and certifications are securely logged on the blockchain.</p>
+          </div>
+          <div className='boxes1'>
+            <div className='image-container2'>
+              {/* <div className='image-container2img'>
+                <img src={icon1} />
+              </div> */}
+            </div>
+            <h1>Buyer & Seller Trust</h1>
+            <p>Smart contracts enforce transparent deals and help eliminate disputes.</p>
           </div>
         </div>
 
         <div className='section-3'>
-          <h1>Cultivating a Thriving Agricultural Ecosystem</h1>
+          <h1>Rooted in Trust, Grown with Blockchain</h1>
           <p>
-            Our platform harnesses the power of blockchain technology to create a decentralized, transparent, and secure supply chain management system for agricultural crops</p>
+            We’re cultivating a smarter agricultural ecosystem by combining blockchain technology with real-world farming — delivering a secure, transparent, and decentralized supply chain for crops.</p>
         </div>
         <div className='boxes_container'>
           <div className='boxessecond'>
@@ -107,6 +127,23 @@ function Home() {
         </div>
         <div className='blankimagecontainer'>
           <img src={image4} />
+          <h2>🚜 Why Choose Our Platform?</h2>
+          <div >
+            
+            <div className='blankomagecontainercontent' >
+              <p>🔗 End-to-End Traceability</p>
+              <p>Track every stage of your agricultural products' journey — from cultivation to distribution — with complete accuracy.</p>
+            </div>
+             <div className='blankomagecontainercontent' >
+              <p>🧑‍🌾 Empowering Farmers</p>
+              <p>Provide farmers with secure access to digital tools, fair markets, and transparent transaction records.</p>
+            </div>
+             <div className='blankomagecontainercontent' >
+              <p>👁 Supply Chain Visibility</p>
+              <p>Monitor and verify all crop movements and quality checks across the network in real-time.</p>
+            </div>
+
+          </div>
         </div>
 
         <div className='section45container'>

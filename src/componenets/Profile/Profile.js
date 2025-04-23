@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import profileImage from '../../Imges/portrait-322470_1280.jpg';
+import profilecover from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
+
 import './Profile.css';
 import axios from 'axios';
 
@@ -106,6 +108,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                         <>
                             <div className="profile-card">
                                 <div className="profile-banner">
+                                   <img src={profilecover} />
                                     <h1>Welcome, {userData.name}</h1>
                                 </div>
                                 <div className="profile-content">

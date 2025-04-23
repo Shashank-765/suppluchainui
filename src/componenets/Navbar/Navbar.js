@@ -38,16 +38,41 @@ function Navbar({ isAuthenticated }) {
 
           {/* Protected: Product Dropdown */}
           {isAuthenticated && (
-            <li className='dropdown'>
-              <span
-                className='dropdown-toggle'
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                Product▾
-              </span>
+            // <li className='dropdown'>
+            //   <span
+            //     className='dropdown-toggle'
+            //     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            //   >
+            //     Product▾
+            //   </span>
 
-              {isDropdownOpen && (
-                <ul className='dropdown-menu'>
+            //   {isDropdownOpen && (
+            //     <ul className='dropdown-menu'>
+            //       <li>
+            //         <Link
+            //           to='/product'
+            //           onClick={() => {
+            //             setNavState('navbarrightside');
+            //             setIsDropdownOpen(false);
+            //           }}
+            //         >
+            //           Explore
+            //         </Link>
+            //       </li>
+            //       <li>
+            //         <Link
+            //           to='/form'
+            //           onClick={() => {
+            //             setNavState('navbarrightside');
+            //             setIsDropdownOpen(false);
+            //           }}
+            //         >
+            //           Add Product
+            //         </Link>
+            //       </li>
+            //     </ul>
+            //   )}
+            // </li>      
                   <li>
                     <Link
                       to='/product'
@@ -59,33 +84,20 @@ function Navbar({ isAuthenticated }) {
                       Explore
                     </Link>
                   </li>
-                  {/* <li> */}
-                    {/* <Link
-                      to='/form'
-                      onClick={() => {
-                        setNavState('navbarrightside');
-                        setIsDropdownOpen(false);
-                      }}
-                    >
-                      Add Product
-                    </Link> */}
-                  {/* </li> */}
-                </ul>
-              )}
-            </li>
+                
           )}
 
           <li onClick={() => setNavState('navbarrightside')}>
             <Link to='/contact'>Contact</Link>
           </li>
-          <li onClick={() => setNavState('navbarrightside')} className='faqbutton'>
+          {/* <li onClick={() => setNavState('navbarrightside')} className='faqbutton'>
             <Link to='/faqs'>FAQs</Link>
-          </li>
+          </li> */}
 
           {/* Show Login/Signup or Logout */}
           {!isAuthenticated ? (
             <li onClick={() => setNavState('navbarrightside')}>
-              <Link to='/auth'>Login</Link>
+              <Link to='/auth'>Signup</Link>
             </li>
           ) : (
             <li onClick={() => setNavState('navbarrightside')}>

@@ -51,10 +51,14 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/viewpage" element={<View />} />
-          <Route
+
+          {
+          !isAuthenticated &&  <Route
             path="/auth"
             element={<SignupLogin setIsAuthenticated={setIsAuthenticated} />}
           />
+          }
+         
 
           {isAuthenticated && (
             <>

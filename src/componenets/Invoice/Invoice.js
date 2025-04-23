@@ -4,8 +4,8 @@ import qrcode from '../../Imges/qrcode.jpg'
 import { useLocation } from 'react-router-dom'
 function Invoice() {
 const location = useLocation();
-const { quantity,price,realprice,productname } = location.state || {};
-console.log(quantity,price,realprice,productname,'price and quantity')
+const { quantity,price,realprice,productname,unit } = location.state || {};
+// console.log(unit,'price and quantity')
   return (
     <div>
       <div className="invoice-container">
@@ -71,8 +71,8 @@ console.log(quantity,price,realprice,productname,'price and quantity')
               <tr>
                 <td>1</td>
                 <td>{productname}</td>
-                <td>{quantity} Qtl</td>
-                <td>₹{realprice}/Qtl</td>
+                <td>{quantity} {unit}</td>
+                <td>₹{realprice}/{unit}</td>
                 <td>₹{price}</td>
               </tr>
               {/* <tr>

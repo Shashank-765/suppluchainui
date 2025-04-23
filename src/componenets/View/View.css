@@ -155,7 +155,7 @@
   height: 500px;
   display: flex;
   justify-content: space-between;
-  box-shadow: 0 0 10px #7cb4a4;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
   align-items: center;
   font-family: Lexend;
   font-weight: 300;
@@ -222,7 +222,7 @@
 
 .about-vegitable {
   width: 93%;
-  height: 50px;
+  height: 40px;
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
@@ -314,6 +314,7 @@
   border-radius: 20px;
   text-align: center;
   overflow: hidden;
+  margin: 10px;
 
   table td,
   table th {
@@ -487,4 +488,152 @@
     padding: 10px;
     text-align: center;
   }
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.popup {
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: fadeScale 0.3s ease-in-out;
+}
+
+.animatedPopup {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.popupTitle {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.inputBlock {
+  margin-bottom: 20px;
+  text-align: left;
+    padding: 1rem;
+    border-radius: 5px;
+    padding-bottom: 25px;
+}
+
+.inputBlock label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.inputQunatity {
+  width: 93%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.inputQunatity:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.select {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.arrowButton {
+  background-color: #f1f1f1;
+  border: none;
+  color: #007bff;
+  font-weight: bold;
+  padding: 8px 15px;
+  margin: 20px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.arrowButton:hover {
+  background-color: #e0e0e0;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.confirmButton {
+  flex: 1;
+  background-color: #28a745;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirmButton:hover {
+  background-color: #218838;
+}
+
+.cancelButton {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancelButton:hover {
+  background-color: #c82333;
+}
+
+/* Animation */
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.disabledBlock {
+  opacity: 0.6;
+  background-color: #e6e5e5;
+  pointer-events: none;
+  border-radius: 10px;
 }

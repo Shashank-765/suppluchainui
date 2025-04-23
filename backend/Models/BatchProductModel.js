@@ -11,6 +11,8 @@ const trackingDetailsSchema = new mongoose.Schema({
     fertilizerUsed: { type: String },
     isInspexted: { type: Boolean, default: false },
     inspectionDate: { type: Date },
+    inspectedImages:[{type:String}],
+    
 
     // Harvester fields
     harvesterId: { type: String },

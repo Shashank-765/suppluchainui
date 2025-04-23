@@ -18,6 +18,9 @@ function View() {
   const [productData, setProductsData] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [unit, setUnit] = useState('kg');
+  const [editableField, setEditableField] = useState('quantity');
 
   const handleScroll = () => {
     const scrollLeft = scrollRef.current.scrollLeft;
@@ -26,6 +29,11 @@ function View() {
     const index = Math.round(scrollLeft / width);
     setActiveIndex(index);
   };
+
+  const handleUnitChange = (e) => setUnit(e.target.value);
+  const toggleEditable = () =>
+    setEditableField(editableField === 'quantity' ? 'price' : 'quantity');
+
 
   // const [quantity, setQuantity] = useState('');
   // const [price, setPrice] = useState('');
@@ -63,7 +71,7 @@ function View() {
     if (price <= 0 && quantity <= 0) return;
     let productname = productData?.productName;
 
-    navigate('/invoice', { state: { quantity, price, realprice, productname } });
+    navigate('/invoice', { state: { quantity, price, realprice, productname,unit } });
   }
   const handleSell = async () => {
     try {
@@ -264,39 +272,94 @@ function View() {
                     </div>
                   ) : (
                     <div className='buynowbuttoncover'>
-                      {/* <div className='quantitypricecover'> 
-                         <input className='quantitytext' onChange={(e)=>setQuantity(e.target.value)} placeholder='Enter Quantity' type='number' />
-                      <input className='quantitytext' onChange={(e)=>setQuantity(e.target.value)} placeholder='Enter Price' type='number' />
-                     </div> */}
-
-                      <div className='quantitypricecover'>
-                       <div>
+                      {/* <div className='quantitypricecover'>
+                        <div>
                           <h3>Total Qunaity</h3>
-                        <input
-                          className='quantitytext'
-                          placeholder='Enter Quantity'
-                          type='number'
-                          value={quantity}
-                          min='0'
-                          onChange={handleQuantityChange}
-                        />
-                       </div>
-                       <div>
-                         <h3>Total Price</h3>
-                        <input
-                          className='quantitytext'
-                          placeholder='Enter Price'
-                          type='number'
-                          value={price}
-                          min='0'
-                          onChange={handlePriceChange}
-                        />
-                       </div>
-                      </div>
-                      <button onClick={() => handlebuynow(quantity, price, productData?.price)} className='buynowbutton'>Buy Now</button>
+                          <input
+                            className='quantitytext'
+                            placeholder='Enter Quantity'
+                            type='number'
+                            value={quantity}
+                            min='0'
+                            onChange={handleQuantityChange}
+                          />
+                        </div>
+                        <div>
+                          <h3>Total Price</h3>
+                          <input
+                            className='quantitytext'
+                            placeholder='Enter Price'
+                            type='number'
+                            value={price}
+                            min='0'
+                            onChange={handlePriceChange}
+                          />
+                        </div>
+                      </div> */}
+                      <button onClick={() => setShowPopup(true)} className='buynowbutton'>Buy Now</button>
                     </div>
                   )
                 }
+
+                {showPopup && (
+                  <div className="popupOverlay">
+                    <div className="popup animatedPopup">
+                      <h2 className="popupTitle">Buy Product</h2>
+
+                      <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
+                        <label>Total Quantity</label>
+                        <input
+                          type="number"
+                          placeholder="Enter Quantity"
+                          className="inputQunatity"
+                          value={quantity}
+                          onChange={handleQuantityChange}
+                          disabled={editableField !== 'quantity'}
+                        />
+                        <select
+                          value={unit}
+                          onChange={handleUnitChange}
+                          disabled={editableField !== 'quantity'}
+                          className="select"
+                        >
+                          <option value="kg">kg</option>
+                          <option value="quintal">quintal</option>
+                        </select>
+                      </div>
+
+                      <button className="arrowButton" onClick={toggleEditable}>
+                        {editableField === 'quantity' ? '↑' : '↓'}
+                      </button>
+
+                      <div className={`inputBlock ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
+                        <label>Total Price</label>
+                        <input
+                          type="number"
+                          placeholder="Enter Price"
+                          className="inputQunatity"
+                          value={price}
+                          onChange={handlePriceChange}
+                          disabled={editableField !== 'price'}
+                        />
+                      </div>
+
+                      <div className="actions">
+                        <button
+                          onClick={() => handlebuynow(quantity, price, productData?.price)}
+                          className="confirmButton"
+                        >
+                          ✅ Confirm
+                        </button>
+                        <button onClick={() => setShowPopup(false)} className="cancelButton">
+                          ❌ Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
+
 
 
               </div>

@@ -5,12 +5,14 @@ import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import './Signup.css';
 
 function SignupLogin({ setIsAuthenticated }) {
-    const [isSignup, setIsSignup] = useState(false);
+    const [isSignup, setIsSignup] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
         userType: 'buyer',
+        contact:'',
+        address:''
     });
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
@@ -63,7 +65,8 @@ function SignupLogin({ setIsAuthenticated }) {
     };
 
     return (
-        <div className='form-container'>
+       <div className='signuploginconainter'>
+          <div className='form-container'>
             <h2>{isSignup ? 'Signup' : 'Login'}</h2>
             <form onSubmit={handleSubmit}>
                 {isSignup && (
@@ -74,6 +77,15 @@ function SignupLogin({ setIsAuthenticated }) {
                             className='authtext'
                             placeholder='Full Name'
                             value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                         <input
+                            type='text'
+                            name='contact'
+                            className='authtext'
+                            placeholder='Contact No.'
+                            value={formData.contact}
                             onChange={handleChange}
                             required
                         />
@@ -88,6 +100,15 @@ function SignupLogin({ setIsAuthenticated }) {
                             <option value='seller'>Seller</option>
                             <option value='retailer'>Retailer</option>
                         </select>
+                         <input
+                            type='text'
+                            name='address'
+                            className='authtext'
+                            placeholder='Address '
+                            value={formData.address}
+                            onChange={handleChange}
+                            required
+                        />
                     </>
                 )}
 
@@ -125,8 +146,7 @@ function SignupLogin({ setIsAuthenticated }) {
                 </button>
             </form>
 
-            {
-                isSignup ? (<p className='toggle-text'>
+             <p className='toggle-text'>
                     {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
                     <span
                         className='toggle-link'
@@ -134,9 +154,10 @@ function SignupLogin({ setIsAuthenticated }) {
                     >
                         {isSignup ? 'Login' : 'Signup'}
                     </span>
-                </p>) : ''
-            }
+                </p>
+            
         </div>
+       </div>
     );
 }
 

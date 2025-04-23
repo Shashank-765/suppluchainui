@@ -15,7 +15,7 @@
 .upload-button {
   margin-left: 3%;
   position: relative;
-  background: white;
+  /* background: white; */
   padding: 2px 4px;
   width: 400px;
 }

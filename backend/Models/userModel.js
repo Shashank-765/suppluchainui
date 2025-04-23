@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     contact: { type: String },
     isBlocked: { type: Boolean, default: false },
     role: { type: Object },
+    address :{type:String},
     userType: { type: String, enum: ['admin', 'user'], default: 'user' },
 });
 

@@ -1,9 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import "./Home.css"
 import section2 from '../../Imges/BG.png'
 import Image10 from '../../Imges/Multicropping.webp'
-import icon1 from '../../Imges/Icon.png'
-import icon2 from '../../Imges/Icon2.png'
 import image1 from '../../Imges/Image6.png'
 import image2 from '../../Imges/Image7.png'
 import image3 from '../../Imges/Image8.png'
@@ -15,8 +13,43 @@ import image11 from '../../Imges/Image 4.png'
 import image12 from '../../Imges/Image 3.png'
 import image13 from '../../Imges/Image 2.png'
 import image14 from '../../Imges/Image 1.png'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+
 function Home() {
+  const Navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem('user')) || null;
+  const [inspectedImages, setInspectedImages] = useState([]);
+  const [images, setImages] = useState([]);
+
+  const userhandler = () => {
+    Navigate('/auth')
+  }
+ const hangelesinghup =()=>{
+   if(user){
+     Navigate('/product')
+   }
+   else{
+   Navigate('/auth')
+   }
+ }
+  const getimages = async () => {
+    try {
+      const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getimages')
+      if (response?.data) {
+        setInspectedImages(response?.data?.randomInspectedImages)
+        setImages(response?.data?.randomImages)
+      }
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
+  useEffect(() => {
+    getimages()
+
+  }, [])
+
   return (
     <>
       <div className='main-container'>
@@ -25,7 +58,7 @@ function Home() {
           <h3>Built on Hyperledger Fabric for Secure, Transparent, and Trusted Agriculture</h3>
           <p>AgriChain is an enterprise-grade crop supply chain management platform that leverages the power of Hyperledger Fabric to ensure transparency, traceability, and trust across all agricultural processes — from sowing to sale.</p>
           <div className='greenleasvehorizontl'><img src={image14} /></div>
-          <Link className='button-explore' to="/product">Get Started</Link>
+          <button className='button-explore'onClick={hangelesinghup}>Get Started</button>
           <div className='greenleasveverticle'><img src={image13} /></div>
           <div className='reddotimage'><img src={image12} /></div>
         </div>
@@ -63,38 +96,18 @@ function Home() {
 
         <div className='boxes_container'>
           <div className='boxes'>
-            <div className='image-container2'>
-              {/* <div className='image-container2img'>
-                <img src={icon1} />
-              </div> */}
-            </div>
             <h1>Farmer Onboarding & Crop Lifecycle Management</h1>
             <p>Register crops, track growth stages, and manage resources all from a single interface.</p>
           </div>
           <div className='boxes1'>
-            <div className='image-container2'>
-              {/* <div className='image-container2img'>
-                <img src={icon2} />
-              </div> */}
-            </div>
             <h1>Transparent Procurement & Distribution</h1>
             <p>From warehouses to retailers, every handoff is digitally recorded and traceable.</p>
           </div>
           <div className='boxes2'>
-            <div className='image-container2'>
-              {/* <div className='image-container2img'>
-                <img src={icon1} />
-              </div> */}
-            </div>
             <h1>Quality Assurance via Integrated Labs</h1>
             <p>Third-party lab reports and certifications are securely logged on the blockchain.</p>
           </div>
           <div className='boxes1'>
-            <div className='image-container2'>
-              {/* <div className='image-container2img'>
-                <img src={icon1} />
-              </div> */}
-            </div>
             <h1>Buyer & Seller Trust</h1>
             <p>Smart contracts enforce transparent deals and help eliminate disputes.</p>
           </div>
@@ -108,38 +121,49 @@ function Home() {
         <div className='boxes_container'>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
-              <img src={image1} />
+            {
+              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[0]}`} />
+              : <img src={image1} />
+            }
+              
             </div>
             <p> Achieve Increased Crop Yields</p>
           </div>
           <div className='boxessecond'>
-            <div className='boxessecondimgcontainer'>
-              <img src={image2} />
+            <div className='boxessecondimgcontainer'>{
+              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[1]}`} />
+              : <img src={image2} />
+            } 
             </div>
             <p> Ensure Quality and Freshness</p>
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
-              <img src={image3} />
+              {
+              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[2]}`} />
+              : <img src={image3} />
+            }
             </div>
+            
             <p>Minimize Waste and Spoilage</p>
           </div>
+         
         </div>
         <div className='blankimagecontainer'>
           <img src={image4} />
           <h2>🚜 Why Choose Our Platform?</h2>
           <div >
-            
+
             <div className='blankomagecontainercontent' >
-              <p>🔗 End-to-End Traceability</p>
+              <p className='paragragraohblank'>🔗 End-to-End Traceability</p>
               <p>Track every stage of your agricultural products' journey — from cultivation to distribution — with complete accuracy.</p>
             </div>
-             <div className='blankomagecontainercontent' >
-              <p>🧑‍🌾 Empowering Farmers</p>
+            <div className='blankomagecontainercontent' >
+              <p className='paragragraohblank'>🧑‍🌾 Empowering Farmers</p>
               <p>Provide farmers with secure access to digital tools, fair markets, and transparent transaction records.</p>
             </div>
-             <div className='blankomagecontainercontent' >
-              <p>👁 Supply Chain Visibility</p>
+            <div className='blankomagecontainercontent' >
+              <p className='paragragraohblank'>👁 Supply Chain Visibility</p>
               <p>Monitor and verify all crop movements and quality checks across the network in real-time.</p>
             </div>
 
@@ -158,7 +182,11 @@ function Home() {
               <p>Our decentralized platform built on Hyperledger Fabric offers end-to-end traceability, enabling you to track the journey of your agricultural products from farm to table</p>
               <br></br>
               <p>Leveraging the power of blockchain technology, our platform provides a secure and immutable record of all transactions, eliminating the risk of fraud and enhancing trust throughout the supply chain</p>
-              <button className='joinnowbutton'>Join Now</button>
+
+              {
+                user ? '' : <button onClick={userhandler} className='joinnowbutton'>Join Now</button>
+              }
+
             </div>
             <div className='sector5-boxes2'>
               <img src={Image10} alt='photo'></img>
@@ -174,13 +202,24 @@ function Home() {
           </div>
           <div className='section-6-lowercontainer'>
             <div className='section-6imgcontainer'>
-              <img src={image5} />
+
+            {
+                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[0]}`} />
+                : <img  src={image5}/>
+            }
+              
             </div>
             <div className='section-6imgcontainer'>
-              <img src={image6} />
+              {
+                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[1]}`} />
+                : <img  src={image6}/>
+            }
             </div>
             <div className='section-6imgcontainer'>
-              <img src={image7} />
+             {
+                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[2]}`} />
+                : <img  src={image7}/>
+            }
             </div>
           </div>
         </div>

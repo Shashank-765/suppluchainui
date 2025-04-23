@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import './Product.css'
+import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -35,9 +36,10 @@ function Product() {
     return (
         <>
             <div className='productsection'>
-                <div className='productlistheading'>
-                    <h1>Product List</h1>
-                </div>
+                 <div className='contactcoverimagecontianer'>
+       <img  src={coverImage}/>
+        <h1>Products</h1>
+    </div>
                 <div className='productmaincontainer'>
                     {
 

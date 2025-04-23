@@ -29,8 +29,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
-}).array('images', 15);
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+}).fields([
+  { name: 'images', maxCount: 15 },
+  { name: 'inspectedImages', maxCount: 15 }
+]);
+
 
 
 router.post('/register', async (req, res) => {
@@ -592,8 +596,8 @@ router.get('/getBatchByUserId', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batches.' });
   }
 });
-router.post('/updateBatch',upload, async (req, res) => {
-console.log('req.body', req.body)
+router.post('/updateBatch', upload, async (req, res) => {
+  console.log('req.body', req.body)
   try {
     const {
       batchId,
@@ -653,21 +657,33 @@ console.log('req.body', req.body)
 
     // FARM INSPECTION LOGIC
     if (farmInspectionId || farmInspectionName || certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed || productName) {
+      const imagePaths = [];
+
+      if (req.files) {
+        if (req.files.images) {
+          imagePaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
+        }
+        if (req.files.inspectedImages) {
+          imagePaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
+        }
+      }
+
       updatedFields.certificateNo = certificateNo;
       updatedFields.certificateFrom = certificateFrom;
       updatedFields.productName = productName;
-      updatedFields.farmInspectionId=farmInspectionId;
-      updatedFields.farmInspectionName=farmInspectionName;
+      updatedFields.farmInspectionId = farmInspectionId;
+      updatedFields.farmInspectionName = farmInspectionName;
       updatedFields.typeOfFertilizer = typeOfFertilizer;
       updatedFields.fertilizerUsed = fertilizerUsed;
       updatedFields.isInspexted = true;
       updatedFields.inspectionDate = new Date();
+      updatedFields.inspectedImages = imagePaths;
     }
 
     // HARVESTER LOGIC
     if (harvesterId || harvesterName || cropSampling || temperatureLevel || humidity) {
-      updatedFields.harvesterId=harvesterId;
-      updatedFields.harvesterName=harvesterName;
+      updatedFields.harvesterId = harvesterId;
+      updatedFields.harvesterName = harvesterName;
       updatedFields.cropSampling = cropSampling;
       updatedFields.temperatureLevel = temperatureLevel;
       updatedFields.humidity = humidity;
@@ -708,7 +724,16 @@ console.log('req.body', req.body)
     // PROCESSOR LOGIC
     if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination || miniQuantity || maxiQuantity || price) {
 
-      const imagePaths = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+      const imagePaths = [];
+
+      if (req.files) {
+        if (req.files.images) {
+          imagePaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
+        }
+        if (req.files.inspectedImages) {
+          imagePaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
+        }
+      }
       updatedFields.price = price;
       updatedFields.miniQuantity = miniQuantity;
       updatedFields.maxiQuantity = maxiQuantity;
@@ -747,7 +772,7 @@ console.log('req.body', req.body)
 });
 router.get('/getproducttomarkiting', async (req, res) => {
   try {
-    const trackingDetails = await TrackingModel.find({isProcessed: true})
+    const trackingDetails = await TrackingModel.find({ isProcessed: true })
     if (!trackingDetails) {
       return res.status(404).json({ message: 'Tracking details not found' });
     }
@@ -759,6 +784,45 @@ router.get('/getproducttomarkiting', async (req, res) => {
   }
 }
 );
+router.get('/getimages', async (req, res) => {
+  try {
+    const trackingRecords = await TrackingModel.find({});
+
+    // Collect all images from all records
+    let allInspectedImages = [];
+    let allImages = [];
+
+    trackingRecords.forEach(record => {
+      if (record.inspectedImages && record.inspectedImages.length > 0) {
+        allInspectedImages.push(...record.inspectedImages);
+      }
+      if (record.images && record.images.length > 0) {
+        allImages.push(...record.images);
+      }
+    });
+
+    // Shuffle and pick up to 3 images from each list
+    const randomInspectedImages = getRandomImages(allInspectedImages, 3);
+    const randomImages = getRandomImages(allImages, 3);
+
+    res.status(200).json({
+      randomInspectedImages,
+      randomImages,
+    });
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).json({ message: 'Error fetching images' });
+  }
+});
+
+function getRandomImages(arr, maxCount) {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, maxCount);
+}
 
 
 

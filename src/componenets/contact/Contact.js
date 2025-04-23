@@ -1,10 +1,15 @@
 import React from 'react';
 import './Contact.css';
+import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
 
 function Contact() {
   return (
     <div className="contact-wrapper">
-      <h1>Contact Us</h1>
+    <div className='contactcoverimagecontianer'>
+       <img  src={coverImage}/>
+        <h1>Contact Us</h1>
+    </div>
+     
 
       {/* Full-width Map */}
       <div className="map-fullwidth">

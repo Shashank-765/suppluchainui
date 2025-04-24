@@ -8,11 +8,21 @@ const Fruit = require('../Models/ProductModel.js');
 const BatchModel = require('../Models/BatchModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const Role = require('../Models/RolesModel.js');
+const nodemailer = require("nodemailer")
 const bcrypt = require('bcryptjs');
 const QRCode = require('qrcode');
 const { generateToken, generateWallet } = require('../Auth/Authenticate.js');
 
 
+let transporter = nodemailer.createTransport({
+  host: "mail.smtp2go.com",
+  port: 2525,
+  secure: false,
+  auth: {
+    user: 'Businessbay',
+    pass: '4RlUtFpREiCs5tn7',
+  },
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,14 +46,12 @@ const upload = multer({
 ]);
 
 
-
 router.post('/register', async (req, res) => {
 
   try {
     console.log('req.body', req.body)
-
-    const { name, email, password, contact, role } = req.body;
-    if (!name || !email || !password || !role || !contact) {
+    const { name, email, password, contact, role, userType, address } = req.body;
+    if (!name || !email || !password || !contact) {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
 
@@ -57,7 +65,9 @@ router.post('/register', async (req, res) => {
       email,
       password,
       role,
+      userType,
       contact,
+      address,
       walletAddress: wallet.address
     });
     await user.save();
@@ -78,6 +88,150 @@ router.post('/register', async (req, res) => {
   }
 
 })
+
+router.post('/createuser', async (req, res) => {
+
+  try {
+    console.log('req.body', req.body)
+    const { name, email, password, contact, role, userType, address } = req.body;
+    if (!name || !email || !password || !contact) {
+      return res.status(400).json({ message: 'Please fill all fields' });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    const wallet = await generateWallet();
+    const user = new User({
+      name,
+      email,
+      password,
+      role,
+      userType,
+      contact,
+      address,
+      walletAddress: wallet.address
+    });
+    await user.save();
+
+    const jwtToken = generateToken(user._id);
+    if (jwtToken) {
+      user.token = jwtToken;
+      await user.save();
+    }
+
+      const mailOptions = {
+      from: 'arun@bastionex.net',
+      to: email,
+      subject: "Verify your email address",
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Confirmation</title>
+            <style>
+                .button {
+                    background-color: #008CBA;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    font-size: 16px;
+                    border-radius: 5px;
+                    display: inline-block;
+                    margin-top: 10px;
+                }
+
+                .button:hover {
+                    background-color: #005f7a;
+                }
+
+                table {
+                    width: 600px;
+                    margin: 0 auto;
+                    border-collapse: collapse;
+                }
+
+                table td {
+                    padding: 10px;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div style="margin:0;font-family: 'Lato', sans-serif;">
+                <table style="width:600px;background-color:rgb(255,255,255);margin:0 auto;border-spacing:0;border-collapse:collapse">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p style="color:#000;text-align:center;font-size:16px;margin-bottom:20px;">
+                                  Your login Id and password 
+                                </p>
+                                <p style="color:#000;text-align:center;font-size:16px;margin-bottom:20px;">
+                                   Email ---  ${email}
+                                   <br/>
+                                   Password --- ${password}
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </body>
+
+        </html>
+
+      `,
+    };    
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ user, message: 'User registered successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+
+  }
+
+})
+
+router.post('/updateprofile', async (req, res) => {
+  try {
+    const { email, name, contact, address, userType } = req.body;
+    console.log(req.body);
+
+    const isExist = await User.findOne({ email });
+    if (!isExist) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    isExist.name = name;
+    isExist.contact = contact;
+    isExist.address = address;
+    isExist.userType = userType;
+
+    await isExist.save();
+
+    return res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        email: isExist.email,
+        name: isExist.name,
+        contact: isExist.contact,
+        address: isExist.address,
+        userType: isExist.userType
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 router.post('/login', async (req, res) => {
 
   try {
@@ -85,12 +239,13 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
-    console.log(email)
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
+     if(user?.isBlocked){
+         return res.status(400).json({message:'This user has been blocked'})
+     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Wrong Password' });
@@ -329,23 +484,18 @@ router.post('/createBatch', async (req, res) => {
 
     if (farmInspectionName) {
       farmInspectionId = await User.findOne({ name: farmInspectionName });
-      console.log('farm', farmInspectionId)
     }
     if (harvesterName) {
       harvesterId = await User.findOne({ name: harvesterName });
-      console.log('harvester', harvesterId)
     }
     if (processorName) {
       processorId = await User.findOne({ name: processorName });
-      console.log('processor', processorId)
     }
     if (exporterName) {
       exporterId = await User.findOne({ name: exporterName });
-      console.log('exporter', exporterId)
     }
     if (importerName) {
       importerId = await User.findOne({ name: importerName });
-      console.log('importer', importerId)
     }
     const newBatch = new BatchModel({
       farmerRegNo,
@@ -384,6 +534,32 @@ router.post('/createBatch', async (req, res) => {
     return res.status(500).json({ message: 'Server error while creating batch' });
   }
 });
+
+router.delete('/deletebatch', async (req, res) => {
+  try {
+    const { batchId } = req.query;
+    console.log(batchId, 'batch ids');
+
+    if (!batchId) {
+      return res.status(400).json({ message: 'batchId is required' });
+    }
+
+    // Delete the batch using the batchId field
+    const deleted = await BatchModel.findOneAndDelete({ batchId: batchId });
+    const delted2 = await TrackingModel.findOneAndDelete({batchId: batchId})
+
+    if (!deleted && !delted2) {
+      return res.status(404).json({ message: 'Batch not found' });
+    }
+
+    res.status(200).json({ message: 'Batch deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting batch:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 // router.post('/insertRoles', async (req, res) => {
 //   const roleMap = {
 //     FARM_INSPECTION: {

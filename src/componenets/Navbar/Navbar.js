@@ -6,7 +6,7 @@ import menu from '../../Imges/menus.png';
 import cross from '../../Imges/cross.png';
 
 function Navbar({ isAuthenticated }) {
- const data = (JSON.parse(localStorage.getItem('user')));
+  const data = (JSON.parse(localStorage.getItem('user')));
   const [navstae, setNavState] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   return (
@@ -30,9 +30,10 @@ function Navbar({ isAuthenticated }) {
                 <Link to='/dashboard'>Dashboard</Link>
               </li>
                 :
-                <li onClick={() => setNavState('navbarrightside')}>
-                  <Link to='/userdashboard'>Dashboard</Link>
-                </li>}
+                data?.userType === 'user' ?
+                  <li onClick={() => setNavState('navbarrightside')}>
+                    <Link to='/userdashboard'>Dashboard</Link>
+                  </li> : ''}
             </>
           )}
 
@@ -73,18 +74,18 @@ function Navbar({ isAuthenticated }) {
             //     </ul>
             //   )}
             // </li>      
-                  <li>
-                    <Link
-                      to='/product'
-                      onClick={() => {
-                        setNavState('navbarrightside');
-                        setIsDropdownOpen(false);
-                      }}
-                    >
-                      Explore
-                    </Link>
-                  </li>
-                
+            <li>
+              <Link
+                to='/product'
+                onClick={() => {
+                  setNavState('navbarrightside');
+                  setIsDropdownOpen(false);
+                }}
+              >
+                Explore
+              </Link>
+            </li>
+
           )}
 
           <li onClick={() => setNavState('navbarrightside')}>

@@ -9,68 +9,83 @@
 
 .profile-edit-form {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin: 20px 0;
-  display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
   width: 100%;
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
 
-  .editformcontianer {
-    max-width: 500px;
-    min-width: 400px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 5rem 3rem;
-    border-radius: 20px;
-    border: 1px solid #1e8d2a;
-  }
+.editformcontianer {
+  background-color: #ffffff;
+  padding: 2rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid #e0e0e0;
 }
 
 .profile-edit-form label {
   display: flex;
   flex-direction: column;
-  font-weight: bold;
-  text-align: left;
-  margin-bottom: 20px;
+  font-weight: 500;
+  margin-bottom: 1.2rem;
+  color: #333;
+  text-align: start;
 }
 
-.profile-edit-form input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 10px;
-}
-
-/* Buttons */
-.profile-edit-btn,
-.profile-save-btn,
-.profile-cancel-btn,
-.profile-logout-btn {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
-  padding: 10px 14px;
-  border: none;
+.profile-edit-form input,
+.profile-edit-form select {
+  padding: 0.75rem;
   border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+  border: 1px solid #ccc;
+  margin-top: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
+
+.profile-edit-form input:focus,
+.profile-edit-form select:focus {
+  outline: none;
+  border-color: #28a745;
+}
+
 
 .profile-edit-btn {
   background-color: #007bff;
   color: white;
   margin: 10px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
 }
 
 .profile-save-btn {
   background-color: #28a745;
   color: white;
+  margin: 10px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
 }
 
 .profile-cancel-btn {
   background-color: #6c757d;
   color: white;
+  margin: 10px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
 
 }
 
@@ -78,6 +93,10 @@
   background-color: crimson;
   color: white;
   margin: 10px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
 }
 
 .profile-edit-buttons {
@@ -150,9 +169,11 @@
 .profile-content {
   padding: 1rem;
   text-align: center;
-  margin-top: -4rem; /* Pulls profile content up into banner */
+  margin-top: -4rem;
+  /* Pulls profile content up into banner */
   position: relative;
-  z-index: 3; /* Ensure it's above banner background */
+  z-index: 3;
+  /* Ensure it's above banner background */
 }
 
 .profile-image {
@@ -160,10 +181,12 @@
   height: 120px;
   border-radius: 100%;
   object-fit: cover;
-  margin-top: 0px; /* This pulls it up to overlap the banner */
+  margin-top: 0px;
+  /* This pulls it up to overlap the banner */
   border: 5px solid #fff;
   z-index: 5;
-  background-color: white; /* Optional: fallback in case image doesn't load */
+  background-color: white;
+  /* Optional: fallback in case image doesn't load */
 }
 
 

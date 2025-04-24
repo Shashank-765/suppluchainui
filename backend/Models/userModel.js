@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     isBlocked: { type: Boolean, default: false },
     role: { type: Object },
     address :{type:String},
-    userType: { type: String, enum: ['admin', 'user'], default: 'user' },
+    userType: { type: String, enum: ['admin', 'user','seller','buyer','retailer'], default: 'user' },
 });
 
 // Hash the password before saving the user

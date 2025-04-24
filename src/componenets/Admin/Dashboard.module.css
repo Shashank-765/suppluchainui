@@ -313,6 +313,20 @@ padding: 1rem;
         /* font-size: 10px; */
     }
 }
+.deleteButton {
+    background: transparent;
+    border: none;
+    color: green;
+    /* border: 1px solid red; */
+
+    >img {
+        width: 18px;
+        color: green;
+        cursor: pointer;
+        margin-left: 5px;
+        /* font-size: 10px; */
+    }
+}
 
 .qrModalOverlay {
     position: fixed;
@@ -452,4 +466,13 @@ padding: 1rem;
     border-radius: 20px;
     /* cursor: pointer; */
     font-size: 16px;
+}
+
+.contactnumber::-webkit-outer-spin-button,
+.contactnumber::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.contactnumber {
+  -moz-appearance: textfield;
 }

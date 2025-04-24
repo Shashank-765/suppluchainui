@@ -119,6 +119,12 @@
     margin-left: 3%;
     color: white;
 
+    >ul{
+       >li{
+        font-size: 20px;
+       }
+    }
+
     >h1 {
         font-family: IBM Plex Mono;
         color: white;

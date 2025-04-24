@@ -4,13 +4,13 @@ import axios from 'axios';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import './Signup.css';
 
-function SignupLogin({ setIsAuthenticated }) {
+function SignupLogin({ setIsAuthenticated,setUserData }) {
     const [isSignup, setIsSignup] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        userType: 'buyer',
+        userType: '',
         contact:'',
         address:''
     });
@@ -54,7 +54,8 @@ function SignupLogin({ setIsAuthenticated }) {
 
                     setIsAuthenticated(true);
                     localStorage.setItem('user', JSON.stringify(loggedInUser.data.user));
-                    navigate('/home');
+                    setUserData(loggedInUser.data.user);
+                    navigate('/');
                     showSuccess('Login successful!');
                 }
             } catch (error) {

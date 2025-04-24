@@ -13,7 +13,6 @@ import SignupLogin from './componenets/signup/Signup';
 import NotFound from './componenets/Not-Found';
 import Profile from './componenets/Profile/Profile';
 import Dashboard from './componenets/Admin/Dashboard';
-import EditUser from './componenets/EditUser/EditUser';
 import UserDashBoard from './componenets/User/UserDashbord';
 import BatchProgressView from './componenets/BatchViewProgress/BatchProgressView';
 import ScreeningPage from './componenets/QrscanerPage/ScreeningPage';
@@ -30,20 +29,24 @@ import {
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState(null);
+
   useEffect(() => {
-    const data = (JSON.parse(localStorage.getItem('user')));
-    if (data) {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setUserData(parsed);
       setIsAuthenticated(true);
     }
   }, []);
 
+  const userType = userData?.userType;
+
   return (
     <Router>
       <ScrollToTop />
-      <div className='appcontainerbakground'>
-        <Navbar
-          isAuthenticated={isAuthenticated}
-        />
+      <div className="appcontainerbakground">
+        <Navbar isAuthenticated={isAuthenticated} />
 
         <Routes>
           <Route path="/" element={<Home />} />
@@ -52,18 +55,16 @@ function App() {
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/viewpage" element={<View />} />
 
-          {
-          !isAuthenticated &&  <Route
-            path="/auth"
-            element={<SignupLogin setIsAuthenticated={setIsAuthenticated} />}
-          />
-          }
-         
+          {!isAuthenticated && (
+            <Route
+              path="/auth"
+              element={<SignupLogin setIsAuthenticated={setIsAuthenticated} setUserData={setUserData} />}
+            />
+          )}
 
-          {isAuthenticated && (
+          {isAuthenticated && userType === 'admin' && (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/edituser" element={<EditUser />} />
               <Route path="/product" element={<Product />} />
               <Route path="/form" element={<Form />} />
               <Route path="/invoice" element={<Invoice />} />
@@ -77,8 +78,35 @@ function App() {
             </>
           )}
 
-          <Route path="*" element={<NotFound />} />
+          {isAuthenticated && userType === 'user' && (
+            <>
+              <Route path="/userdashboard" element={<UserDashBoard />} />
+              <Route path="/product" element={<Product />} />
+              <Route path="/form" element={<Form />} />
+              <Route path="/invoice" element={<Invoice />} />
+              <Route path="/batchprogress" element={<BatchProgressView />} />
+              <Route path="/screening" element={<ScreeningPage />} />
+              <Route
+                path="/profile"
+                element={<Profile setIsAuthenticated={setIsAuthenticated} />}
+              />
+            </>
+          )}
 
+          {isAuthenticated &&
+            userType !== 'user' &&
+            userType !== 'admin' && (
+              <>
+                <Route path="/product" element={<Product />} />
+                <Route path="/invoice" element={<Invoice />} />
+                <Route
+                  path="/profile"
+                  element={<Profile setIsAuthenticated={setIsAuthenticated} />}
+                />
+              </>
+            )}
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         <Footer />
@@ -97,6 +125,8 @@ function App() {
     </Router>
   );
 }
+
+
 
 function ScrollToTop() {
   const location = useLocation();

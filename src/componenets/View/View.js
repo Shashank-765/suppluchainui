@@ -21,7 +21,23 @@ function View() {
   const [showPopup, setShowPopup] = useState(false);
   const [unit, setUnit] = useState('kg');
   const [editableField, setEditableField] = useState('quantity');
+  const popupRef = useRef(null);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (popupRef.current && !popupRef.current.contains(event.target)) {
+        setShowPopup(false);
+      }
+    }
+
+    if (showPopup) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showPopup]);
   const handleScroll = () => {
     const scrollLeft = scrollRef.current.scrollLeft;
     const width = scrollRef.current.offsetWidth;
@@ -30,7 +46,29 @@ function View() {
     setActiveIndex(index);
   };
 
-  const handleUnitChange = (e) => setUnit(e.target.value);
+ const handleUnitChange = (e) => {
+  const newUnit = e.target.value;
+  setUnit(newUnit);
+
+  const basePricePerQuintal = parseFloat(productData?.price || 0);
+  const unitPrice = newUnit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
+
+  if (lastChanged === 'quantity') {
+    const calculatedPrice =
+      quantity
+        ? (parseFloat(quantity) * unitPrice).toFixed(2)
+        : '';
+    setPrice(calculatedPrice);
+  } else if (lastChanged === 'price') {
+    const calculatedQty =
+      price
+        ? (parseFloat(price) / unitPrice).toFixed(2)
+        : '';
+    setQuantity(calculatedQty);
+  }
+};
+
+
   const toggleEditable = () =>
     setEditableField(editableField === 'quantity' ? 'price' : 'quantity');
 
@@ -71,7 +109,7 @@ function View() {
     if (price <= 0 && quantity <= 0) return;
     let productname = productData?.productName;
 
-    navigate('/invoice', { state: { quantity, price, realprice, productname,unit } });
+    navigate('/invoice', { state: { quantity, price, realprice, productname, unit } });
   }
   const handleSell = async () => {
     try {
@@ -117,44 +155,55 @@ function View() {
   const handleAccordion = (index) => {
     setActiveAccordion(activeAccordion === index ? null : index);
   };
+ const handleQuantityChange = (e) => {
+  const value = e.target.value;
+  if (parseFloat(value) < 0) return;
 
-  const handleQuantityChange = (e) => {
-    const value = e.target.value;
-    if (parseFloat(value) < 0) return;
+  if (lastChanged === 'price') {
+    setQuantity('');
+    setPrice('');
+    setLastChanged(null);
+  } else {
+    setQuantity(value);
 
-    if (lastChanged === 'price') {
-      setQuantity('');
-      setPrice('');
-      setLastChanged(null);
-    } else {
-      setQuantity(value);
-      const calculatedPrice =
-        value && productData?.price
-          ? (parseFloat(value) * parseFloat(productData.price)).toFixed(2)
-          : '';
-      setPrice(calculatedPrice);
-      setLastChanged('quantity');
-    }
-  };
+    const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
+
+    const calculatedPrice =
+      value
+        ? (parseFloat(value) * unitPrice).toFixed(2)
+        : '';
+
+    setPrice(calculatedPrice);
+    setLastChanged('quantity');
+  }
+};
+
 
   const handlePriceChange = (e) => {
-    const value = e.target.value;
-    if (parseFloat(value) < 0) return;
+  const value = e.target.value;
+  if (parseFloat(value) < 0) return;
 
-    if (lastChanged === 'quantity') {
-      setQuantity('');
-      setPrice('');
-      setLastChanged(null);
-    } else {
-      setPrice(value);
-      const calculatedQty =
-        value && productData?.price
-          ? (parseFloat(value) / parseFloat(productData.price)).toFixed(2)
-          : '';
-      setQuantity(calculatedQty);
-      setLastChanged('price');
-    }
-  };
+  if (lastChanged === 'quantity') {
+    setQuantity('');
+    setPrice('');
+    setLastChanged(null);
+  } else {
+    setPrice(value);
+
+    const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
+
+    const calculatedQty =
+      value
+        ? (parseFloat(value) / unitPrice).toFixed(2)
+        : '';
+
+    setQuantity(calculatedQty);
+    setLastChanged('price');
+  }
+};
+
 
 
   const dummyData = [
@@ -250,7 +299,17 @@ function View() {
           </div>
           <div className='rightviewdiv'>
             <div className='rightviewfirstdiv'>
-              <h2><img src={locationImage} />{productData?.warehouseAddress}</h2>
+              <h2>
+                <a
+                  href={`https://www.google.com/maps?q=${encodeURIComponent(productData?.warehouseAddress)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}
+                >
+                  <img src={locationImage} alt="Location" style={{ marginRight: '8px' }} />
+                  {productData?.warehouseAddress}
+                </a>
+              </h2>
               <h2 className='nameofproductowner'>{productData?.productName}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.price}</span></h2>
               <h2>Mini Qty : <span className='priceproduct'>{productData?.miniQuantity} Qtl</span></h2>
@@ -303,40 +362,43 @@ function View() {
 
                 {showPopup && (
                   <div className="popupOverlay">
-                    <div className="popup animatedPopup">
+                    <div ref={popupRef} className="popup animatedPopup">
                       <h2 className="popupTitle">Buy Product</h2>
 
                       <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
                         <label>Total Quantity</label>
-                        <input
-                          type="number"
-                          placeholder="Enter Quantity"
-                          className="inputQunatity"
-                          value={quantity}
-                          onChange={handleQuantityChange}
-                          disabled={editableField !== 'quantity'}
-                        />
-                        <select
-                          value={unit}
-                          onChange={handleUnitChange}
-                          disabled={editableField !== 'quantity'}
-                          className="select"
-                        >
-                          <option value="kg">kg</option>
-                          <option value="quintal">quintal</option>
-                        </select>
+                        <div className='quantity_box'>
+                          <input
+                            type="number"
+                            placeholder="Enter Quantity"
+                            className="inputQunatity"
+                            value={quantity}
+                            onChange={handleQuantityChange}
+                            disabled={editableField !== 'quantity'}
+                          />
+                          <select
+                            value={unit}
+                            onChange={(e)=>handleUnitChange(e)}
+                            disabled={editableField !== 'quantity'}
+                            className="select"
+                          >
+                            <option value="kg">kg</option>
+                            <option value="quintal">quintal</option>
+                          </select>
+                        </div>
+
                       </div>
 
                       <button className="arrowButton" onClick={toggleEditable}>
                         {editableField === 'quantity' ? '↑' : '↓'}
                       </button>
 
-                      <div className={`inputBlock ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
+                      <div className={`inputBlock2 ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
                         <label>Total Price</label>
                         <input
                           type="number"
                           placeholder="Enter Price"
-                          className="inputQunatity"
+                          className="inputQunatity2"
                           value={price}
                           onChange={handlePriceChange}
                           disabled={editableField !== 'price'}
@@ -348,10 +410,10 @@ function View() {
                           onClick={() => handlebuynow(quantity, price, productData?.price)}
                           className="confirmButton"
                         >
-                          ✅ Confirm
+                          Confirm
                         </button>
                         <button onClick={() => setShowPopup(false)} className="cancelButton">
-                          ❌ Cancel
+                          Cancel
                         </button>
                       </div>
                     </div>

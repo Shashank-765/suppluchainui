@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import edit from '../../Imges/edit (1).png'
 import view from '../../Imges/eye.png'
+import deleteimage from '../../Imges/delete.png'
 import block from '../../Imges/prohibition.png'
 import unblock from '../../Imges/unlocked.png'
 import styles from './Dashboard.module.css';
@@ -10,6 +11,7 @@ import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const popupRef = useRef(null);
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showUserModal, setShowUserModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +28,7 @@ const Dashboard = () => {
     const [allBatch, setAllBatch] = useState([]);
     const [currnetBatchPage, setCurrentBatchPage] = useState(1);
     const [roles, setRoles] = useState([]);
-
+    const [isEditing, setIsEditing] = useState(false);
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const qrImageRef = useRef(null);
 
@@ -41,6 +43,42 @@ const Dashboard = () => {
         role: '',
     });
 
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                handleEditToggle(); // close popup if click outside
+            }
+        };
+
+        if (isEditing) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isEditing]);
+
+
+    const handleSave = async () => {
+        try {
+
+            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/updateprofile', edituserdata)
+            if (response?.data) {
+                setIsEditing(false);
+                setToggle(!toggle);
+                showSuccess('Profile updated!');
+            }
+        } catch (error) {
+            setIsEditing(true);
+            showError('Failed to update profile')
+        }
+
+    };
+    const handleEditToggle = () => {
+        setIsEditing(!isEditing);
+    };
 
     const HandleBatchviewPage = (batch) => {
         console.log(batch);
@@ -141,7 +179,7 @@ const Dashboard = () => {
 
         // Example POST request
         try {
-            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/register', userForm);
+            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/createuser', userForm);
             if (response.data) {
                 console.log('User created!');
                 setShowUserModal(false);
@@ -160,8 +198,17 @@ const Dashboard = () => {
         }
     };
 
-    const edithandler = (user) => {
-        navigate('/edituser', { state: { user } });
+    const [edituserdata,setedituserdata]=useState({ name: '', email: '', userType: '', address: '', contact: '' })
+
+    const edithandler = (edituser) => {
+    setedituserdata({
+      name:edituser?.name,
+      email:edituser?.email,
+      userType:edituser?.userType,
+      address:edituser?.address,
+      contact:edituser?.contact
+    })
+        setIsEditing(!isEditing);
     }
     const userview = (userdata) => {
         navigate('/userdashboard', { state: { userdata } });
@@ -276,9 +323,26 @@ const Dashboard = () => {
         }
 
     }
+      const handleeditChange = (e) => {
+        const { name, value } = e.target;
+        setedituserdata((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const deleteBatch = async (id) => {
+        try {
+            const response = await axios.delete(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/deletebatch?batchId=${id}`)
+            if (response?.data) {
+                setToggle(!toggle);
+                showSuccess("Batch deleted succefully")
+            }
+        } catch (error) {
+            console.log(error)
+            showError("failed to delte batch")
+        }
+    }
     useEffect(() => {
         fetchbatch();
-    }, [currnetBatchPage, searchBatchTerm, showBatchModal]);
+    }, [currnetBatchPage, searchBatchTerm, showBatchModal, toggle]);
 
 
     useEffect(() => {
@@ -467,6 +531,9 @@ const Dashboard = () => {
                                             <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
                                                 <img src={view} />
                                             </button>
+                                            <button onClick={() => deleteBatch(batch.batchId)} className={styles.deleteButton}>
+                                                <img src={deleteimage} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -551,78 +618,78 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className={styles.usersTableWrapper1}>
-                      <div className={styles.tableheader}>
-                           <h3>Users</h3>
-                    <div className={styles.sectionHeader1}>
-                        <input
-                            type="text"
-                            placeholder="Search user..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className={styles.searchInput}
-                        />
-                        <button className={styles.primaryBtn} onClick={() => setShowUserModal(true)}>
-                            Create User
-                        </button>
-                    </div>
-                      </div>
+                        <div className={styles.tableheader}>
+                            <h3>Users</h3>
+                            <div className={styles.sectionHeader1}>
+                                <input
+                                    type="text"
+                                    placeholder="Search user..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className={styles.searchInput}
+                                />
+                                <button className={styles.primaryBtn} onClick={() => setShowUserModal(true)}>
+                                    Create User
+                                </button>
+                            </div>
+                        </div>
                         <div className={styles.usersTableWrapper}>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>Wallet Address</th>
-                                    <th>Name</th>
-                                    <th>Contact No.</th>
-                                    <th>Role</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {allUser?.length > 0 ? (
-                                    allUser.map((user, index) => (
-                                        <tr key={index}>
-                                            <td>
-                                                {user.walletAddress
-                                                    ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
-                                                    : ''}
-                                            </td>
-                                            <td>{user.name}</td>
-                                            <td>{user.contact}</td>
-                                            <td>
-                                                {user.role && (
-                                                    <span
-                                                        className={
-                                                            user.role.className
-                                                                .split(' ')
-                                                                .map(cn => styles[cn])
-                                                                .join(' ')
-                                                        }
-                                                    >
-                                                        {user.role.label}
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} /></button>
-                                                {
-                                                    !user?.isBlocked ? (
-                                                        <button onClick={() => blockhandler(user)} className={styles.editButton}><img src={unblock} /></button>
-                                                    ) : (
-                                                        <button onClick={() => unblockhandler(user)} className={styles.editButton}><img src={block} /></button>
-                                                    )}
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Wallet Address</th>
+                                        <th>Name</th>
+                                        <th>Contact No.</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {allUser?.length > 0 ? (
+                                        allUser.map((user, index) => (
+                                            <tr key={index}>
+                                                <td>
+                                                    {user.walletAddress
+                                                        ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
+                                                        : ''}
+                                                </td>
+                                                <td>{user.name}</td>
+                                                <td>{user.contact}</td>
+                                                <td>
+                                                    {user.role ? (
+                                                        <span
+                                                            className={
+                                                                user.role.className
+                                                                    .split(' ')
+                                                                    .map(cn => styles[cn])
+                                                                    .join(' ')
+                                                            }
+                                                        >
+                                                            {user.role.label}
+                                                        </span>
+                                                    ):' -----'}
+                                                </td>
+                                                <td>
+                                                    <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} /></button>
+                                                    {
+                                                        !user?.isBlocked ? (
+                                                            <button onClick={() => blockhandler(user)} className={styles.editButton}><img src={unblock} /></button>
+                                                        ) : (
+                                                            <button onClick={() => unblockhandler(user)} className={styles.editButton}><img src={block} /></button>
+                                                        )}
 
-                                                <button onClick={() => userview(user)} className={styles.editButton}><img src={view} /></button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr><td colSpan="5" className={styles.centerText}>No Users Found</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                        
-                    </div>
-                    <div className={styles.pagination}>
+                                                    <button onClick={() => userview(user)} className={styles.editButton}><img src={view} /></button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr><td colSpan="5" className={styles.centerText}>No Users Found</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div className={styles.pagination}>
                             <button onClick={handlePreviousPage} disabled={currentPage === 1}>
                                 ◀
                             </button>
@@ -632,9 +699,9 @@ const Dashboard = () => {
                             <button onClick={handleNextPage} disabled={currentPage === totalPages}>
                                 ▶
                             </button>
+                        </div>
                     </div>
-                    </div>
-                    
+
                 </div>
             </div>
 
@@ -747,6 +814,48 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
+
+            {isEditing ? (
+                <div className="profile-edit-form">
+                    <div className="editformcontianer" ref={popupRef}>
+                        <label>
+                            Name:
+                            <input type="text" name="name" value={edituserdata.name} onChange={handleeditChange} />
+                        </label>
+                        <label>
+                            Email:
+                            <input type="email" name="email" value={edituserdata.email} onChange={handleeditChange} disabled />
+                        </label>
+                        <label>
+                            Contact:
+                            <input type="number" className={styles.contactnumber} name="contact" value={edituserdata.contact} onChange={handleeditChange} />
+                        </label>
+                        <label>
+                            Address:
+                            <input type="text" name="address" value={edituserdata.address} onChange={handleeditChange} />
+                        </label>
+                        {(edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin') ? (
+                            <label>
+                                User Type:
+                                <select
+                                    name="userType"
+                                    className="authtext"
+                                    value={edituserdata.userType}
+                                    onChange={handleeditChange}
+                                    required
+                                >
+                                    <option value="buyer">Buyer</option>
+                                    <option value="seller">Seller</option>
+                                    <option value="retailer">Retailer</option>
+                                </select>
+                            </label>
+                        ) : null}
+
+                        <button onClick={handleSave} className="profile-save-btn">Save</button>
+                        <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            ) : null}
 
             {showUserModal && (
                 <div className={styles.modalOverlay}>

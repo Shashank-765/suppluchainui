@@ -418,8 +418,11 @@ router.get('/fetchalluser', async (req, res) => {
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / limit);
 
+    const allUserwihtoutPagination = await User.find({});
+
     res.status(200).json({
       allUsers,
+      allUserwihtoutPagination,
       totalUsers,
       totalPages,
       currentPage: parseInt(page)

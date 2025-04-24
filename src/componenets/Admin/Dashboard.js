@@ -31,6 +31,7 @@ const Dashboard = () => {
     const [isEditing, setIsEditing] = useState(false);
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const qrImageRef = useRef(null);
+    const [withoutPaginaitonalluser,setwithoutPaginaitonalluser]=useState([]);
 
 
 
@@ -284,6 +285,7 @@ const Dashboard = () => {
             });
             console.log(response.data, 'response.data')
             setAllUser(response.data.allUsers);
+            setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
             setTotalPages(response.data.totalPages);
             setTotalUser(response.data.totalUsers);
         } catch (error) {
@@ -748,7 +750,7 @@ const Dashboard = () => {
                                 style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                             >
                                 <option value="" disabled >Select a farmInspection Name</option>
-                                {allUser.map((user) => (
+                                {withoutPaginaitonalluser.map((user) => (
                                     user?.role?.label === 'Farm Inspection' && (<option key={user._id} style={{ color: "black" }}>
                                         {user?.role?.label === 'Farm Inspection' && user?.name}
                                     </option>)
@@ -761,7 +763,7 @@ const Dashboard = () => {
                                 style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                             >
                                 <option value="" disabled>Select a harvesterName Name</option>
-                                {allUser.map((user) => (
+                                {withoutPaginaitonalluser.map((user) => (
                                     (user?.role?.label === 'Harvester' && <option key={user._id} style={{ color: "black" }}>
                                         {user?.role?.label === 'Harvester' && user?.name}
                                     </option>)
@@ -774,7 +776,7 @@ const Dashboard = () => {
                                 style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                             >
                                 <option value="" disabled>Select a processorName Name</option>
-                                {allUser.map((user) => (
+                                {withoutPaginaitonalluser.map((user) => (
                                     (user?.role?.label === 'Processor' && <option key={user._id} style={{ color: "black" }}>
                                         {user?.role?.label === 'Processor' && user?.name}
                                     </option>)
@@ -787,7 +789,7 @@ const Dashboard = () => {
                                 style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                             >
                                 <option value="" disabled>Select a exporterName Name</option>
-                                {allUser.map((user) => (
+                                {withoutPaginaitonalluser.map((user) => (
                                     (user?.role?.label === 'Exporter' && <option key={user._id} style={{ color: "black" }}>
                                         {user?.role?.label === 'Exporter' && user?.name}
                                     </option>)
@@ -800,7 +802,7 @@ const Dashboard = () => {
                                 style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                             >
                                 <option value="" disabled>Select a importerName Name</option>
-                                {allUser.map((user) => (
+                                {withoutPaginaitonalluser.map((user) => (
                                     (user?.role?.label === 'Importer' && <option key={user._id} style={{ color: "black" }}>
                                         {user?.role?.label === 'Importer' && user?.name}
                                     </option>)

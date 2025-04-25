@@ -8,8 +8,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 const BatchProgressView = () => {
   const location = useLocation();
-  const { batch } = location.state || {}; // Extracting batch data from location state
-  // console.log(batch, "batch"); // Logging the batch data for debugging
+  const { batch } = location.state || {}; 
 
   const [allBatch, setAllBatch] = useState([]);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -26,7 +25,7 @@ const BatchProgressView = () => {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatchById?id=${batch?.batchId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchById?id=${batch?.batchId}`, {
       });
 
       if (response.data) {
@@ -36,7 +35,6 @@ const BatchProgressView = () => {
       console.error('Error fetching batch:', error);
     }
   }
-  console.log(allBatch, "allBatch");
   useEffect(() => {
     fetchbatchbyid();
   }, [])
@@ -48,7 +46,7 @@ const BatchProgressView = () => {
       </p>
 
       <div className={styles.timeline}>
-        {/* Cultivation */}
+
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
             {allBatch?.farmerRegNo ?
@@ -95,7 +93,6 @@ const BatchProgressView = () => {
         )}
 
 
-        {/* Farm Inspector */}
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
           {allBatch?.tracking?.isInspexted ?
@@ -114,7 +111,6 @@ const BatchProgressView = () => {
           </div>
         </div>
 
-        {/* Harvester */}
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
           {allBatch?.tracking?.isHarvested ?
@@ -134,7 +130,6 @@ const BatchProgressView = () => {
 
 
 
-        {/* Importer */}
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
           {allBatch?.tracking?.isImported ?
@@ -154,7 +149,7 @@ const BatchProgressView = () => {
             <p><span className={styles.batchesheading}>Importer Address:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.importerAddress}</span></p>
           </div>
         </div>
-        {/* Exporter */}
+       
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
            {allBatch?.tracking?.isExported ?
@@ -175,7 +170,7 @@ const BatchProgressView = () => {
           </div>
         </div>
 
-        {/* Processor */}
+    
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
            {allBatch?.tracking?.isProcessed ?

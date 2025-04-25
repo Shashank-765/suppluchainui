@@ -1,23 +1,29 @@
 import React from 'react'
 import './Footer.css'
 import Image1 from '../../Imges/companylogo.png'
+import { Link, useNavigate } from 'react-router-dom'
 function Footer() {
+    const navigate = useNavigate();
+    const navigatetohome = () => {
+        navigate('/')
+    }
     return (
         <div className='footer-section'>
             <div className='footerleftIcon'>
-            <div className='footerleftIconcontainer'>
-               <img src={Image1}/>
-            </div>
-            <p>© 2025 Bastionex Infotech, Inc.
-              All rights reserved.</p>
+                <div className='footerleftIconcontainer'>
+
+                    <img onClick={navigatetohome} src={Image1} />
+                </div>
+                <p>© 2025 Bastionex Infotech, Inc.
+                    All rights reserved.</p>
             </div>
             <div className='footerrightcontent'>
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Quick Links</p>
-                    <p className='footerlink'>Home</p>
-                    <p className='footerlink'>ABout</p>
-                    <p className='footerlink'>Product</p>
-                    <p className='footerlink'>Contact</p>
+                    <p className='footerlink'><Link to='/'>Home</Link></p>
+                    <p className='footerlink'>About</p>
+                    <p className='footerlink'><Link to='/product'>Explore</Link></p>
+                    <p className='footerlink'><Link to='/contact'>Contact</Link></p>
                 </div>
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Exolore More</p>
@@ -29,10 +35,10 @@ function Footer() {
                 </div>
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Connect with us</p>
-                    <p className='footerlink'>Facebook</p>
-                    <p className='footerlink'>twitter</p>
-                    <p className='footerlink'>LinkedIn</p>
-                    <p className='footerlink'>Instagram</p>
+                    <p className='footerlink'><a href="https://www.facebook.com/" target="_blank" rel="noreferrer">Facebook</a></p>
+                    <p className='footerlink'><a href="https://twitter.com/" target="_blank" rel="noreferrer"></a>twitter</p>
+                    <p className='footerlink'><a href="https://linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a></p>
+                    <p className='footerlink'><a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a></p>
 
                 </div>
             </div>

@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom'
 function Invoice() {
 const location = useLocation();
 const { quantity,price,realprice,productname,unit } = location.state || {};
-// console.log(unit,'price and quantity')
   return (
     <div>
       <div className="invoice-container">

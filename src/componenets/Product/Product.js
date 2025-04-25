@@ -14,8 +14,7 @@ function Product() {
     const [data, setData] = React.useState([]);
     const fetchallproducts = async () => {
         try {
-            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getproducttomarkiting');
-            console.log(response.data.trackingDetails, 'response')
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getproducttomarkiting`);
 
             if (response.data) {
                 setData(response.data.trackingDetails);

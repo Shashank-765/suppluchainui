@@ -36,7 +36,7 @@ function Home() {
  }
   const getimages = async () => {
     try {
-      const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getimages')
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/getimages`)
       if (response?.data) {
         setInspectedImages(response?.data?.randomInspectedImages)
         setImages(response?.data?.randomImages)

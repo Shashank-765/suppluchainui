@@ -6,6 +6,8 @@ import deleteimage from '../../Imges/delete.png'
 import block from '../../Imges/prohibition.png'
 import unblock from '../../Imges/unlocked.png'
 import styles from './Dashboard.module.css';
+import CircularLoader from '../CircularLoader/CircularLoader'
+import Popup from '../Popups/Popup'
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 
@@ -31,9 +33,28 @@ const Dashboard = () => {
     const [isEditing, setIsEditing] = useState(false);
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const qrImageRef = useRef(null);
-    const [withoutPaginaitonalluser,setwithoutPaginaitonalluser]=useState([]);
+    const [withoutPaginaitonalluser, setwithoutPaginaitonalluser] = useState([]);
+    const [isCircularloader, setIsCircularLoader] = useState(false);
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [popupAction, setPopupAction] = useState('');
+    const [pendingFunction, setPendingFunction] = useState(null);
+    const [pendingArgs, setPendingArgs] = useState([]);
 
 
+
+    const showPopup = (actionText, callbackFn, args = []) => {
+        setPopupAction(actionText);
+        setPendingFunction(() => callbackFn);
+        setPendingArgs(args);
+        setPopupOpen(true);
+    };
+
+    const handleConfirm = () => {
+        if (typeof pendingFunction === 'function') {
+            pendingFunction(...pendingArgs);
+        }
+        setPopupOpen(false);
+    };
 
     const [allUser, setAllUser] = useState([]);
     const [userForm, setUserForm] = useState({
@@ -48,7 +69,7 @@ const Dashboard = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
-                handleEditToggle(); // close popup if click outside
+                handleEditToggle();
             }
         };
 
@@ -63,16 +84,33 @@ const Dashboard = () => {
 
 
     const handleSave = async () => {
+        // e.preventDefault();
+        setIsCircularLoader(true);
+        const allTouched = {};
+        Object.keys(edituserdata).forEach(key => {
+            if (key !== 'email') {
+                allTouched[key] = true;
+            }
+        });
+        setEditTouched(allTouched);
+
+
+        if (!validateEditForm()) {
+            setIsCircularLoader(false);
+            return;
+        }
         try {
 
-            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/updateprofile', edituserdata)
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/updateprofile`, edituserdata)
             if (response?.data) {
                 setIsEditing(false);
+                setIsCircularLoader(false);
                 setToggle(!toggle);
-                showSuccess('Profile updated!');
+                showSuccess('Profile updated succefully');
             }
         } catch (error) {
             setIsEditing(true);
+            setIsCircularLoader(false);
             showError('Failed to update profile')
         }
 
@@ -86,28 +124,7 @@ const Dashboard = () => {
         navigate('/batchprogress', { state: { batch } });
     }
 
-    const handleUserChange = (e) => {
-        const { name, value } = e.target;
 
-        if (name === 'role') {
-            const selected = roles.find(role => role.key === value);
-            if (selected) {
-                setUserForm((prev) => ({
-                    ...prev,
-                    role: {
-                        slug: selected.key,
-                        label: selected.name,
-                        className: selected.className
-                    }
-                }));
-            }
-        } else {
-            setUserForm((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    };
     const [qrModalOpen, setQrModalOpen] = useState(false);
     const [selectedQr, setSelectedQr] = useState(null);
 
@@ -133,56 +150,159 @@ const Dashboard = () => {
         coffeeType: "",
     });
 
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
+
+    const validateField = (name, value) => {
+        let error = '';
+
+
+        if (!value) {
+            error = 'This field is required';
+            return error;
+        }
+
+
+        switch (name) {
+            case 'farmerRegNo':
+                if (value.length < 3) error = 'Registration number must be at least 3 characters';
+                break;
+            case 'farmerName':
+                if (!/^[a-zA-Z\s]+$/.test(value)) error = 'Name should contain only letters';
+                break;
+            case 'coffeeType':
+                if (value.length < 2) error = 'Please enter a valid food type';
+                break;
+            case 'farmerAddress':
+                if (value.length < 10) error = 'Address should be more detailed';
+                break;
+            case 'farmInspectionName':
+            case 'harvesterName':
+            case 'processorName':
+            case 'exporterName':
+            case 'importerName':
+                if (value === "") error = 'Please select an option';
+                break;
+            default:
+                break;
+        }
+
+        return error;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+
         setFormData(prev => ({
             ...prev,
             [name]: value,
         }));
+
+
+        if (touched[name]) {
+            const error = validateField(name, value);
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
 
-        try {
-            const res = await axios.post("https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/createBatch", formData);
 
-            console.log("Saved successfully:", res.data);
-            setShowBatchModal(false); // close modal
-            setFormData({
-                farmerRegNo: "",
-                farmerName: "",
-                farmerAddress: "",
-                farmInspectionName: "",
-                harvesterName: "",
-                processorName: "",
-                exporterName: "",
-                importerName: "",
-                coffeeType: "",
-            });
-        } catch (error) {
-            if (error.response) {
-                // Server responded with a status other than 2xx
-                console.error("Failed to save:", error.response.data);
-            } else if (error.request) {
-                // Request was made but no response received
-                console.error("No response received:", error.request);
-            } else {
-                // Something else happened
-                console.error("Error submitting form:", error.message);
+        setTouched(prev => ({ ...prev, [name]: true }));
+        const error = validateField(name, value);
+        setErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        let isValid = true;
+
+        Object.keys(formData).forEach(key => {
+            const error = validateField(key, formData[key]);
+            if (error) {
+                newErrors[key] = error;
+                isValid = false;
             }
+        });
+
+        setErrors(newErrors);
+        return isValid;
+    };
+    const handlepopupSubmit = async (e) => {
+
+        e.preventDefault();
+        const allTouched = {};
+        Object.keys(formData).forEach(key => {
+            allTouched[key] = true;
+        });
+        setTouched(allTouched);
+
+
+        if (!validateForm()) {
+            setIsCircularLoader(false);
+            return;
         }
 
+        showPopup('create batch', handleSubmit, [e]);
+
     };
 
-    const handleUserSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
 
-        // Example POST request
+        setIsCircularLoader(true);
+
         try {
-            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/createuser', userForm);
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/createBatch`, formData);
+            if (res.data) {
+                setIsCircularLoader(false);
+                showSuccess("Batch Created")
+                setShowBatchModal(false);
+                setFormData({
+                    farmerRegNo: "",
+                    farmerName: "",
+                    farmerAddress: "",
+                    farmInspectionName: "",
+                    harvesterName: "",
+                    processorName: "",
+                    exporterName: "",
+                    importerName: "",
+                    coffeeType: "",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            setIsCircularLoader(false);
+            showError("Failed to create Batch")
+        }
+    }
+
+    const handleUserPopupSubmit = async (e) => {
+        e.preventDefault();
+        showPopup('create user', handleUserSubmit, [e]);
+    };
+
+    const handleUserSubmit = async () => {
+
+        setIsCircularLoader(true);
+        const allTouched = {};
+        Object.keys(userForm).forEach(key => {
+            allTouched[key] = true;
+        });
+        setUserTouched(allTouched);
+
+
+        if (!validateUserForm()) {
+            setIsCircularLoader(false);
+            return;
+        }
+
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/createuser`, userForm);
             if (response.data) {
-                console.log('User created!');
+                showSuccess("User Created succefully")
+                setIsCircularLoader(false);
                 setShowUserModal(false);
                 setUserForm({
                     name: '',
@@ -193,22 +313,125 @@ const Dashboard = () => {
                 });
             } else {
                 console.error('Failed to create user');
+                showError("Failed to create user")
             }
         } catch (err) {
             console.error('Error:', err);
+            showError("Failed to create user")
+        }
+    }
+
+
+    const [userErrors, setUserErrors] = useState({});
+    const [userTouched, setUserTouched] = useState({});
+
+    const validateUserField = (name, value) => {
+        let error = '';
+
+        if (!value) {
+            error = 'This field is required';
+            return error;
+        }
+
+
+        switch (name) {
+            case 'name':
+                if (!/^[a-zA-Z\s]+$/.test(value)) error = 'Name should contain only letters';
+                else if (value.length < 2) error = 'Name is too short';
+                break;
+            case 'email':
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email format';
+                break;
+            case 'password':
+                if (value.length < 6) error = 'Password must be at least 6 characters';
+                break;
+            case 'contact':
+                if (!/^[0-9]{10,15}$/.test(value)) error = 'Invalid phone number (10-15 digits)';
+                break;
+            case 'role':
+                if (!value) error = 'Please select a role';
+                break;
+            default:
+                break;
+        }
+
+        return error;
+    };
+
+
+    const handleUserChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === 'role') {
+            const selected = roles.find(role => role.key === value);
+            if (selected) {
+                setUserForm((prev) => ({
+                    ...prev,
+                    role: {
+                        slug: selected.key,
+                        label: selected.name,
+                        className: selected.className
+                    }
+                }));
+
+
+                if (userTouched.role) {
+                    const error = validateUserField(name, value);
+                    setUserErrors(prev => ({ ...prev, [name]: error }));
+                }
+            }
+        } else {
+            setUserForm((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+
+
+            if (userTouched[name]) {
+                const error = validateUserField(name, value);
+                setUserErrors(prev => ({ ...prev, [name]: error }));
+            }
         }
     };
 
-    const [edituserdata,setedituserdata]=useState({ name: '', email: '', userType: '', address: '', contact: '' })
+    const handleUserBlur = (e) => {
+        const { name, value } = e.target;
+
+
+        setUserTouched(prev => ({ ...prev, [name]: true }));
+
+        const error = validateUserField(name, value);
+        setUserErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const validateUserForm = () => {
+        const newErrors = {};
+        let isValid = true;
+
+
+        Object.keys(userForm).forEach(key => {
+            const value = key === 'role' ? userForm.role?.slug : userForm[key];
+            const error = validateUserField(key, value);
+            if (error) {
+                newErrors[key] = error;
+                isValid = false;
+            }
+        });
+
+        setUserErrors(newErrors);
+        return isValid;
+    };
+
+    const [edituserdata, setedituserdata] = useState({ name: '', email: '', userType: '', address: '', contact: '' })
 
     const edithandler = (edituser) => {
-    setedituserdata({
-      name:edituser?.name,
-      email:edituser?.email,
-      userType:edituser?.userType,
-      address:edituser?.address,
-      contact:edituser?.contact
-    })
+        setedituserdata({
+            name: edituser?.name,
+            email: edituser?.email,
+            userType: edituser?.userType,
+            address: edituser?.address,
+            contact: edituser?.contact
+        })
         setIsEditing(!isEditing);
     }
     const userview = (userdata) => {
@@ -217,7 +440,7 @@ const Dashboard = () => {
 
     const blockhandler = async (user) => {
         try {
-            const response = await axios.post(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/blockUser?id=${user._id}`);
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/blockUser?id=${user._id}`);
             if (response.data) {
                 // console.log('User blocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User Blocked Succefully')
@@ -235,7 +458,7 @@ const Dashboard = () => {
 
     const unblockhandler = async (user) => {
         try {
-            const response = await axios.post(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/unblockUser?id=${user?._id}`,);
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/unblockUser?id=${user?._id}`,);
             if (response.data) {
                 // console.log('User unblocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User unblocked successfully!');
@@ -276,14 +499,13 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/fetchalluser', {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/fetchalluser`, {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
                     search: searchTerm,
                 },
             });
-            console.log(response.data, 'response.data')
             setAllUser(response.data.allUsers);
             setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
             setTotalPages(response.data.totalPages);
@@ -309,7 +531,7 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            const response = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatch', {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatch`, {
                 params: {
                     page: currnetBatchPage,
                     limit: usersPerPage,
@@ -325,14 +547,90 @@ const Dashboard = () => {
         }
 
     }
-      const handleeditChange = (e) => {
-        const { name, value } = e.target;
-        setedituserdata((prev) => ({ ...prev, [name]: value }));
+
+    const [editErrors, setEditErrors] = useState({});
+    const [editTouched, setEditTouched] = useState({});
+
+    const validateEditField = (name, value) => {
+        let error = '';
+
+
+        if (name === 'email') return error;
+
+
+        if (!value && name !== 'userType') {
+            error = 'This field is required';
+            return error;
+        }
+
+        switch (name) {
+            case 'name':
+                if (!/^[a-zA-Z\s]+$/.test(value)) error = 'Name should contain only letters';
+                else if (value.length < 2) error = 'Name is too short';
+                break;
+            case 'contact':
+                if (!/^[0-9]{10,15}$/.test(value)) error = 'Invalid phone number (10-15 digits)';
+                break;
+            case 'address':
+                if (value.length < 10) error = 'Address should be more detailed';
+                break;
+            case 'userType':
+                if (!value && (edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin')) {
+                    error = 'Please select a user type';
+                }
+                break;
+            default:
+                break;
+        }
+
+        return error;
     };
 
+
+    const handleeditChange = (e) => {
+        const { name, value } = e.target;
+
+        setedituserdata((prev) => ({ ...prev, [name]: value }));
+
+
+        if (editTouched[name]) {
+            const error = validateEditField(name, value);
+            setEditErrors(prev => ({ ...prev, [name]: error }));
+        }
+    };
+
+    const handleEditBlur = (e) => {
+        const { name, value } = e.target;
+
+
+        setEditTouched(prev => ({ ...prev, [name]: true }));
+
+
+        const error = validateEditField(name, value);
+        setEditErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+
+    const validateEditForm = () => {
+        const newErrors = {};
+        let isValid = true;
+
+        Object.keys(edituserdata).forEach(key => {
+            if (key !== 'email') {
+                const error = validateEditField(key, edituserdata[key]);
+                if (error) {
+                    newErrors[key] = error;
+                    isValid = false;
+                }
+            }
+        });
+
+        setEditErrors(newErrors);
+        return isValid;
+    };
     const deleteBatch = async (id) => {
         try {
-            const response = await axios.delete(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/deletebatch?batchId=${id}`)
+            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/batch/deletebatch?batchId=${id}`)
             if (response?.data) {
                 setToggle(!toggle);
                 showSuccess("Batch deleted succefully")
@@ -353,7 +651,7 @@ const Dashboard = () => {
 
     const fetchRoles = async () => {
         try {
-            const res = await axios.get('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getRoles');
+            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getRoles`);
             if (res.data?.roles) {
                 setRoles(res.data?.roles);
                 setTotalRoles(res?.data?.totalCount)
@@ -440,7 +738,7 @@ const Dashboard = () => {
                                         </td>
                                         <td>{batch.coffeeType}</td>
                                         <td>
-                                            {/* {batch?.farmInspectionName} */}
+
 
                                             {
 
@@ -457,10 +755,10 @@ const Dashboard = () => {
 
                                             }
 
-                                            {/* <button className={styles.verifyBtn}>✅</button> */}
+
                                         </td>
                                         <td>
-                                            {/* {batch?.harvesterName} */}
+
                                             {
 
                                                 (batch?.tracking?.isHarvested) ? <button
@@ -480,7 +778,7 @@ const Dashboard = () => {
                                             }
                                         </td>
                                         <td>
-                                            {/* {batch?.importerName} */}
+
                                             {
 
                                                 (batch?.tracking?.isImported) ? <button
@@ -497,7 +795,7 @@ const Dashboard = () => {
                                             }
                                         </td>
                                         <td>
-                                            {/* {batch?.exporterName} */}
+
                                             {
 
                                                 (batch?.tracking?.isExported) ? <button
@@ -533,9 +831,12 @@ const Dashboard = () => {
                                             <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
                                                 <img src={view} />
                                             </button>
-                                            <button onClick={() => deleteBatch(batch.batchId)} className={styles.deleteButton}>
-                                                <img src={deleteimage} />
-                                            </button>
+                                            {
+                                                batch?.tracking?.isProcessed ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
+                                                    <img src={deleteimage} />
+                                                </button>
+                                            }
+
                                         </td>
                                     </tr>
                                 ))
@@ -669,15 +970,15 @@ const Dashboard = () => {
                                                         >
                                                             {user.role.label}
                                                         </span>
-                                                    ):' -----'}
+                                                    ) : ' -----'}
                                                 </td>
                                                 <td>
                                                     <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} /></button>
                                                     {
                                                         !user?.isBlocked ? (
-                                                            <button onClick={() => blockhandler(user)} className={styles.editButton}><img src={unblock} /></button>
+                                                            <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} /></button>
                                                         ) : (
-                                                            <button onClick={() => unblockhandler(user)} className={styles.editButton}><img src={block} /></button>
+                                                            <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} /></button>
                                                         )}
 
                                                     <button onClick={() => userview(user)} className={styles.editButton}><img src={view} /></button>
@@ -711,106 +1012,157 @@ const Dashboard = () => {
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>
                         <h2>Add Batch</h2>
-                        <form onSubmit={handleSubmit}>
-                            <input
-                                type="text"
-                                name="farmerRegNo"
-                                placeholder="Farmer Reg No"
-                                required
-                                value={formData.farmerRegNo}
-                                onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="farmerName"
-                                placeholder="Farmer Name"
-                                required
-                                value={formData.farmerName}
-                                onChange={handleChange}
-                            />
-                            <input
-                                type="text"
-                                name="coffeeType"
-                                placeholder="Food Type"
-                                required
-                                value={formData.coffeeType}
-                                onChange={handleChange}
-                            />
-                            <textarea
-                                name="farmerAddress"
-                                placeholder="Farmer Address"
-                                required
-                                value={formData.farmerAddress}
-                                onChange={handleChange}
-                            />
-                            <select
-                                value={formData.farmInspectionName}
-                                name="farmInspectionName"
-                                onChange={handleChange}
-                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
-                            >
-                                <option value="" disabled >Select a farmInspection Name</option>
-                                {withoutPaginaitonalluser.map((user) => (
-                                    user?.role?.label === 'Farm Inspection' && (<option key={user._id} style={{ color: "black" }}>
-                                        {user?.role?.label === 'Farm Inspection' && user?.name}
-                                    </option>)
-                                ))}
-                            </select>
-                            <select
-                                value={formData.harvesterName}
-                                name="harvesterName"
-                                onChange={handleChange}
-                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
-                            >
-                                <option value="" disabled>Select a harvesterName Name</option>
-                                {withoutPaginaitonalluser.map((user) => (
-                                    (user?.role?.label === 'Harvester' && <option key={user._id} style={{ color: "black" }}>
-                                        {user?.role?.label === 'Harvester' && user?.name}
-                                    </option>)
-                                ))}
-                            </select>
-                            <select
-                                value={formData.processorName}
-                                name="processorName"
-                                onChange={handleChange}
-                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
-                            >
-                                <option value="" disabled>Select a processorName Name</option>
-                                {withoutPaginaitonalluser.map((user) => (
-                                    (user?.role?.label === 'Processor' && <option key={user._id} style={{ color: "black" }}>
-                                        {user?.role?.label === 'Processor' && user?.name}
-                                    </option>)
-                                ))}
-                            </select>
-                            <select
-                                value={formData.exporterName}
-                                name="exporterName"
-                                onChange={handleChange}
-                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
-                            >
-                                <option value="" disabled>Select a exporterName Name</option>
-                                {withoutPaginaitonalluser.map((user) => (
-                                    (user?.role?.label === 'Exporter' && <option key={user._id} style={{ color: "black" }}>
-                                        {user?.role?.label === 'Exporter' && user?.name}
-                                    </option>)
-                                ))}
-                            </select>
-                            <select
-                                value={formData.importerName}
-                                name="importerName"
-                                onChange={handleChange}
-                                style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
-                            >
-                                <option value="" disabled>Select a importerName Name</option>
-                                {withoutPaginaitonalluser.map((user) => (
-                                    (user?.role?.label === 'Importer' && <option key={user._id} style={{ color: "black" }}>
-                                        {user?.role?.label === 'Importer' && user?.name}
-                                    </option>)
-                                ))}
-                            </select>
+                        <form onSubmit={handlepopupSubmit}>
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="farmerRegNo"
+                                    placeholder="Farmer Reg No"
+                                    value={formData.farmerRegNo}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {errors.farmerRegNo && <span className={styles.errorText}>{errors.farmerRegNo}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="farmerName"
+                                    placeholder="Farmer Name"
+                                    value={formData.farmerName}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {errors.farmerName && <span className={styles.errorText}>{errors.farmerName}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="coffeeType"
+                                    placeholder="Food Type"
+                                    value={formData.coffeeType}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {errors.coffeeType && <span className={styles.errorText}>{errors.coffeeType}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <textarea
+                                    name="farmerAddress"
+                                    placeholder="Farmer Address"
+                                    value={formData.farmerAddress}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {errors.farmerAddress && <span className={styles.errorText}>{errors.farmerAddress}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={formData.farmInspectionName}
+                                    name="farmInspectionName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.farmInspectionName ? styles.errorInput : ''}
+                                    style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
+                                >
+                                    <option value="" disabled>Select a farmInspection Name</option>
+                                    {withoutPaginaitonalluser.map((user) => (
+                                        user?.role?.label === 'Farm Inspection' && (
+                                            <option key={user._id} value={user.name} style={{ color: "black" }}>
+                                                {user?.name}
+                                            </option>
+                                        )
+                                    ))}
+                                </select>
+                                {errors.farmInspectionName && <span className={styles.errorText}>{errors.farmInspectionName}</span>}
+                            </div>
+
+                            {/* Repeat the same pattern for other select inputs */}
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={formData.harvesterName}
+                                    name="harvesterName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.harvesterName ? styles.errorInput : ''}
+                                    style={{ color: formData.harvesterName ? "black" : "#757587" }}
+                                >
+                                    <option value="" disabled>Select a harvesterName Name</option>
+                                    {withoutPaginaitonalluser.map((user) => (
+                                        user?.role?.label === 'Harvester' && (
+                                            <option key={user._id} value={user.name} style={{ color: "black" }}>
+                                                {user?.name}
+                                            </option>
+                                        )
+                                    ))}
+                                </select>
+                                {errors.harvesterName && <span className={styles.errorText}>{errors.harvesterName}</span>}
+                            </div>
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={formData.processorName}
+                                    name="processorName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.processorName ? styles.errorInput : ''}
+                                    style={{ color: formData.processorName ? "black" : "#757587" }}
+                                >
+                                    <option value="" disabled>Select a processorName Name</option>
+                                    {withoutPaginaitonalluser.map((user) => (
+                                        (user?.role?.label === 'Processor' && <option key={user._id} style={{ color: "black" }}>
+                                            {user?.role?.label === 'Processor' && user?.name}
+                                        </option>)
+                                    ))}
+                                </select>
+                                {errors.processorName && <span className={styles.errorText}>{errors.processorName}</span>}
+                            </div>
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={formData.exporterName}
+                                    name="exporterName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.exporterName ? styles.errorInput : ''}
+                                    style={{ color: formData.exporterName ? "black" : "#757587" }}
+                                >
+                                    <option value="" disabled>Select a exporterName Name</option>
+                                    {withoutPaginaitonalluser.map((user) => (
+                                        (user?.role?.label === 'Exporter' && <option key={user._id} style={{ color: "black" }}>
+                                            {user?.role?.label === 'Exporter' && user?.name}
+                                        </option>)
+                                    ))}
+                                </select>
+                                {errors.exporterName && <span className={styles.errorText}>{errors.exporterName}</span>}
+                            </div>
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={formData.importerName}
+                                    name="importerName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.importerName ? styles.errorInput : ''}
+                                    style={{ color: formData.importerName ? "black" : "#757587" }}
+                                >
+                                    <option value="" disabled>Select a importerName Name</option>
+                                    {withoutPaginaitonalluser.map((user) => (
+                                        (user?.role?.label === 'Importer' && <option key={user._id} style={{ color: "black" }}>
+                                            {user?.role?.label === 'Importer' && user?.name}
+                                        </option>)
+                                    ))}
+                                </select>
+                                {errors.importerName && <span className={styles.errorText}>{errors.importerName}</span>}
+                            </div>
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowBatchModal(false)}>Cancel</button>
-                                <button type="submit">Submit</button>
+                                <button type="submit">{isCircularloader ? <CircularLoader size={15} /> : 'Submit'}</button>
                             </div>
                         </form>
                     </div>
@@ -820,41 +1172,90 @@ const Dashboard = () => {
             {isEditing ? (
                 <div className="profile-edit-form">
                     <div className="editformcontianer" ref={popupRef}>
-                        <label>
-                            Name:
-                            <input type="text" name="name" value={edituserdata.name} onChange={handleeditChange} />
-                        </label>
-                        <label>
-                            Email:
-                            <input type="email" name="email" value={edituserdata.email} onChange={handleeditChange} disabled />
-                        </label>
-                        <label>
-                            Contact:
-                            <input type="number" className={styles.contactnumber} name="contact" value={edituserdata.contact} onChange={handleeditChange} />
-                        </label>
-                        <label>
-                            Address:
-                            <input type="text" name="address" value={edituserdata.address} onChange={handleeditChange} />
-                        </label>
-                        {(edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin') ? (
+                        <div className={styles.formGroup}>
                             <label>
-                                User Type:
-                                <select
-                                    name="userType"
-                                    className="authtext"
-                                    value={edituserdata.userType}
+                                Name:
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={edituserdata.name}
                                     onChange={handleeditChange}
-                                    required
-                                >
-                                    <option value="buyer">Buyer</option>
-                                    <option value="seller">Seller</option>
-                                    <option value="retailer">Retailer</option>
-                                </select>
+                                    onBlur={handleEditBlur}
+                                    className={editErrors.name ? styles.errorInput : ''}
+                                />
                             </label>
+                            {editErrors.name && <span className={styles.errorText}>{editErrors.name}</span>}
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>
+                                Email:
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={edituserdata.email}
+                                    onChange={handleeditChange}
+                                    disabled
+                                />
+                            </label>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>
+                                Contact:
+                                <input
+                                    type="number"
+                                    className={`${styles.contactnumber} ${editErrors.contact ? styles.errorInput : ''}`}
+                                    name="contact"
+                                    value={edituserdata.contact}
+                                    onChange={handleeditChange}
+                                    onBlur={handleEditBlur}
+                                />
+                            </label>
+                            {editErrors.contact && <span className={styles.errorText}>{editErrors.contact}</span>}
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>
+                                Address:
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={edituserdata.address}
+                                    onChange={handleeditChange}
+                                    onBlur={handleEditBlur}
+                                    className={editErrors.address ? styles.errorInput : ''}
+                                />
+                            </label>
+                            {editErrors.address && <span className={styles.errorText}>{editErrors.address}</span>}
+                        </div>
+
+                        {(edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin') ? (
+                            <div className={styles.formGroup}>
+                                <label>
+                                    User Type:
+                                    <select
+                                        name="userType"
+                                        className={`authtext ${editErrors.userType ? styles.errorInput : ''}`}
+                                        value={edituserdata.userType}
+                                        onChange={handleeditChange}
+                                        onBlur={handleEditBlur}
+                                        required
+                                    >
+                                        <option value="">Select user type</option>
+                                        <option value="buyer">Buyer</option>
+                                        <option value="seller">Seller</option>
+                                        <option value="retailer">Retailer</option>
+                                    </select>
+                                </label>
+                                {editErrors.userType && <span className={styles.errorText}>{editErrors.userType}</span>}
+                            </div>
                         ) : null}
 
-                        <button onClick={handleSave} className="profile-save-btn">Save</button>
-                        <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                        <div className={styles.formActions}>
+                            <button onClick={() => showPopup("edit this user", handleSave)} className="profile-save-btn">{isCircularloader ? <CircularLoader size={15} /> : 'Submit'}</button>
+                            <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                        </div>
                     </div>
                 </div>
             ) : null}
@@ -863,62 +1264,94 @@ const Dashboard = () => {
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>
                         <h2>Add User</h2>
-                        <form onSubmit={handleUserSubmit}>
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Name"
-                                value={userForm.name}
-                                onChange={handleUserChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="email"
-                                placeholder="Email"
-                                value={userForm.email}
-                                onChange={handleUserChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="password"
-                                placeholder="Password"
-                                value={userForm.password}
-                                onChange={handleUserChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="contact"
-                                placeholder="Contact No."
-                                value={userForm.contact}
-                                onChange={handleUserChange}
-                                required
-                            />
-                            <select
-                                value={userForm.role?.slug || ''}
-                                name="role"
-                                onChange={handleUserChange}
-                            >
-                                <option value="" disabled>Select a role</option>
-                                {roles.map((role) => (
-                                    <option key={role._id} value={role.key}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
+                        <form onSubmit={handleUserPopupSubmit}>
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name"
+                                    value={userForm.name}
+                                    onChange={handleUserChange}
+                                    onBlur={handleUserBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {userErrors.name && <span className={styles.errorText}>{userErrors.name}</span>}
+                            </div>
 
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={userForm.email}
+                                    onChange={handleUserChange}
+                                    onBlur={handleUserBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {userErrors.email && <span className={styles.errorText}>{userErrors.email}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="password"  // Changed from text to password
+                                    name="password"
+                                    placeholder="Password"
+                                    value={userForm.password}
+                                    onChange={handleUserChange}
+                                    onBlur={handleUserBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {userErrors.password && <span className={styles.errorText}>{userErrors.password}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <input
+                                    type="text"
+                                    name="contact"
+                                    placeholder="Contact No."
+                                    value={userForm.contact}
+                                    onChange={handleUserChange}
+                                    onBlur={handleUserBlur}
+                                    className={styles.inputtextclasses}
+                                />
+                                {userErrors.contact && <span className={styles.errorText}>{userErrors.contact}</span>}
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <select
+                                    value={userForm.role?.slug || ''}
+                                    name="role"
+                                    onChange={handleUserChange}
+                                    onBlur={handleUserBlur}
+                                    className={userErrors.role ? styles.errorInput : ''}
+                                >
+                                    <option value="" disabled>Select a role</option>
+                                    {roles.map((role) => (
+                                        <option key={role._id} value={role.key}>
+                                            {role.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {userErrors.role && <span className={styles.errorText}>{userErrors.role}</span>}
+                            </div>
 
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowUserModal(false)}>Cancel</button>
-                                <button type="submit">Submit</button>
+                                <button type="submit">{isCircularloader ? <CircularLoader size={15} /> : 'Submit'}</button>
                             </div>
                         </form>
 
                     </div>
                 </div>
             )}
+
+
+            <Popup
+                isOpen={popupOpen}
+                onClose={() => setPopupOpen(false)}
+                onConfirm={handleConfirm}
+                action={popupAction}
+            />
         </div>
     );
 };

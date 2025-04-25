@@ -1,5 +1,5 @@
 .dashboardContainer {
-padding: 1rem;
+    padding: 1rem;
     background: #f9f9f9;
     font-family: Arial, sans-serif;
 }
@@ -48,7 +48,8 @@ padding: 1rem;
     align-items: center;
     margin-bottom: 1rem;
 }
-.sectionHeader1{
+
+.sectionHeader1 {
     display: flex;
     justify-content: end;
     align-items: center;
@@ -71,7 +72,10 @@ padding: 1rem;
 }
 
 @media (max-width: 740px) {
-    .tableWrapper, .usersTableWrapper,.cards {
+
+    .tableWrapper,
+    .usersTableWrapper,
+    .cards {
         overflow-x: scroll;
     }
 
@@ -80,30 +84,35 @@ padding: 1rem;
         /* Set this based on your actual table's column width */
     }
 }
+
 @media (max-width: 540px) {
-    .sectionHeader{
-      flex-direction: column;
-      >div{
-         >input{
-           width: 100%;
-           margin-bottom: 10px;
-         }
-      }
+    .sectionHeader {
+        flex-direction: column;
+
+        >div {
+            >input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
     }
 }
-@media (max-width: 420px) {
-   .tableheader{
-    flex-direction: column;
-   }
-   .sectionHeader1{
-   flex-direction: column;
 
-   >input{
-    margin-bottom: 10px;
-    width: 100%;
-   }
-   }
+@media (max-width: 420px) {
+    .tableheader {
+        flex-direction: column;
+    }
+
+    .sectionHeader1 {
+        flex-direction: column;
+
+        >input {
+            margin-bottom: 10px;
+            width: 100%;
+        }
+    }
 }
+
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -155,12 +164,11 @@ padding: 1rem;
     gap: 1rem;
 }
 
-.modal input,
-.modal select,
-.modal textarea {
+.modal select {
     padding: 0.5rem;
     border-radius: 6px;
     border: 1px solid #ccc;
+    width: 100%;
 }
 
 .modalActions {
@@ -170,7 +178,8 @@ padding: 1rem;
 }
 
 .modalActions button {
-    padding: 0.5rem 1rem;
+    height: 30px;
+    width: 60px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -210,13 +219,16 @@ padding: 1rem;
 .usersTableWrapper {
     flex: 2;
 }
+
 .usersTableWrapper1 {
     flex: 2;
 }
-.tableheader{
- display: flex;
- justify-content: space-between;
+
+.tableheader {
+    display: flex;
+    justify-content: space-between;
 }
+
 .boxTitle {
     font-size: 1.25rem;
     font-weight: bold;
@@ -313,6 +325,7 @@ padding: 1rem;
         /* font-size: 10px; */
     }
 }
+
 .deleteButton {
     background: transparent;
     border: none;
@@ -470,9 +483,40 @@ padding: 1rem;
 
 .contactnumber::-webkit-outer-spin-button,
 .contactnumber::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
+
 .contactnumber {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.errorInput {
+    border: 1px solid red;
+}
+
+.errorText {
+    color: red;
+    font-size: 0.8rem;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}
+
+.inputtextclasses {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 95%;
+}
+
+.formActions {
+    display: flex;
+    justify-content: start;
+    align-items: center;
 }

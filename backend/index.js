@@ -11,6 +11,9 @@ connectDB();
 
 app.use("/uploads", express.static('uploads'));
 app.use('/api/users', require('./Routes/userRoutes.js'));
+app.use('/api/batch', require('./Routes/batchRoutes.js'));
+app.use('/api/products', require('./Routes/productsRoutes.js'));
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

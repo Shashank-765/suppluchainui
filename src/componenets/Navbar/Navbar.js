@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../../Imges/companylogo.png';
 import menu from '../../Imges/menus.png';
@@ -9,11 +9,17 @@ function Navbar({ isAuthenticated }) {
   const data = (JSON.parse(localStorage.getItem('user')));
   const [navstae, setNavState] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const navigatetohome = () => {
+    navigate('/')
+  }
   return (
     <div className='navbarsection'>
       <div className='navbarleftlog'>
         <div className='logocontainercompany'>
-          <img src={logo} alt='images' />
+
+          <img onClick={navigatetohome} src={logo} alt='images' />
         </div>
       </div>
 

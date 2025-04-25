@@ -5,7 +5,9 @@ import view from '../../Imges/eye.png'
 import { useNavigate, useLocation } from 'react-router-dom';
 import profileImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import formbackground from '../../Imges/formbackground.jpg'
+import CircularLoader from '../CircularLoader/CircularLoader'
 import { showError, showSuccess } from '../ToastMessage/ToastMessage';
+import Popup from '../Popups/Popup'
 
 function UserDashBoard() {
   const user = JSON.parse(localStorage.getItem('user')) || null;
@@ -17,25 +19,43 @@ function UserDashBoard() {
   const [totalBatchPage, setTotalBatchPage] = useState(0);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [hoveredBatchId, setHoveredBatchId] = useState(null);
+  const [isCircularloader, setIsCircularLoader] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupAction, setPopupAction] = useState('');
+  const [pendingFunction, setPendingFunction] = useState(null);
+  const [pendingArgs, setPendingArgs] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef();
+  const [toggle, setToggle] = useState(false);
 
-const popupRef = useRef();
-  
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (popupRef.current && !popupRef.current.contains(event.target)) {
-      setShowForm(false); // close popup
+  const popupRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popupRef.current && !popupRef.current.contains(event.target)) {
+        setShowForm(false); // close popup
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  const showPopup = (actionText, callbackFn, args = []) => {
+    setPopupAction(actionText);
+    setPendingFunction(() => callbackFn);
+    setPendingArgs(args);
+    setPopupOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (typeof pendingFunction === 'function') {
+      pendingFunction(...pendingArgs);
     }
+    setPopupOpen(false);
   };
-
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, []);
-
   const { userdata } = location.state || {};
   const [formData, setFormData] = useState({
     batchId: '',
@@ -122,11 +142,10 @@ useEffect(() => {
 
     setFormData(prev => ({
       ...prev,
-      images: [...prev.images, ...newFiles] // File objects must go here
+      images: [...prev.images, ...newFiles]
     }));
     setImagePreviews(prev => [...prev, ...newPreviews]);
 
-    // Reset to allow re-selection of same files
     fileInputRef.current.value = '';
   };
   const handleInspectedImageChange = (e) => {
@@ -140,7 +159,7 @@ useEffect(() => {
     }));
     setImagePreviews(prev => [...prev, ...newPreviews]);
 
-    // Reset to allow re-selection of same files
+
     fileInputRef.current.value = '';
   };
 
@@ -191,7 +210,7 @@ useEffect(() => {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getBatchByUserId?id=${userdata ? userdata?._id : user?._id}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchByUserId?id=${userdata ? userdata?._id : user?._id}`, {
         params: {
           page: currnetBatchPage,
           limit: usersPerPage,
@@ -208,15 +227,196 @@ useEffect(() => {
     }
   }
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateField = (name, value) => {
+    let error = '';
+
+    if (name === 'images' || name === 'inspectedImages') {
+      return error;
+    }
+    const currentRoleFields = getCurrentRoleFields(user?.role?.label);
+
+    if (!currentRoleFields.includes(name)) {
+      return error;
+    }
+
+    if (!value && value !== 0) {
+      error = 'This field is required';
+      return error;
+    }
+    switch (name) {
+      case 'certificateNo':
+        if (value.length < 3) error = 'Certificate No must be at least 3 characters';
+        break;
+      case 'temperatureLevel':
+      case 'humidity':
+        if (isNaN(value)) error = 'Must be a number';
+        else if (name === 'temperatureLevel' && (value < -50 || value > 100)) error = 'Temperature must be between -50 and 100';
+        else if (name === 'humidity' && (value < 0 || value > 100)) error = 'Humidity must be between 0 and 100';
+        break;
+      case 'quantityImported':
+      case 'quantityProcessed':
+        if (isNaN(value)) error = 'Must be a number';
+        else if (value <= 0) error = 'Must be greater than 0';
+        break;
+      case 'departureDate':
+      case 'estimatedDate':
+      case 'arrivalDate':
+      case 'warehouseArrivalDate':
+      case 'packagedDate':
+        if (new Date(value) > new Date()) error = 'Date cannot be in the future';
+        break;
+      case 'estimatedDate':
+        if (formData.departureDate && new Date(value) < new Date(formData.departureDate)) {
+          error = 'Estimated date cannot be before departure date';
+        }
+        break;
+      case 'warehouseArrivalDate':
+        if (formData.arrivalDate && new Date(value) < new Date(formData.arrivalDate)) {
+          error = 'Warehouse arrival cannot be before ship arrival';
+        }
+        break;
+      case 'price':
+      case 'miniQuantity':
+      case 'maxiQuantity':
+        if (isNaN(value)) error = 'Must be a number';
+        else if (value <= 0) error = 'Must be greater than 0';
+        break;
+      case 'miniQuantity':
+        if (formData.maxiQuantity && parseFloat(value) > parseFloat(formData.maxiQuantity)) {
+          error = 'Minimum quantity cannot be greater than maximum';
+        }
+        break;
+      case 'maxiQuantity':
+        if (formData.miniQuantity && parseFloat(value) < parseFloat(formData.miniQuantity)) {
+          error = 'Maximum quantity cannot be less than minimum';
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
   };
 
-  const handleSubmit = async (e) => {
+  const getCurrentRoleFields = (roleLabel) => {
+    const roleFields = {
+      'Farm Inspection': [
+        'farmInspectionId',
+        'farmInspectionName',
+        'certificateNo',
+        'certificateFrom',
+        'productName',
+        'typeOfFertilizer',
+        'fertilizerUsed',
+        'inspectedImages'
+      ],
+      'Harvester': [
+        'harvesterId',
+        'harvesterName',
+        'cropSampling',
+        'temperatureLevel',
+        'humidity'
+      ],
+      'Exporter': [
+        'exporterId',
+        'exporterName',
+        'coordinationAddress',
+        'shipName',
+        'shipNo',
+        'departureDate',
+        'estimatedDate',
+        'exportedTo'
+      ],
+      'Importer': [
+        'importerId',
+        'importerName',
+        'quantityImported',
+        'shipStorage',
+        'arrivalDate',
+        'warehouseLocation',
+        'warehouseArrivalDate',
+        'importerAddress'
+      ],
+      'Processor': [
+        'processorId',
+        'processorName',
+        'quantityProcessed',
+        'processingMethod',
+        'packaging',
+        'packagedDate',
+        'warehouse',
+        'warehouseAddress',
+        'destination',
+        'price',
+        'miniQuantity',
+        'maxiQuantity',
+        'images'
+      ]
+    };
+
+    return roleFields[roleLabel] || [];
+  };
+
+  const validateForm = () => {
+    const currentRoleFields = getCurrentRoleFields(user?.role?.label);
+    const newErrors = {};
+
+    currentRoleFields.forEach(key => {
+      if (key !== 'images' && key !== 'inspectedImages') {
+        const error = validateField(key, formData[key]);
+        if (error) newErrors[key] = error;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const error = validateField(name, formData[name]);
+    setErrors(prev => ({ ...prev, [name]: error }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handlePopupSubmit = async (e) => {
     e.preventDefault();
+    const allTouched = {};
+    Object.keys(formData).forEach(key => {
+      if (key !== 'images' && key !== 'inspectedImages') {
+        allTouched[key] = true;
+      }
+    });
+    setTouched(allTouched);
+
+    // Validate form
+    if (!validateForm()) {
+      setIsCircularLoader(false);
+      showError('Please fix the errors in the form');
+      return;
+    }
+    showPopup(' submit this form ', handleSubmit, [e]);
+
+  };
+  const handleSubmit = async () => {
+    setIsCircularLoader(true);
 
     try {
 
@@ -236,173 +436,283 @@ useEffect(() => {
         }
       }
 
-
-      console.log(payload, 'payload');
-      const res = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/updateBatch', payload);
+      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/updateBatch`, payload);
       if (res) {
+        setIsCircularLoader(false);
         toggleForm();
+        setToggle(!toggle)
         setImagePreviews([]);
+        setFormData({
+          batchId: '',
+          farmInspectionId: '',
+          farmInspectionName: '',
+          productName: '',
+          certificateNo: '',
+          certificateFrom: '',
+          typeOfFertilizer: '',
+          fertilizerUsed: '',
+          inspectedImages: [],
+          harvesterId: '',
+          harvesterName: '',
+          cropSampling: '',
+          temperatureLevel: '',
+          humidity: '',
+          exporterId: '',
+          exporterName: '',
+          coordinationAddress: '',
+          shipName: '',
+          shipNo: '',
+          departureDate: '',
+          estimatedDate: '',
+          exportedTo: '',
+          importerId: '',
+          importerName: '',
+          quantityImported: '',
+          shipStorage: '',
+          arrivalDate: '',
+          warehouseLocation: '',
+          warehouseArrivalDate: '',
+          importerAddress: '',
+          processorId: '',
+          processorName: '',
+          quantityProcessed: '',
+          processingMethod: '',
+          packaging: '',
+          packagedDate: '',
+          warehouse: '',
+          warehouseAddress: '',
+          destination: '',
+          price: '',
+          miniQuantity: '',
+          maxiQuantity: '',
+          images: [],
+        });
         showSuccess('submitted successfully')
       }
     } catch (err) {
+      setIsCircularLoader(false);
       console.error(err);
       showError('Failed to update batch.');
     }
-  };
-
+  }
   useEffect(() => {
     fetchbatchbyid();
-  }, [searchBatchTerm, currnetBatchPage, showForm]);
+  }, [searchBatchTerm, currnetBatchPage, toggle]);
+
+  const renderInput = (name, label, type = 'text', disabled = false, options = []) => (
+    <div className={styles.formGroup}>
+      <label>
+        {label}:
+        {type === 'select' ? (
+          <select
+            name={name}
+            value={formData[name] || ''}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={disabled}
+            className={errors[name] && touched[name] ? styles.errorInput : ''}
+          >
+            {options.map((option, idx) => (
+              <option key={idx} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={type}
+            name={name}
+            value={formData[name] || ''}
+            disabled={disabled}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={errors[name] && touched[name] ? styles.errorInput : ''}
+          />
+        )}
+      </label>
+      {errors[name] && touched[name] && (
+        <div className={styles.errorMessage}>{errors[name]}</div>
+      )}
+    </div>
+  );
+
 
   return (
     <div className={styles.batchViewContainer}>
 
       {showForm && (
-        <div className={styles.popupOverlay}>      
+        <div className={styles.popupOverlay}>
           <div className={styles.popupForm} ref={popupRef}>
             <div className={styles.popupFormContent}>
-            <h2>{user?.role?.label}</h2>
-            <form onSubmit={handleSubmit}>
-              {user?.role?.label === 'Farm Inspection' && (
-                <>
-                  <label>Farm Inspection Id: <input type="text" name="farmInspectionId" value={formData.farmInspectionId} disabled='true' onChange={handleChange} /></label>
-                  <label>Farm Inspection Name: <input type="text" name="farmInspectionName" value={formData.farmInspectionName} disabled='true' onChange={handleChange} /></label>
-                  <label>Certificate No: <input type="text" name="certificateNo" value={formData.certificateNo} onChange={handleChange} /></label>
-                  <label>Certificate From: <input type="text" name="certificateFrom" value={formData.certificateFrom} onChange={handleChange} /></label>
-                  <label>Product Name: <input type="text" name="productName" value={formData.productName} onChange={handleChange} /></label>
-                  <label>Type of Fertilizer: <input type="text" name="typeOfFertilizer" value={formData.typeOfFertilizer} onChange={handleChange} /></label>
-                  <label>Fertilizer Used: <input type="text" name="fertilizerUsed" value={formData.fertilizerUsed} onChange={handleChange} /></label>
-                  <div className='custom-file-upload'>
-                    <label htmlFor='fruit-images' className='upload-button'>
-                      {formData.inspectedImages.length === 0
-                        ? 'Choose images'
-                        : `${formData.inspectedImages.length} image${formData.inspectedImages.length > 1 ? 's' : ''} selected`}
-                    </label>
-                    <input
-                      id='fruit-images'
-                      type='file'
-                      multiple
-                      accept='image/*'
-                      onChange={handleInspectedImageChange}
-                      ref={fileInputRef}
-                      className={styles.custom_file_input}
-                    />
-                  </div>
-
-                  <div className='preview-container'>
-                    {imagePreviews.map((src, idx) => (
-                      <div key={idx} className='preview-item'>
-                        <img src={src} alt={`fruit-${idx}`} className='preview-image' />
-                        <span
-                          className='remove-icon'
-                          onClick={() => handleRemoveInspectedImage(idx)}
-                        >
-                          &times;
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {user?.role?.label === 'Harvester' && (
-                <>
-                  <label>Harvester Id: <input type="text" name="harvesterId" value={formData.harvesterId} disabled='true' onChange={handleChange} /></label>
-                  <label>Harvester Name: <input type="text" name="harvesterName" value={formData.harvesterName} disabled='true' onChange={handleChange} /></label>
-                  <label>Crop Sampling: <input type="text" name="cropSampling" value={formData.cropSampling} onChange={handleChange} /></label>
-                  <label>Temperature Level: <input type="text" name="temperatureLevel" value={formData.temperatureLevel} onChange={handleChange} /></label>
-                  <label>Humidity: <input type="text" name="humidity" value={formData.humidity} onChange={handleChange} /></label>
-                </>
-              )}
-
-              {user?.role?.label === 'Exporter' && (
-                <>
-                  <label>Exporter ID: <input type="text" name="exporterId" value={formData.exporterId} disabled='true' onChange={handleChange} /></label>
-                  <label>Exporter Name: <input type="text" name="exporterName" value={formData.exporterName} disabled='true' onChange={handleChange} /></label>
-                  <label>Coordination Address: <input type="text" name="coordinationAddress" value={formData.coordinationAddress} onChange={handleChange} /></label>
-                  <label>Ship Name: <input type="text" name="shipName" value={formData.shipName} onChange={handleChange} /></label>
-                  <label>Ship No: <input type="text" name="shipNo" value={formData.shipNo} onChange={handleChange} /></label>
-                  <label>Departure Date: <input type="date" name="departureDate" value={formData.departureDate} onChange={handleChange} /></label>
-                  <label>Estimated Date: <input type="date" name="estimatedDate" value={formData.estimatedDate} onChange={handleChange} /></label>
-                  <label>Exported To: <input type="text" name="exportedTo" value={formData.exportedTo} onChange={handleChange} /></label>
-                </>
-              )}
-
-              {user?.role?.label === 'Importer' && (
-                <>
-                  <label>Importer ID: <input type="text" name="importerId" value={formData.importerId} disabled='true' onChange={handleChange} /></label>
-                  <label>Importer Name: <input type="text" name="importerName" value={formData.importerName} disabled='true' onChange={handleChange} /></label>
-                  <label>Quantity: <input type="text" name="quantityImported" value={formData.quantityImported} onChange={handleChange} /></label>
-                  <label>Ship Storage: <input type="text" name="shipStorage" value={formData.shipStorage} onChange={handleChange} /></label>
-                  <label>Arrival Date: <input type="date" name="arrivalDate" value={formData.arrivalDate} onChange={handleChange} /></label>
-                  <label>Warehouse Location: <input type="text" name="warehouseLocation" value={formData.warehouseLocation} onChange={handleChange} /></label>
-                  <label>Warehouse Arrival Date: <input type="date" name="warehouseArrivalDate" value={formData.warehouseArrivalDate} onChange={handleChange} /></label>
-                  <label>Importer Address: <input type="text" name="importerAddress" value={formData.importerAddress} onChange={handleChange} /></label>
-                </>
-              )}
-
-              {user?.role?.label === 'Processor' && (
-                <>
-                  <label>Processor ID: <input type="text" name="processorId" value={formData.processorId} disabled='true' onChange={handleChange} /></label>
-                  <label>Processor Name: <input type="text" name="processorName" value={formData.processorName} disabled='true' onChange={handleChange} /></label>
-                  <label>Quantity: <input type="text" name="quantityProcessed" value={formData.quantityProcessed} onChange={handleChange} /></label>
-                  <label>Processing Method: <input type="text" name="processingMethod" value={formData.processingMethod} onChange={handleChange} /></label>
-                  <label>Packaging: <input type="text" name="packaging" value={formData.packaging} onChange={handleChange} /></label>
-                  <label>Packaged Date: <input type="date" name="packagedDate" value={formData.packagedDate} onChange={handleChange} /></label>
-                  <label>Warehouse: <input type="text" name="warehouse" value={formData.warehouse} onChange={handleChange} /></label>
-                  <label>Warehouse Address: <input type="text" name="warehouseAddress" value={formData.warehouseAddress} onChange={handleChange} /></label>
-                  <label>Destination: <input type="text" name="destination" value={formData.destination} onChange={handleChange} /></label>
-                  <label>Price: <input type="text" name="price" value={formData.price} onChange={handleChange} /></label>
-                  <label>miniQuantity: <input type="text" name="miniQuantity" value={formData.miniQuantity} onChange={handleChange} /></label>
-                  <label>maxQuantity: <input type="text" name="maxiQuantity" value={formData.maxiQuantity} onChange={handleChange} /></label>
-                  <div className='custom-file-upload'>
-                    <label htmlFor='fruit-images' className='upload-button'>
-                      {formData.images.length === 0
-                        ? 'Choose images'
-                        : `${formData.images.length} image${formData.images.length > 1 ? 's' : ''} selected`}
-                    </label>
-                    <input
-                      id='fruit-images'
-                      type='file'
-                      multiple
-                      accept='image/*'
-                      onChange={handleImageChange}
-                      ref={fileInputRef}
-                      className={styles.custom_file_input}
-                    />
-                  </div>
-
-                  <div className='preview-container'>
-                    {imagePreviews.map((src, idx) => (
-                      <div key={idx} className='preview-item'>
-                        <img src={src} alt={`fruit-${idx}`} className='preview-image' />
-                        <span
-                          className='remove-icon'
-                          onClick={() => handleRemoveImage(idx)}
-                        >
-                          &times;
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              <div className={styles.formActions}>
-                <button type="submit">Submit</button>
-                <button type="button" onClick={toggleForm}>Cancel</button>
+              <div className={styles.formheaders}>
+                <h2>{user?.role?.label}</h2>
               </div>
-            </form>
-          </div>
+              <form onSubmit={handlePopupSubmit}>
+                {/* Farm Inspector */}
+                {user?.role?.label === 'Farm Inspection' && (
+                  <>
+                    {renderInput('farmInspectionId', 'Farm Inspection Id', 'text', true)}
+                    {renderInput('farmInspectionName', 'Farm Inspection Name', 'text', true)}
+                    {renderInput('certificateNo', 'Certificate No')}
+                    {renderInput('certificateFrom', 'Certificate From')}
+                    {renderInput('productName', 'Product Name')}
+                    {renderInput('typeOfFertilizer', 'Type of Fertilizer')}
+                    {renderInput('fertilizerUsed', 'Fertilizer Used')}
+
+                    {/* Select input for Farm Inspector */}
+                    {renderInput('inspectionStatus', 'Inspection Status', 'select', false, ['Ready to Inspect', 'Pending', 'Completed'])}
+
+                    {/* Image upload remains unchanged */}
+                    <div className='custom-file-upload'>
+                      <label htmlFor='fruit-images' className='upload-button'>
+                        {formData.inspectedImages.length === 0
+                          ? 'Choose images'
+                          : `${formData.inspectedImages.length} image${formData.inspectedImages.length > 1 ? 's' : ''} selected`}
+                      </label>
+                      <input
+                        id='fruit-images'
+                        type='file'
+                        multiple
+                        accept='image/*'
+                        onChange={handleInspectedImageChange}
+                        ref={fileInputRef}
+                        className={styles.custom_file_input}
+                      />
+                    </div>
+
+                    <div className='preview-container'>
+                      {imagePreviews.map((src, idx) => (
+                        <div key={idx} className='preview-item'>
+                          <img src={src} alt={`fruit-${idx}`} className='preview-image' />
+                          <span
+                            className='remove-icon'
+                            onClick={() => handleRemoveInspectedImage(idx)}
+                          >
+                            &times;
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Harvester */}
+                {user?.role?.label === 'Harvester' && (
+                  <>
+                    {renderInput('harvesterId', 'Harvester Id', 'text', true)}
+                    {renderInput('harvesterName', 'Harvester Name', 'text', true)}
+                    {renderInput('cropSampling', 'Crop Sampling')}
+                    {renderInput('temperatureLevel', 'Temperature Level')}
+                    {renderInput('humidity', 'Humidity')}
+
+                    {/* Select input for Harvester */}
+                    {renderInput('harvestStatus', 'Harvest Status', 'select', false, ['Ready to Harvest', 'Pending', 'Completed'])}
+                  </>
+                )}
+
+                {/* Exporter */}
+                {user?.role?.label === 'Exporter' && (
+                  <>
+                    {renderInput('exporterId', 'Exporter ID', 'text', true)}
+                    {renderInput('exporterName', 'Exporter Name', 'text', true)}
+                    {renderInput('coordinationAddress', 'Coordination Address')}
+                    {renderInput('shipName', 'Ship Name')}
+                    {renderInput('shipNo', 'Ship No')}
+                    {renderInput('departureDate', 'Departure Date', 'date')}
+                    {renderInput('estimatedDate', 'Estimated Date', 'date')}
+                    {renderInput('exportedTo', 'Exported To')}
+
+                    {/* Select input for Exporter */}
+                    {renderInput('exportStatus', 'Export Status', 'select', false, ['Ready for Export', 'Pending', 'Shipped'])}
+                  </>
+                )}
+
+                {/* Importer */}
+                {user?.role?.label === 'Importer' && (
+                  <>
+                    {renderInput('importerId', 'Importer ID', 'text', true)}
+                    {renderInput('importerName', 'Importer Name', 'text', true)}
+                    {renderInput('quantityImported', 'Quantity')}
+                    {renderInput('shipStorage', 'Ship Storage')}
+                    {renderInput('arrivalDate', 'Arrival Date', 'date')}
+                    {renderInput('warehouseLocation', 'Warehouse Location')}
+                    {renderInput('warehouseArrivalDate', 'Warehouse Arrival Date', 'date')}
+                    {renderInput('importerAddress', 'Importer Address')}
+
+                    {/* Select input for Importer */}
+                    {renderInput('importStatus', 'Import Status', 'select', false, ['Ready for Import', 'Pending', 'Received'])}
+                  </>
+                )}
+
+                {/* Processor */}
+                {user?.role?.label === 'Processor' && (
+                  <>
+                    {renderInput('processorId', 'Processor ID', 'text', true)}
+                    {renderInput('processorName', 'Processor Name', 'text', true)}
+                    {renderInput('quantityProcessed', 'Quantity')}
+                    {renderInput('processingMethod', 'Processing Method')}
+                    {renderInput('packaging', 'Packaging')}
+                    {renderInput('packagedDate', 'Packaged Date', 'date')}
+                    {renderInput('warehouse', 'Warehouse')}
+                    {renderInput('warehouseAddress', 'Warehouse Address')}
+                    {renderInput('destination', 'Destination')}
+                    {renderInput('price', 'Price')}
+                    {renderInput('miniQuantity', 'Mini Quantity')}
+                    {renderInput('maxiQuantity', 'Max Quantity')}
+
+                    {/* Select input for Processor */}
+                    {renderInput('processingStatus', 'Processing Status', 'select', false, ['Ready for Processing', 'Pending', 'Processed'])}
+
+                    {/* Image upload remains unchanged */}
+                    <div className='custom-file-upload'>
+                      <label htmlFor='fruit-images' className='upload-button'>
+                        {formData.images.length === 0
+                          ? 'Choose images'
+                          : `${formData.images.length} image${formData.images.length > 1 ? 's' : ''} selected`}
+                      </label>
+                      <input
+                        id='fruit-images'
+                        type='file'
+                        multiple
+                        accept='image/*'
+                        onChange={handleImageChange}
+                        ref={fileInputRef}
+                        className={styles.custom_file_input}
+                      />
+                    </div>
+
+                    <div className='preview-container'>
+                      {imagePreviews.map((src, idx) => (
+                        <div key={idx} className='preview-item'>
+                          <img src={src} alt={`fruit-${idx}`} className='preview-image' />
+                          <span
+                            className='remove-icon'
+                            onClick={() => handleRemoveImage(idx)}
+                          >
+                            &times;
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <div className={styles.formActions}>
+                  <button type="submit">{isCircularloader ? <CircularLoader size={18} /> : 'Submit'}</button>
+                  <button type="button" onClick={toggleForm}>Cancel</button>
+                </div>
+              </form>
+
+            </div>
           </div>
         </div>
       )}
 
       <div className={styles.batchesOverview}>
-      <div className={styles.batchoverviewimagecontainer}>
+        <div className={styles.batchoverviewimagecontainer}>
           <img src={profileImage} />
           <h1>Batches Overview</h1>
-      </div>
+        </div>
         <input
           type="text"
           placeholder="Search By Batch ID"
@@ -441,7 +751,7 @@ useEffect(() => {
                                 : user?.role?.label === 'Farm Inspection'
                                   ? 'pointer'
                                   : 'not-allowed',
-                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)', // Only scale if hovered
+                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)',
                               transition: 'transform 0.3s ease',
                             }}
                             onClick={
@@ -449,8 +759,8 @@ useEffect(() => {
                                 ? () => toggleForm(batch?.batchId)
                                 : undefined
                             }
-                            onMouseEnter={() => user?.role?.label === 'Farm Inspection' && setHoveredBatchId(batch?.batchId)} // Set hover state
-                            onMouseLeave={() => setHoveredBatchId(null)} // Reset hover state
+                            onMouseEnter={() => user?.role?.label === 'Farm Inspection' && setHoveredBatchId(batch?.batchId)}
+                            onMouseLeave={() => setHoveredBatchId(null)}
                           >
                             Progress
                           </button>
@@ -486,7 +796,7 @@ useEffect(() => {
                                 : user?.role?.label === 'Harvester' && batch?.tracking?.isInspexted
                                   ? 'pointer'
                                   : 'not-allowed',
-                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)', // Only scale if hovered
+                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)',
                               transition: 'transform 0.3s ease',
                             }}
                             onClick={
@@ -496,8 +806,8 @@ useEffect(() => {
                                 ? () => toggleForm(batch?.batchId)
                                 : undefined
                             }
-                            onMouseEnter={() => user?.role?.label === 'Harvester' && setHoveredBatchId(batch?.batchId)} // Set hover state
-                            onMouseLeave={() => setHoveredBatchId(null)} // Reset hover state
+                            onMouseEnter={() => user?.role?.label === 'Harvester' && setHoveredBatchId(batch?.batchId)}
+                            onMouseLeave={() => setHoveredBatchId(null)}
                           >
                             Progress
                           </button>
@@ -538,7 +848,7 @@ useEffect(() => {
                                   batch?.tracking?.isInspexted
                                   ? 'pointer'
                                   : 'not-allowed',
-                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)', // Only scale if hovered
+                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)',
                               transition: 'transform 0.3s ease',
                             }}
                             onClick={
@@ -549,8 +859,8 @@ useEffect(() => {
                                 ? () => toggleForm(batch?.batchId)
                                 : undefined
                             }
-                            onMouseEnter={() => user?.role?.label === 'Importer' && setHoveredBatchId(batch?.batchId)} // Set hover state
-                            onMouseLeave={() => setHoveredBatchId(null)} // Reset hover state
+                            onMouseEnter={() => user?.role?.label === 'Importer' && setHoveredBatchId(batch?.batchId)}
+                            onMouseLeave={() => setHoveredBatchId(null)}
                           >
                             Progress
                           </button>
@@ -594,7 +904,7 @@ useEffect(() => {
                                   batch?.tracking?.isInspexted
                                   ? 'pointer'
                                   : 'not-allowed',
-                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)', // Only scale if hovered
+                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)',
                               transition: 'transform 0.3s ease',
                             }}
                             onClick={
@@ -606,8 +916,8 @@ useEffect(() => {
                                 ? () => toggleForm(batch?.batchId)
                                 : undefined
                             }
-                            onMouseEnter={() => user?.role?.label === 'Exporter' && setHoveredBatchId(batch?.batchId)} // Set hover state
-                            onMouseLeave={() => setHoveredBatchId(null)} // Reset hover state
+                            onMouseEnter={() => user?.role?.label === 'Exporter' && setHoveredBatchId(batch?.batchId)}
+                            onMouseLeave={() => setHoveredBatchId(null)}
                           >
                             Progress
                           </button>
@@ -654,7 +964,7 @@ useEffect(() => {
                                   batch?.tracking?.isInspexted
                                   ? 'pointer'
                                   : 'not-allowed',
-                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)', // Only scale if hovered
+                              transform: hoveredBatchId === batch?.batchId ? 'scale(1.1)' : 'scale(1)',
                               transition: 'transform 0.3s ease',
                             }}
                             onClick={
@@ -667,8 +977,8 @@ useEffect(() => {
                                 ? () => toggleForm(batch?.batchId)
                                 : undefined
                             }
-                            onMouseEnter={() => user?.role?.label === 'Processor' && setHoveredBatchId(batch?.batchId)} // Set hover state
-                            onMouseLeave={() => setHoveredBatchId(null)} // Reset hover state
+                            onMouseEnter={() => user?.role?.label === 'Processor' && setHoveredBatchId(batch?.batchId)}
+                            onMouseLeave={() => setHoveredBatchId(null)}
                           >
                             Progress
                           </button>
@@ -734,6 +1044,14 @@ useEffect(() => {
       <footer className={styles.footer}>
         © 2025 Coffee SupplyChain by <a href="https://bastionex.net/" target="_blank" rel="noopener noreferrer">Bastionex Infotech Pvt Ltd</a>
       </footer>
+
+
+      <Popup
+        isOpen={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        onConfirm={handleConfirm}
+        action={popupAction}
+      />
     </div>
   );
 }

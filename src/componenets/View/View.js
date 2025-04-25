@@ -72,9 +72,6 @@ function View() {
   const toggleEditable = () =>
     setEditableField(editableField === 'quantity' ? 'price' : 'quantity');
 
-
-  // const [quantity, setQuantity] = useState('');
-  // const [price, setPrice] = useState('');
   const [lastChanged, setLastChanged] = useState(null);
 
   const scrollToIndex = (index) => {
@@ -89,13 +86,12 @@ function View() {
 
     // try {
 
-    //   const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/buyproduct', {
+    //   const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/buyproduct`, {
     //     id: product?._id,
     //     quantity: quantity,
     //     ownerId: product?.ownerId,
     //     buyerId: user?._id
     //   });
-    //   console.log(response.data, 'response')
     //   if (response.data) {
     //     alert('Product Bought Successfully');
     //   } else {
@@ -113,11 +109,10 @@ function View() {
   }
   const handleSell = async () => {
     try {
-      const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/soldproduct', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/soldproduct`, {
         id: product?._id,
         price: price,
       });
-      console.log(response.data, 'response')
       if (response?.data?.product?.isAvailable === true) {
         setIsProductSold(true)
       }
@@ -134,10 +129,9 @@ function View() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getProductById?id=${product?._id}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getProductById?id=${product?._id}`);
       if (response.data) {
         setProductsData(response.data.product);
-        console.log(response.data.product, 'response')
       } else {
         console.error('Error fetching products:', response.data.message);
 

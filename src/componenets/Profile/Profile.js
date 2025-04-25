@@ -24,7 +24,7 @@ function Profile({ setIsAuthenticated, setUser }) {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
-                handleEditToggle(); // close popup if click outside
+                handleEditToggle(); 
             }
         };
 
@@ -50,7 +50,7 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/getProducts?id=${user._id}`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getProducts?id=${user._id}`);
             if (response.data) {
                 setProducts(response.data.products);
             } else {
@@ -84,7 +84,7 @@ function Profile({ setIsAuthenticated, setUser }) {
     const handleSave = async () => {
         try {
 
-            const response = await axios.post('https://lfgkx3p7-5000.inc1.devtunnels.ms/api/users/updateprofile', formData)
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/updateprofile`, formData)
             if (response?.data) {
                 setIsEditing(false);
                 showSuccess('Profile updated!');

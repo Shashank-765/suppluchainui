@@ -152,8 +152,14 @@
     width: 400px;
     max-width: 95%;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 85vh;
+    overflow-y: scroll;
 }
 
+.modal::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, and Opera */
+}
 .modal h2 {
     margin-bottom: 1rem;
 }

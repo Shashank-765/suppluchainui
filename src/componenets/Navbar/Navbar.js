@@ -8,7 +8,6 @@ import cross from '../../Imges/cross.png';
 function Navbar({ isAuthenticated }) {
   const data = (JSON.parse(localStorage.getItem('user')));
   const [navstae, setNavState] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
   const navigatetohome = () => {
@@ -18,7 +17,6 @@ function Navbar({ isAuthenticated }) {
     <div className='navbarsection'>
       <div className='navbarleftlog'>
         <div className='logocontainercompany'>
-
           <img onClick={navigatetohome} src={logo} alt='images' />
         </div>
       </div>
@@ -43,56 +41,19 @@ function Navbar({ isAuthenticated }) {
             </>
           )}
 
-          {/* Protected: Product Dropdown */}
-          {isAuthenticated && (
-            // <li className='dropdown'>
-            //   <span
-            //     className='dropdown-toggle'
-            //     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            //   >
-            //     Product▾
-            //   </span>
-
-            //   {isDropdownOpen && (
-            //     <ul className='dropdown-menu'>
-            //       <li>
-            //         <Link
-            //           to='/product'
-            //           onClick={() => {
-            //             setNavState('navbarrightside');
-            //             setIsDropdownOpen(false);
-            //           }}
-            //         >
-            //           Explore
-            //         </Link>
-            //       </li>
-            //       <li>
-            //         <Link
-            //           to='/form'
-            //           onClick={() => {
-            //             setNavState('navbarrightside');
-            //             setIsDropdownOpen(false);
-            //           }}
-            //         >
-            //           Add Product
-            //         </Link>
-            //       </li>
-            //     </ul>
-            //   )}
-            // </li>      
+              
             <li>
               <Link
                 to='/product'
                 onClick={() => {
                   setNavState('navbarrightside');
-                  setIsDropdownOpen(false);
                 }}
               >
                 Explore
               </Link>
             </li>
 
-          )}
+        
 
           <li onClick={() => setNavState('navbarrightside')}>
             <Link to='/contact'>Contact</Link>

@@ -54,6 +54,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faqs" element={<Faqs />} />
+          <Route path="/product" element={<Product />} />
           <Route path="/viewpage" element={<View />} />
 
           {!isAuthenticated && (

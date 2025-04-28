@@ -51,7 +51,7 @@ function Product() {
                                     <div className='productdetailscontainer'>
                                         <div className='productdetailscontainerdetails'>
                                             <p>{ele?.productName}</p>
-                                            <p>Min QTY : <span className='pricevalueproduct'>{ele?.miniQuantity}</span></p>
+                                            <p>Total QTY : <span className='pricevalueproduct'>{ele?.quantityProcessed} qtl</span></p>
                                         </div>
                                         <p className='prices'>Price : <span className='pricevalueproduct'>{ele?.price}</span></p>
                                     </div>

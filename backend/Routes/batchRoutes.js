@@ -5,7 +5,6 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const User = require('../Models/userModel.js');
-const Fruit = require('../Models/ProductModel.js');
 const BatchModel = require('../Models/BatchModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const Role = require('../Models/RolesModel.js');
@@ -310,12 +309,14 @@ router.post('/updateBatch', upload, async (req, res) => {
       certificateFrom,
       typeOfFertilizer,
       fertilizerUsed,
+      inspectionStatus,
 
       harvesterId,
       harvesterName,
       cropSampling,
       temperatureLevel,
       humidity,
+      harvestStatus,
 
       exporterId,
       exporterName,
@@ -325,6 +326,7 @@ router.post('/updateBatch', upload, async (req, res) => {
       departureDate,
       estimatedDate,
       exportedTo,
+      exportStatus,
 
       importerId,
       importerName,
@@ -334,6 +336,7 @@ router.post('/updateBatch', upload, async (req, res) => {
       warehouseLocation,
       warehouseArrivalDate,
       importerAddress,
+      importStatus,
 
       processorId,
       processorName,
@@ -345,8 +348,7 @@ router.post('/updateBatch', upload, async (req, res) => {
       warehouseAddress,
       destination,
       price,
-      miniQuantity,
-      maxiQuantity,
+      processingStatus
     } = req.body;
 
     if (!batchId) {
@@ -358,7 +360,7 @@ router.post('/updateBatch', upload, async (req, res) => {
     const updatedFields = {};
 
     // FARM INSPECTION LOGIC
-    if (farmInspectionId || farmInspectionName || certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed || productName) {
+    if (farmInspectionId || farmInspectionName || certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed || productName || inspectionStatus) {
       const imagePaths = [];
 
       if (req.files) {
@@ -377,24 +379,26 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.farmInspectionName = farmInspectionName;
       updatedFields.typeOfFertilizer = typeOfFertilizer;
       updatedFields.fertilizerUsed = fertilizerUsed;
-      updatedFields.isInspexted = true;
+      updatedFields.isInspexted = inspectionStatus==='Completed'? true:false;
       updatedFields.inspectionDate = new Date();
       updatedFields.inspectedImages = imagePaths;
+      updatedFields.inspectionStatus = inspectionStatus;
     }
 
     // HARVESTER LOGIC
-    if (harvesterId || harvesterName || cropSampling || temperatureLevel || humidity) {
+    if (harvesterId || harvesterName || cropSampling || temperatureLevel || humidity || harvestStatus) {
       updatedFields.harvesterId = harvesterId;
       updatedFields.harvesterName = harvesterName;
       updatedFields.cropSampling = cropSampling;
       updatedFields.temperatureLevel = temperatureLevel;
       updatedFields.humidity = humidity;
-      updatedFields.isHarvested = true;
+      updatedFields.isHarvested = harvestStatus==='Completed'? true:false;
       updatedFields.harvestDate = new Date();
+      updatedFields.harvestStatus = harvestStatus;
     }
 
     // EXPORTER LOGIC
-    if (exporterId || coordinationAddress || shipName || shipNo || departureDate || estimatedDate || exportedTo) {
+    if (exporterId || coordinationAddress || shipName || shipNo || departureDate || estimatedDate || exportedTo || exportStatus) {
       updatedFields.exporterId = exporterId;
       updatedFields.exporterName = exporterName;
       updatedFields.coordinationAddress = coordinationAddress;
@@ -403,12 +407,13 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.departureDate = departureDate;
       updatedFields.estimatedDate = estimatedDate;
       updatedFields.exportedTo = exportedTo;
-      updatedFields.isExported = true;
+      updatedFields.isExported = exportStatus==='Completed' || 'Shipped'? true:false;
       updatedFields.exportDate = new Date();
+      updatedFields.exportStatus = exportStatus;
     }
 
     // IMPORTER LOGIC
-    if (importerId || quantityImported || shipStorage || arrivalDate || warehouseLocation || warehouseArrivalDate || importerAddress) {
+    if (importerId || quantityImported || shipStorage || arrivalDate || warehouseLocation || warehouseArrivalDate || importerAddress || importStatus) {
       updatedFields.importerId = importerId;
       updatedFields.importerName = importerName;
       updatedFields.quantityImported = quantityImported;
@@ -417,14 +422,15 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.warehouseLocation = warehouseLocation;
       updatedFields.warehouseArrivalDate = warehouseArrivalDate;
       updatedFields.importerAddress = importerAddress;
-      updatedFields.isImported = true;
+      updatedFields.isImported =importStatus==='Completed' || 'Received'? true:false;
       updatedFields.importDate = new Date();
+      updatedFields.importStatus = importStatus;
     }
 
 
 
     // PROCESSOR LOGIC
-    if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination || miniQuantity || maxiQuantity || price) {
+    if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination ||  price || processingStatus) {
 
       const imagePaths = [];
 
@@ -437,8 +443,6 @@ router.post('/updateBatch', upload, async (req, res) => {
         }
       }
       updatedFields.price = price;
-      updatedFields.miniQuantity = miniQuantity;
-      updatedFields.maxiQuantity = maxiQuantity;
       updatedFields.processorId = processorId;
       updatedFields.processorName = processorName;
       updatedFields.quantityProcessed = quantityProcessed;
@@ -448,9 +452,10 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.warehouse = warehouse;
       updatedFields.warehouseAddress = warehouseAddress;
       updatedFields.destination = destination;
-      updatedFields.isProcessed = true;
+      updatedFields.isProcessed = processingStatus==='Completed'|| 'Processed' ? true:false;
       updatedFields.processedDate = new Date();
-      updatedFields.images = imagePaths; // Save image paths in the database
+      updatedFields.images = imagePaths;
+      updatedFields.processingStatus = processingStatus;
     }
 
     // Always ensure batchId is in the update set (required for upsert)

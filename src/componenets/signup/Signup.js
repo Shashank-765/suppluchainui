@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import axios from 'axios';
 import CircularLoader from '../CircularLoader/CircularLoader'
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import './Signup.css';
 
 function SignupLogin({ setIsAuthenticated, setUserData }) {
-    const [isSignup, setIsSignup] = useState(true);
+const location = useLocation();
+//  const { login } = location.state || {};
+    const [isSignup, setIsSignup] = useState(false);
     const [isCircularloader, setIsCircularLoader] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        userType: '',
+        userType: 'buyer',
         contact: '',
         address: ''
     });
@@ -55,6 +57,10 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
                     setIsAuthenticated(true);
                     localStorage.setItem('user', JSON.stringify(loggedInUser.data.user));
                     setUserData(loggedInUser.data.user);
+                    // if(login){
+                    // console.log('login', login)
+                    //  navigate('/viewpage');
+                    // }
                     navigate('/');
                     showSuccess('Login successful!');
                 }
@@ -99,7 +105,7 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
                                 required
                             >
                                 <option value='buyer'>Buyer</option>
-                                <option value='seller'>Seller</option>
+                                {/* <option value='seller'>Seller</option> */}
                                 <option value='retailer'>Retailer</option>
                             </select>
                             <input

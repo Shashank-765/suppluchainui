@@ -14,12 +14,13 @@ import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 const Dashboard = () => {
     const navigate = useNavigate();
     const popupRef = useRef(null);
+    const modalUserRef = useRef(null);
+    const modalRef = useRef(null);
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showUserModal, setShowUserModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchBatchTerm, setSearchBatchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [isBlocked, setIsBlocked] = useState(false);
     const [toatalUser, setTotalUser] = useState(0);
     const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
@@ -41,6 +42,17 @@ const Dashboard = () => {
     const [pendingArgs, setPendingArgs] = useState([]);
 
 
+
+    useEffect(() => {
+        if (showBatchModal || showUserModal || isEditing)
+
+            document.body.style.overflow = 'hidden';
+        else
+            document.body.style.overflow = 'auto';
+        return () => {
+            document.body.style.overflow = 'auto';
+        }
+    }, [showBatchModal, showUserModal, isEditing]);
 
     const showPopup = (actionText, callbackFn, args = []) => {
         setPopupAction(actionText);
@@ -81,6 +93,40 @@ const Dashboard = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isEditing]);
+
+    useEffect(() => {
+        const handleClickOutsideModal = (event) => {
+            if (modalUserRef.current && !modalUserRef.current.contains(event.target)) {
+                setShowUserModal(false);
+            }
+        };
+
+        if (showUserModal) {
+            document.addEventListener('mousedown', handleClickOutsideModal);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutsideModal);
+        };
+    }, [showUserModal]);
+
+
+    useEffect(() => {
+        const handleClickOutsideModal = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                setShowBatchModal(false); 
+            }
+        };
+
+        if (showBatchModal) {
+            document.addEventListener('mousedown', handleClickOutsideModal);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutsideModal);
+        };
+    }, [showBatchModal]);
+
 
 
     const handleSave = async () => {
@@ -444,7 +490,6 @@ const Dashboard = () => {
             if (response.data) {
                 // console.log('User blocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User Blocked Succefully')
-                setIsBlocked(response?.data?.user?.isBlocked);
                 setToggle(!toggle);
             } else {
                 console.error('Failed to block user');
@@ -462,7 +507,6 @@ const Dashboard = () => {
             if (response.data) {
                 // console.log('User unblocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User unblocked successfully!');
-                setIsBlocked(response?.data?.user?.isBlocked);
                 setToggle(!toggle);
             } else {
                 console.error('Failed to unblock user');
@@ -812,7 +856,7 @@ const Dashboard = () => {
                                             }
                                         </td>
                                         <td>
-                                            {/* {batch?.processorName} */}
+
                                             {
 
                                                 (batch?.tracking?.isProcessed) ? <button
@@ -1010,7 +1054,7 @@ const Dashboard = () => {
 
             {showBatchModal && (
                 <div className={styles.modalOverlay}>
-                    <div className={styles.modal}>
+                    <div className={styles.modal} ref={modalRef}>
                         <h2>Add Batch</h2>
                         <form onSubmit={handlepopupSubmit}>
                             <div className={styles.formGroup}>
@@ -1085,7 +1129,7 @@ const Dashboard = () => {
                                 {errors.farmInspectionName && <span className={styles.errorText}>{errors.farmInspectionName}</span>}
                             </div>
 
-                            {/* Repeat the same pattern for other select inputs */}
+
                             <div className={styles.formGroup}>
                                 <select
                                     value={formData.harvesterName}
@@ -1262,7 +1306,7 @@ const Dashboard = () => {
 
             {showUserModal && (
                 <div className={styles.modalOverlay}>
-                    <div className={styles.modal}>
+                    <div className={styles.modal} ref={modalUserRef}>
                         <h2>Add User</h2>
                         <form onSubmit={handleUserPopupSubmit}>
                             <div className={styles.formGroup}>
@@ -1293,7 +1337,7 @@ const Dashboard = () => {
 
                             <div className={styles.formGroup}>
                                 <input
-                                    type="password"  // Changed from text to password
+                                    type="password"
                                     name="password"
                                     placeholder="Password"
                                     value={userForm.password}

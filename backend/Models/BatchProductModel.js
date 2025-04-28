@@ -11,8 +11,9 @@ const trackingDetailsSchema = new mongoose.Schema({
     fertilizerUsed: { type: String },
     isInspexted: { type: Boolean, default: false },
     inspectionDate: { type: Date },
-    inspectedImages:[{type:String}],
-    
+    inspectedImages: [{ type: String }],
+    inspectionStatus: { type: String },
+
 
     // Harvester fields
     harvesterId: { type: String },
@@ -22,6 +23,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     humidity: { type: String },
     isHarvested: { type: Boolean, default: false },
     harvestDate: { type: Date },
+    harvestStatus: { type: String },
 
     // Exporter fields
     exporterId: { type: String },
@@ -34,6 +36,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     exportedTo: { type: String },
     isExported: { type: Boolean, default: false },
     exportDate: { type: Date, },
+    exportStatus: { type: String },
 
     // Importer fields
     importerId: { type: String },
@@ -46,6 +49,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     importerAddress: { type: String },
     isImported: { type: Boolean, default: false },
     importDate: { type: Date },
+    importStatus: { type: String },
 
     // Processor fields
     processorId: { type: String },
@@ -60,11 +64,22 @@ const trackingDetailsSchema = new mongoose.Schema({
     isProcessed: { type: Boolean, default: false },
     processedDate: { type: Date },
     images: [{ type: String, },],
-    price:{ type: String, },
-    miniQuantity:{ type: String, },
-    maxiQuantity:{ type: String, },
+    price: { type: String, },
+    processingStatus: { type: String },
+    purchaseHistory: [
+        {
+            buyerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+            ownerId:{type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            quantityBought: { type: String }, 
+            pricePaid: { type: Number },     
+            purchaseDate: { type: Date, default: Date.now }, 
+        }
+    ],
+
+    
     // Common fields
     batchId: { type: String, required: true },
+    isAvailable: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now }
 });
 

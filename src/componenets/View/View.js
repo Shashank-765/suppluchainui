@@ -4,6 +4,7 @@ import './View.css'
 import uparrow from '../../Imges/down-arrow.png'
 import downarrow from '../../Imges/arrow.png'
 import informat from '../../Imges/information.png'
+import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import locationImage from '../../Imges/location.png'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,18 +15,23 @@ function View() {
   const user = JSON.parse(localStorage.getItem('user')) || null;
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isProductSold, setIsProductSold] = useState(false);
   const [productData, setProductsData] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
   const [unit, setUnit] = useState('kg');
   const [editableField, setEditableField] = useState('quantity');
+  const [quantityError, setQuantityError] = useState('');
+  const [priceError, setPriceError] = useState('');
   const popupRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
+        setQuantity('');
+        setPrice('');
+        setPriceError('')
+        setQuantityError('')
         setShowPopup(false);
       }
     }
@@ -46,27 +52,27 @@ function View() {
     setActiveIndex(index);
   };
 
- const handleUnitChange = (e) => {
-  const newUnit = e.target.value;
-  setUnit(newUnit);
+  const handleUnitChange = (e) => {
+    const newUnit = e.target.value;
+    setUnit(newUnit);
 
-  const basePricePerQuintal = parseFloat(productData?.price || 0);
-  const unitPrice = newUnit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
+    const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const unitPrice = newUnit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
-  if (lastChanged === 'quantity') {
-    const calculatedPrice =
-      quantity
-        ? (parseFloat(quantity) * unitPrice).toFixed(2)
-        : '';
-    setPrice(calculatedPrice);
-  } else if (lastChanged === 'price') {
-    const calculatedQty =
-      price
-        ? (parseFloat(price) / unitPrice).toFixed(2)
-        : '';
-    setQuantity(calculatedQty);
-  }
-};
+    if (lastChanged === 'quantity') {
+      const calculatedPrice =
+        quantity
+          ? (parseFloat(quantity) * unitPrice).toFixed(2)
+          : '';
+      setPrice(calculatedPrice);
+    } else if (lastChanged === 'price') {
+      const calculatedQty =
+        price
+          ? (parseFloat(price) / unitPrice).toFixed(2)
+          : '';
+      setQuantity(calculatedQty);
+    }
+  };
 
 
   const toggleEditable = () =>
@@ -82,50 +88,42 @@ function View() {
     });
   };
 
+
+
   const handlebuynow = async (quantity, price, realprice) => {
+    setQuantityError('');
+    setPriceError('');
+    if (quantity <= 0 && editableField === 'quantity') {
+      setQuantityError('Please enter a valid quantity');
+      return;
+    }
 
-    // try {
+    if (price <= 0 && editableField === 'price') {
+      setPriceError('Please enter a valid price');
+      return;
+    }
 
-    //   const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/buyproduct`, {
-    //     id: product?._id,
-    //     quantity: quantity,
-    //     ownerId: product?.ownerId,
-    //     buyerId: user?._id
-    //   });
-    //   if (response.data) {
-    //     alert('Product Bought Successfully');
-    //   } else {
-    //     alert('Something went wrong');
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching products:', error);
-
-    // }
-
-    if (price <= 0 && quantity <= 0) return;
-    let productname = productData?.productName;
-
-    navigate('/invoice', { state: { quantity, price, realprice, productname, unit } });
-  }
-  const handleSell = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/soldproduct`, {
-        id: product?._id,
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/buyproduct`, {
+        batchId: productData?.batchId,
+        quantity: quantity,
         price: price,
+        buyerId: user?._id,
+        ownerId: product?._id,
+        unit
       });
-      if (response?.data?.product?.isAvailable === true) {
-        setIsProductSold(true)
-      }
       if (response.data) {
-        alert('Product Sold Successfully');
+        showSuccess('Product Bought Successfully');
+        let productname = productData?.productName;
+        navigate('/invoice', { state: { quantity, price, realprice, productname, unit } });
       } else {
-        alert('Something went wrong');
+        showError('Something went wrong');
       }
     } catch (error) {
-      console.error('Error selling product:', error);
-      alert('Server error, please try again later');
+      console.error('Error fetching products:', error);
+      showError('error')
     }
-  };
+  }
 
   const fetchProducts = async () => {
     try {
@@ -134,7 +132,6 @@ function View() {
         setProductsData(response.data.product);
       } else {
         console.error('Error fetching products:', response.data.message);
-
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -142,61 +139,95 @@ function View() {
   }
   useEffect(() => {
     fetchProducts();
-  }, [isProductSold])
+  }, [])
 
   const [activeAccordion, setActiveAccordion] = useState(null);
 
   const handleAccordion = (index) => {
     setActiveAccordion(activeAccordion === index ? null : index);
   };
- const handleQuantityChange = (e) => {
-  const value = e.target.value;
-  if (parseFloat(value) < 0) return;
-
-  if (lastChanged === 'price') {
-    setQuantity('');
-    setPrice('');
-    setLastChanged(null);
-  } else {
-    setQuantity(value);
+  const handleQuantityChange = (e) => {
+    const value = e.target.value;
+    if (parseFloat(value) < 0) return;
 
     const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
-    const calculatedPrice =
-      value
-        ? (parseFloat(value) * unitPrice).toFixed(2)
+    let enteredQuantity = parseFloat(value) || 0;
+    let quantityInQuintal = unit === 'kg' ? enteredQuantity / 100 : enteredQuantity;
+
+    if (quantityInQuintal > totalAvailableQuintal) {
+      showError(`Only ${totalAvailableQuintal} quintals available.`);
+      return; 
+    }
+
+    if (lastChanged === 'price') {
+      setQuantity('');
+      setPrice('');
+      setLastChanged(null);
+    } else {
+      setQuantity(value);
+
+      const calculatedPrice = value
+        ? (enteredQuantity * unitPrice).toFixed(2)
         : '';
 
-    setPrice(calculatedPrice);
-    setLastChanged('quantity');
-  }
-};
-
+      setPrice(calculatedPrice);
+      setLastChanged('quantity');
+    }
+  };
 
   const handlePriceChange = (e) => {
-  const value = e.target.value;
-  if (parseFloat(value) < 0) return;
-
-  if (lastChanged === 'quantity') {
-    setQuantity('');
-    setPrice('');
-    setLastChanged(null);
-  } else {
-    setPrice(value);
+    const value = e.target.value;
+    if (parseFloat(value) < 0) return;
 
     const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
-    const calculatedQty =
-      value
-        ? (parseFloat(value) / unitPrice).toFixed(2)
+    let enteredPrice = parseFloat(value) || 0;
+    let calculatedQty = enteredPrice / unitPrice;
+    let quantityInQuintal = unit === 'kg' ? calculatedQty / 100 : calculatedQty;
+
+    if (quantityInQuintal > totalAvailableQuintal) {
+      showError(`Only ${totalAvailableQuintal} quintals available.`);
+      return;
+    }
+
+    if (lastChanged === 'quantity') {
+      setQuantity('');
+      setPrice('');
+      setLastChanged(null);
+    } else {
+      setPrice(value);
+
+      const calculatedQuantity = value
+        ? calculatedQty.toFixed(2)
         : '';
 
-    setQuantity(calculatedQty);
-    setLastChanged('price');
+      setQuantity(calculatedQuantity);
+      setLastChanged('price');
+    }
+  };
+
+
+  const BuyNowHandler = () => {
+    if (user) {
+      setShowPopup(true)
+    }
+    else {
+      navigate('/auth',{ state: { login:'viewpage' }})
+    }
   }
-};
+
+  const handleClosepopup = () => {
+    setQuantity('');
+    setPrice('');
+    setPriceError('')
+    setQuantityError('')
+    setShowPopup(false)
+  }
 
 
 
@@ -306,125 +337,13 @@ function View() {
               </h2>
               <h2 className='nameofproductowner'>{productData?.productName}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.price}</span></h2>
-              <h2>Mini Qty : <span className='priceproduct'>{productData?.miniQuantity} Qtl</span></h2>
+              <h2>Qty : <span className='priceproduct'>{productData?.quantityProcessed}  Qtl</span></h2>
               <div className='buynowbuttoncover'>
-                {
-                  productData?.ownerId === user?._id ? (
-                    <div className='buynowbuttoncover'>
-                      {
-                        productData?.isAvailable ? (
-                          <button className='buynowbutton'> Product Sold</button>
-                        ) : (
-                          <>
-                            <input className='quantitytext' onChange={(e) => setPrice(e.target.value)} placeholder='Enter Price' type='number' />
-                            <button onClick={handleSell} className='buynowbutton'>Sell Now</button>
-                          </>
-                        )
 
-                      }
-                    </div>
-                  ) : (
-                    <div className='buynowbuttoncover'>
-                      {/* <div className='quantitypricecover'>
-                        <div>
-                          <h3>Total Qunaity</h3>
-                          <input
-                            className='quantitytext'
-                            placeholder='Enter Quantity'
-                            type='number'
-                            value={quantity}
-                            min='0'
-                            onChange={handleQuantityChange}
-                          />
-                        </div>
-                        <div>
-                          <h3>Total Price</h3>
-                          <input
-                            className='quantitytext'
-                            placeholder='Enter Price'
-                            type='number'
-                            value={price}
-                            min='0'
-                            onChange={handlePriceChange}
-                          />
-                        </div>
-                      </div> */}
-                      <button onClick={() => setShowPopup(true)} className='buynowbutton'>Buy Now</button>
-                    </div>
-                  )
-                }
-
-                {showPopup && (
-                  <div className="popupOverlay">
-                    <div ref={popupRef} className="popup animatedPopup">
-                      <h2 className="popupTitle">Buy Product</h2>
-
-                      <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
-                        <label>Total Quantity</label>
-                        <div className='quantity_box'>
-                          <input
-                            type="number"
-                            placeholder="Enter Quantity"
-                            className="inputQunatity"
-                            value={quantity}
-                            onChange={handleQuantityChange}
-                            disabled={editableField !== 'quantity'}
-                          />
-                          <select
-                            value={unit}
-                            onChange={(e)=>handleUnitChange(e)}
-                            disabled={editableField !== 'quantity'}
-                            className="select"
-                          >
-                            <option value="kg">kg</option>
-                            <option value="quintal">quintal</option>
-                          </select>
-                        </div>
-
-                      </div>
-
-                      <button className="arrowButton" onClick={toggleEditable}>
-                        {editableField === 'quantity' ? '↑' : '↓'}
-                      </button>
-
-                      <div className={`inputBlock2 ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
-                        <label>Total Price</label>
-                        <input
-                          type="number"
-                          placeholder="Enter Price"
-                          className="inputQunatity2"
-                          value={price}
-                          onChange={handlePriceChange}
-                          disabled={editableField !== 'price'}
-                        />
-                      </div>
-
-                      <div className="actions">
-                        <button
-                          onClick={() => handlebuynow(quantity, price, productData?.price)}
-                          className="confirmButton"
-                        >
-                          Confirm
-                        </button>
-                        <button onClick={() => setShowPopup(false)} className="cancelButton">
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-
-
-
-
+                <div className='buynowbuttoncover'>
+                  <button onClick={BuyNowHandler} className='buynowbutton'>Buy Now</button>
+                </div>
               </div>
-
-              {/* <div className='buynowbuttoncover'>
-                <input className='quantitytext' placeholder='Enter Price' type='number' />
-                <button onClick={handlebuynow} className='buynowbutton'>Sell Now</button>
-              </div> */}
-
             </div>
 
           </div>
@@ -552,6 +471,68 @@ function View() {
           </div>
         </div>
       </div>
+
+       {showPopup && (
+                  <div className="popupOverlay">
+                    <div ref={popupRef} className="popup animatedPopup">
+                      <h2 className="popupTitle">Buy Product</h2>
+
+                      <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
+                        <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.quantityProcessed}</span></p>
+                        <div className='quantity_box'>
+                          <input
+                            type="number"
+                            placeholder="Enter Quantity"
+                            className="inputQunatity"
+                            value={quantity}
+                            onChange={handleQuantityChange}
+                            disabled={editableField !== 'quantity'}
+                          />
+                          <select
+                            value={unit}
+                            onChange={(e) => handleUnitChange(e)}
+                            disabled={editableField !== 'quantity'}
+                            className="select"
+                          >
+                            <option value="kg">kg</option>
+                            <option value="quintal">quintal</option>
+                          </select>
+
+                        </div>
+                        {quantityError && <p className='errorclass'>{quantityError}</p>}
+                      </div>
+
+                      <button className="arrowButton" onClick={toggleEditable}>
+                        {editableField === 'quantity' ? '↑' : '↓'}
+                      </button>
+
+                      <div className={`inputBlock2 ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
+                        <label>Total Price</label>
+                        <input
+                          type="number"
+                          placeholder="Enter Price"
+                          className="inputQunatity2"
+                          value={price}
+                          onChange={handlePriceChange}
+                          disabled={editableField !== 'price'}
+                        />
+                        {priceError && <p className='errorclass'>{priceError}</p>}
+                      </div>
+
+                      <div className="actions">
+                        <button
+                          onClick={() => handlebuynow(quantity, price, productData?.price)}
+                          className="confirmButton"
+                        >
+                          Confirm
+                        </button>
+                        <button onClick={handleClosepopup} className="cancelButton">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
     </>
   )
 }

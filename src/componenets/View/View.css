@@ -222,6 +222,10 @@
   background: #235f48;
   color: white;
 }
+.errorclass{
+ color: red;
+ margin: 0;
+}
 
 .about-vegitable {
   width: 93%;
@@ -527,7 +531,7 @@
 .popupTitle {
   font-size: 1.6rem;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin: 0;
   color: #333;
 }
 
@@ -548,9 +552,20 @@
 
 .inputBlock label {
   font-weight: 500;
-  display: block;
+  display: flex;
   margin-bottom: 6px;
   color: #444;
+}
+.inputBlock{
+ 
+  .totalquantityblock{
+    margin: 10px 0;
+    display: flex;
+    justify-content: start;
+    >span{
+     margin-left: 10px;
+    }
+  }
 }
 
 .inputQunatity {

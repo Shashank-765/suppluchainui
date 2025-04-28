@@ -4,7 +4,6 @@ import axios from 'axios';
 import view from '../../Imges/eye.png'
 import { useNavigate, useLocation } from 'react-router-dom';
 import profileImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
-import formbackground from '../../Imges/formbackground.jpg'
 import CircularLoader from '../CircularLoader/CircularLoader'
 import { showError, showSuccess } from '../ToastMessage/ToastMessage';
 import Popup from '../Popups/Popup'
@@ -68,12 +67,14 @@ function UserDashBoard() {
     typeOfFertilizer: '',
     fertilizerUsed: '',
     inspectedImages: [],
+    inspectionStatus: '',
 
     harvesterId: '',
     harvesterName: '',
     cropSampling: '',
     temperatureLevel: '',
     humidity: '',
+    harvestStatus: '',
 
     exporterId: '',
     exporterName: '',
@@ -83,6 +84,7 @@ function UserDashBoard() {
     departureDate: '',
     estimatedDate: '',
     exportedTo: '',
+    exportStatus: '',
 
     importerId: '',
     importerName: '',
@@ -92,6 +94,7 @@ function UserDashBoard() {
     warehouseLocation: '',
     warehouseArrivalDate: '',
     importerAddress: '',
+    importStatus: '',
 
     processorId: '',
     processorName: '',
@@ -103,38 +106,9 @@ function UserDashBoard() {
     warehouseAddress: '',
     destination: '',
     price: '',
-    miniQuantity: '',
-    maxiQuantity: '',
     images: [],
+    processingStatus: ''
   });
-  if (user?.role?.label) {
-
-    if (user?.role?.label === 'Farm Inspection') {
-      formData.farmInspectionId = user?._id;
-      formData.farmInspectionName = user?.name;
-    }
-
-    if (user?.role?.label === 'Harvester') {
-      formData.harvesterId = user?._id;
-      formData.harvesterName = user?.name;
-    }
-
-    if (user?.role?.label === 'Importer') {
-      formData.importerId = user?._id;
-      formData.importerName = user?.name;
-    }
-
-    if (user?.role?.label === 'Exporter') {
-      formData.exporterId = user?._id;
-      formData.exporterName = user?.name;
-    }
-
-    if (user?.role?.label === 'Processor') {
-      formData.processorId = user?._id;
-      formData.processorName = user?.name;
-    }
-
-  }
   const handleImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
     const updatedImages = [...formData.images, ...newFiles];
@@ -189,10 +163,76 @@ function UserDashBoard() {
   const handleNextBatchPage = () => {
     setCurrentBatchPage((prev) => Math.min(prev + 1, totalBatchPage));
   };
+
   const toggleForm = (id) => {
-    formData.batchId = id;
-    setShowForm(!showForm)
+    // Find the batch data with the given batchId
+    const selectedBatch = batchData.find(batch => String(batch.batchId) === String(id));
+
+    if (selectedBatch) {
+      setFormData(prevData => ({
+        ...prevData,
+        batchId: selectedBatch?.batchId || '',
+        farmInspectionId: selectedBatch?.farmInspectionId || '',
+        farmInspectionName: selectedBatch?.farmInspectionName || '',
+        productName: selectedBatch?.tracking?.productName || '',
+        certificateNo: selectedBatch?.tracking?.certificateNo || '',
+        certificateFrom: selectedBatch?.tracking?.certificateFrom || '',
+        typeOfFertilizer: selectedBatch?.tracking?.typeOfFertilizer || '',
+        fertilizerUsed: selectedBatch?.tracking?.fertilizerUsed || '',
+        inspectedImages: selectedBatch?.tracking?.inspectedImages || [],
+        inspectionStatus: selectedBatch?.tracking?.inspectionStatus || '',
+
+        harvesterId: selectedBatch?.harvesterId || '',
+        harvesterName: selectedBatch?.harvesterName || '',
+        cropSampling: selectedBatch?.tracking?.cropSampling || '',
+        temperatureLevel: selectedBatch?.tracking?.temperatureLevel || '',
+        humidity: selectedBatch?.tracking?.humidity || '',
+        harvestStatus: selectedBatch?.tracking?.harvestStatus || '',
+
+        exporterId: selectedBatch?.exporterId || '',
+        exporterName: selectedBatch?.exporterName || '',
+        coordinationAddress: selectedBatch?.tracking?.coordinationAddress || '',
+        shipName: selectedBatch?.tracking?.shipName || '',
+        shipNo: selectedBatch?.tracking?.shipNo || '',
+        departureDate: selectedBatch?.tracking?.departureDate || '',
+        estimatedDate: selectedBatch?.tracking?.estimatedDate || '',
+        exportedTo: selectedBatch?.tracking?.exportedTo || '',
+        exportStatus: selectedBatch?.tracking?.exportStatus || '',
+
+        importerId: selectedBatch?.importerId || '',
+        importerName: selectedBatch?.importerName || '',
+        quantityImported: selectedBatch?.tracking?.quantityImported || '',
+        shipStorage: selectedBatch?.tracking?.shipStorage || '',
+        arrivalDate: selectedBatch?.tracking?.arrivalDate || '',
+        warehouseLocation: selectedBatch?.tracking?.warehouseLocation || '',
+        warehouseArrivalDate: selectedBatch?.tracking?.warehouseArrivalDate || '',
+        importerAddress: selectedBatch?.tracking?.importerAddress || '',
+        importStatus: selectedBatch?.tracking?.importStatus || '',
+
+        processorId: selectedBatch?.processorId || '',
+        processorName: selectedBatch?.processorName || '',
+        quantityProcessed: selectedBatch?.tracking?.quantityProcessed || '',
+        processingMethod: selectedBatch?.tracking?.processingMethod || '',
+        packaging: selectedBatch?.tracking?.packaging || '',
+        packagedDate: selectedBatch?.tracking?.packagedDate || '',
+        warehouse: selectedBatch?.tracking?.warehouse || '',
+        warehouseAddress: selectedBatch?.tracking?.warehouseAddress || '',
+        destination: selectedBatch?.tracking?.destination || '',
+        price: selectedBatch?.tracking?.price || '',
+        images: selectedBatch?.tracking?.images || [],
+        processingStatus: selectedBatch?.tracking?.processingStatus || ''
+      }));
+
+      setShowForm(true);
+    } else {
+      console.error('Batch not found');
+    }
   };
+
+  const toggleFormClose = () => {
+    setShowForm(false);
+  }
+
   const HandleBatchviewPage = (batch) => {
     navigate('/batchprogress', { state: { batch } });
   }
@@ -311,14 +351,16 @@ function UserDashBoard() {
         'productName',
         'typeOfFertilizer',
         'fertilizerUsed',
-        'inspectedImages'
+        'inspectedImages',
+        'inspectionStatus'
       ],
       'Harvester': [
         'harvesterId',
         'harvesterName',
         'cropSampling',
         'temperatureLevel',
-        'humidity'
+        'humidity',
+        'harvestStatus'
       ],
       'Exporter': [
         'exporterId',
@@ -328,7 +370,8 @@ function UserDashBoard() {
         'shipNo',
         'departureDate',
         'estimatedDate',
-        'exportedTo'
+        'exportedTo',
+        'exportStatus'
       ],
       'Importer': [
         'importerId',
@@ -338,7 +381,8 @@ function UserDashBoard() {
         'arrivalDate',
         'warehouseLocation',
         'warehouseArrivalDate',
-        'importerAddress'
+        'importerAddress',
+        'importStatus'
       ],
       'Processor': [
         'processorId',
@@ -351,9 +395,8 @@ function UserDashBoard() {
         'warehouseAddress',
         'destination',
         'price',
-        'miniQuantity',
-        'maxiQuantity',
-        'images'
+        'images',
+        'processingStatus'
       ]
     };
 
@@ -406,7 +449,6 @@ function UserDashBoard() {
     });
     setTouched(allTouched);
 
-    // Validate form
     if (!validateForm()) {
       setIsCircularLoader(false);
       showError('Please fix the errors in the form');
@@ -415,6 +457,7 @@ function UserDashBoard() {
     showPopup(' submit this form ', handleSubmit, [e]);
 
   };
+  console.log(batchData, 'batches data')
   const handleSubmit = async () => {
     setIsCircularLoader(true);
 
@@ -435,6 +478,8 @@ function UserDashBoard() {
           payload.append(key, formData[key]);
         }
       }
+
+
 
       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/updateBatch`, payload);
       if (res) {
@@ -483,9 +528,12 @@ function UserDashBoard() {
           warehouseAddress: '',
           destination: '',
           price: '',
-          miniQuantity: '',
-          maxiQuantity: '',
           images: [],
+          inspectionStatus: '',
+          harvestStatus: '',
+          exportStatus: '',
+          importStatus: '',
+          processingStatus: ''
         });
         showSuccess('submitted successfully')
       }
@@ -558,11 +606,9 @@ function UserDashBoard() {
                     {renderInput('productName', 'Product Name')}
                     {renderInput('typeOfFertilizer', 'Type of Fertilizer')}
                     {renderInput('fertilizerUsed', 'Fertilizer Used')}
-
-                    {/* Select input for Farm Inspector */}
                     {renderInput('inspectionStatus', 'Inspection Status', 'select', false, ['Ready to Inspect', 'Pending', 'Completed'])}
 
-                    {/* Image upload remains unchanged */}
+
                     <div className='custom-file-upload'>
                       <label htmlFor='fruit-images' className='upload-button'>
                         {formData.inspectedImages.length === 0
@@ -596,7 +642,6 @@ function UserDashBoard() {
                   </>
                 )}
 
-                {/* Harvester */}
                 {user?.role?.label === 'Harvester' && (
                   <>
                     {renderInput('harvesterId', 'Harvester Id', 'text', true)}
@@ -604,13 +649,10 @@ function UserDashBoard() {
                     {renderInput('cropSampling', 'Crop Sampling')}
                     {renderInput('temperatureLevel', 'Temperature Level')}
                     {renderInput('humidity', 'Humidity')}
-
-                    {/* Select input for Harvester */}
                     {renderInput('harvestStatus', 'Harvest Status', 'select', false, ['Ready to Harvest', 'Pending', 'Completed'])}
                   </>
                 )}
 
-                {/* Exporter */}
                 {user?.role?.label === 'Exporter' && (
                   <>
                     {renderInput('exporterId', 'Exporter ID', 'text', true)}
@@ -621,13 +663,10 @@ function UserDashBoard() {
                     {renderInput('departureDate', 'Departure Date', 'date')}
                     {renderInput('estimatedDate', 'Estimated Date', 'date')}
                     {renderInput('exportedTo', 'Exported To')}
-
-                    {/* Select input for Exporter */}
                     {renderInput('exportStatus', 'Export Status', 'select', false, ['Ready for Export', 'Pending', 'Shipped'])}
                   </>
                 )}
 
-                {/* Importer */}
                 {user?.role?.label === 'Importer' && (
                   <>
                     {renderInput('importerId', 'Importer ID', 'text', true)}
@@ -638,13 +677,10 @@ function UserDashBoard() {
                     {renderInput('warehouseLocation', 'Warehouse Location')}
                     {renderInput('warehouseArrivalDate', 'Warehouse Arrival Date', 'date')}
                     {renderInput('importerAddress', 'Importer Address')}
-
-                    {/* Select input for Importer */}
                     {renderInput('importStatus', 'Import Status', 'select', false, ['Ready for Import', 'Pending', 'Received'])}
                   </>
                 )}
 
-                {/* Processor */}
                 {user?.role?.label === 'Processor' && (
                   <>
                     {renderInput('processorId', 'Processor ID', 'text', true)}
@@ -657,13 +693,8 @@ function UserDashBoard() {
                     {renderInput('warehouseAddress', 'Warehouse Address')}
                     {renderInput('destination', 'Destination')}
                     {renderInput('price', 'Price')}
-                    {renderInput('miniQuantity', 'Mini Quantity')}
-                    {renderInput('maxiQuantity', 'Max Quantity')}
-
-                    {/* Select input for Processor */}
                     {renderInput('processingStatus', 'Processing Status', 'select', false, ['Ready for Processing', 'Pending', 'Processed'])}
 
-                    {/* Image upload remains unchanged */}
                     <div className='custom-file-upload'>
                       <label htmlFor='fruit-images' className='upload-button'>
                         {formData.images.length === 0
@@ -699,7 +730,7 @@ function UserDashBoard() {
 
                 <div className={styles.formActions}>
                   <button type="submit">{isCircularloader ? <CircularLoader size={18} /> : 'Submit'}</button>
-                  <button type="button" onClick={toggleForm}>Cancel</button>
+                  <button type="button" onClick={toggleFormClose}>Cancel</button>
                 </div>
               </form>
 

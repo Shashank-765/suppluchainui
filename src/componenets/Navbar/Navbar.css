@@ -1,7 +1,7 @@
 .navbarsection {
   width: 100%;
   display: flex;
-  z-index: 2;
+  z-index: 1000;
   justify-content: space-between;
   align-items: center;
   background: #FEF7F0;
@@ -94,30 +94,19 @@
 @media screen and (max-width:940px) {
   .navbarleftlog {
     width: 50%;
-    z-index: 2;
 
-    /* border: 1px solid red; */
     >img {
       margin-left: 10%;
     }
-  }
-
-  .navbarsection {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* background: rgba(0, 0, 0,.8); */
-    background: #FEF7F0;
   }
 
   .navafterbutton {
     position: absolute;
     display: flex;
     width: 100%;
-    z-index: 1;
+    z-index: 999;
     border-bottom: 3px solid #51947a;
-    margin-top: 39%;
-    /* background: rgba(0, 0, 0,.8); */
+    margin-top: 30%;
     background: #FEF7F0;
     flex-direction: column;
     justify-content: center;
@@ -125,7 +114,6 @@
     color: black;
 
     >ul {
-      /* margin-right: 7%; */
       display: flex;
       flex-direction: column;
       justify-content: start;
@@ -158,7 +146,6 @@
   .menubutton {
     display: block;
     margin-left: 38%;
-    z-index: 2;
   }
 
   .navbarsection {
@@ -176,23 +163,33 @@
     }
   }
 }
-
+@media screen and (max-width:900px) {
+   .navafterbutton {
+    margin-top: 33%;
+  }
+}
+@media screen and (max-width:800px) {
+   .navafterbutton {
+    margin-top: 35%;
+  }
+}
 @media screen and (max-width:740px) {
   .navbarsection {
     display: flex;
     justify-content: space-between;
     align-items: center;
     /* background: rgba(0, 0, 0,.8); */
+    z-index: 1000;
+
     background: #FEF7F0;
   }
 
   .navafterbutton {
     position: absolute;
     display: flex;
-    width: 95%;
-    z-index: 1;
+    width: 100%;
+    z-index: 999;
     border-bottom: 3px solid #51947a;
-    ;
     margin-top: 40%;
     /* background: rgba(0, 0, 0,.8); */
     background: #FEF7F0;
@@ -235,7 +232,6 @@
   .menubutton {
     display: block;
     margin-left: 38%;
-    z-index: 2;
   }
 
   .navbarsection {
@@ -256,13 +252,28 @@
 
 @media screen and (max-width:710px) {
   .navafterbutton {
-    margin-top: 50%;
+    margin-top: 43%;
   }
 }
 
 @media screen and (max-width:580px) {
   .navafterbutton {
-    margin-top: 65%;
+    margin-top: 52%;
+  }
+}
+@media screen and (max-width:510px) {
+  .navafterbutton {
+    margin-top: 57%;
+  }
+}
+@media screen and (max-width:480px) {
+  .navafterbutton {
+    margin-top: 64%;
+  }
+}
+@media screen and (max-width:420px) {
+  .navafterbutton {
+    margin-top: 75%;
   }
 }
 

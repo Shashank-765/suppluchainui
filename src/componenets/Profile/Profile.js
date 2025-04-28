@@ -14,6 +14,17 @@ function Profile({ setIsAuthenticated, setUser }) {
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({ name: '', email: '', userType: '', address: '', contact: '' });
 
+    useEffect(() => {
+        if (isEditing)
+
+            document.body.style.overflow = 'hidden';
+        else
+            document.body.style.overflow = 'auto';
+        return () => {
+            document.body.style.overflow = 'auto';
+        }
+    }, [isEditing]);
+
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const navigate = useNavigate();
 
@@ -24,7 +35,7 @@ function Profile({ setIsAuthenticated, setUser }) {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
-                handleEditToggle(); 
+                handleEditToggle();
             }
         };
 
@@ -50,10 +61,37 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getProducts?id=${user._id}`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getmyproducts?id=${user._id}`);
             if (response.data) {
-                setProducts(response.data.products);
-            } else {
+                const updatedProducts = response.data.products.map((product) => {
+                    let totalQuantityQuintal = 0;
+
+                    (product.purchaseHistory || []).forEach((history) => {
+                        const quantityStr = history.quantityBought || '';
+                        const matches = quantityStr.match(/([\d.]+)\s*\/?\s*(kg|quintal)?/i);
+
+                        if (matches) {
+                            const quantity = parseFloat(matches[1]);
+                            const unit = matches[2]?.toLowerCase() || 'quintal';
+
+                            if (unit.includes('kg')) {
+                                totalQuantityQuintal += quantity / 100;
+                            } else {
+                                totalQuantityQuintal += quantity;
+                            }
+                        }
+                    });
+
+                    // Attach totalQuantity to product
+                    return {
+                        ...product,
+                        totalQuantityQuintal: totalQuantityQuintal.toFixed(2), // added this field per product
+                    };
+                });
+
+                setProducts(updatedProducts);
+            }
+            else {
                 showError('Failed to fetch products');
             }
         } catch (error) {
@@ -155,12 +193,18 @@ function Profile({ setIsAuthenticated, setUser }) {
                                         <p>Contact No</p>
                                         <span className="contact-information">{user?.contact}</span>
                                     </div>
-                                    <div className="role-info">
-                                        <p>Role</p>
-                                        <span className={user?.role?.className}>
-                                            {user?.role?.slug}
-                                        </span>
-                                    </div>
+
+                                    {
+
+                                        user?.userType === 'user' ? <div className="role-info">
+                                            <p>Role</p>
+                                            <span className={user?.role?.className}>
+                                                {user?.role?.slug}
+                                            </span>
+                                        </div> : ''
+
+                                    }
+
                                     <div className="settings">
                                         <p>{user?.role?.label} Email</p>
                                         <span className="edit-btn">{user?.email}</span>
@@ -179,39 +223,44 @@ function Profile({ setIsAuthenticated, setUser }) {
                             </div>
                         </div>
 
-                        <div className="my-product-continer">
-                            <h2 className="my-products-only">My Products</h2>
-                            <div className="productmaincontainer">
-                                {products.length > 0 ? (
-                                    products.map((product, i) => (
-                                        <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
-                                            <div className="productimagecontianer">
-                                                {product?.images?.length > 0 && (
-                                                    <img
-                                                        src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${product.images[0]}`}
-                                                        alt={`product-${i}`}
-                                                        className="product-image"
-                                                    />
-                                                )}
-                                            </div>
-                                            <div className="productdetailscontainer">
-                                                <div className="productdetailscontainerdetails">
-                                                    <p>{product?.fruitName}</p>
-                                                    <p>QTY: <span className="pricevalueproduct">{product?.quantity}</span></p>
+
+                        {
+
+                            user?.userType === 'user' || user?.userType === 'admin' ? '' :
+                                <div className="my-product-continer">
+                                    <h2 className="my-products-only">My Products</h2>
+                                    <div className="productmaincontainer">
+                                        {products.length > 0 ? (
+                                            products.map((product, i) => (
+                                                <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
+                                                    <div className="productimagecontianer">
+                                                        {product?.images?.length > 0 && (
+                                                            <img
+                                                                src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${product.images[0]}`}
+                                                                alt={`product-${i}`}
+                                                                className="product-image"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="productdetailscontainer">
+                                                        <div className="productdetailscontainerdetails">
+                                                            <p>{product?.fruitName}</p>
+                                                            <p>QTY: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
+                                                        </div>
+                                                        <p className="prices">
+                                                            Price: <span className="pricevalueproduct">{product?.price}</span>
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <p className="prices">
-                                                    Price: <span className="pricevalueproduct">{product?.price}</span>
-                                                </p>
+                                            ))
+                                        ) : (
+                                            <div className="no-product-container-profile">
+                                                <p>No Product Available</p>
                                             </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="no-product-container-profile">
-                                        <p>No Product Available</p>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
+                                </div>
+                        }
                     </>
 
                 </>

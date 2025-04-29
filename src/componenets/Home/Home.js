@@ -122,7 +122,7 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
             {
-              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[0]}`} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} />
               : <img src={image1} />
             }
               
@@ -131,7 +131,7 @@ function Home() {
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>{
-              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[1]}`} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} />
               : <img src={image2} />
             } 
             </div>
@@ -140,7 +140,7 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
               {
-              inspectedImages?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${inspectedImages[2]}`} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} />
               : <img src={image3} />
             }
             </div>
@@ -204,20 +204,20 @@ function Home() {
             <div className='section-6imgcontainer'>
 
             {
-                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[0]}`} />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} />
                 : <img  src={image5}/>
             }
               
             </div>
             <div className='section-6imgcontainer'>
               {
-                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[1]}`} />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} />
                 : <img  src={image6}/>
             }
             </div>
             <div className='section-6imgcontainer'>
              {
-                images?.length > 0 ? <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${images[2]}`} />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} />
                 : <img  src={image7}/>
             }
             </div>

@@ -1,21 +1,26 @@
-import React, { useRef, useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom';
-import './View.css'
-import uparrow from '../../Imges/down-arrow.png'
-import downarrow from '../../Imges/arrow.png'
-import informat from '../../Imges/information.png'
-import { showSuccess, showError } from '../ToastMessage/ToastMessage';
-import locationImage from '../../Imges/location.png'
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { loadStripe } from '@stripe/stripe-js';
+import './View.css';
+import uparrow from '../../Imges/down-arrow.png';
+import downarrow from '../../Imges/arrow.png';
+import CircularLoader from '../CircularLoader/CircularLoader'
+import informat from '../../Imges/information.png';
+import locationImage from '../../Imges/location.png';
+import { showSuccess, showError } from '../ToastMessage/ToastMessage';
+const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
+
 function View() {
   const location = useLocation();
   const navigate = useNavigate();
   const { product } = location.state || {};
+  console.log('product ids', product?._id);
   const user = JSON.parse(localStorage.getItem('user')) || null;
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [productData, setProductsData] = useState([]);
+  const [isCircularloader, setIsCircularLoader] = useState(false  );
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
@@ -51,7 +56,22 @@ function View() {
     const index = Math.round(scrollLeft / width);
     setActiveIndex(index);
   };
+  const [history, setHistory] = useState([]);
+  const fetchHistory = async () => {
+    try {
+      const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/gettransactionhistory?productId=${product?._id}`)
+      if (resp?.data) {
+        setHistory(resp?.data?.Data);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  console.log(history, 'history')
 
+  useEffect(() => {
+    fetchHistory();
+  }, [])
   const handleUnitChange = (e) => {
     const newUnit = e.target.value;
     setUnit(newUnit);
@@ -70,7 +90,7 @@ function View() {
         price
           ? (parseFloat(price) / unitPrice).toFixed(2)
           : '';
-      setQuantity(calculatedQty);
+      setQuantity(calculatedQty.trim());
     }
   };
 
@@ -88,11 +108,10 @@ function View() {
     });
   };
 
-
-
   const handlebuynow = async (quantity, price, realprice) => {
     setQuantityError('');
     setPriceError('');
+
     if (quantity <= 0 && editableField === 'quantity') {
       setQuantityError('Please enter a valid quantity');
       return;
@@ -102,28 +121,42 @@ function View() {
       setPriceError('Please enter a valid price');
       return;
     }
-
+    setIsCircularLoader(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/buyproduct`, {
+      const stripe = await stripePromise;
+      const sessionRes = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/payments/create-checkout-session`, {
         batchId: productData?.batchId,
-        quantity: quantity,
-        price: price,
+        quantity,
+        price,
         buyerId: user?._id,
-        ownerId: product?._id,
-        unit
+        sellerId: productData?.processorId,
+        productId: product?._id,
+        unit,
       });
-      if (response.data) {
-        showSuccess('Product Bought Successfully');
-        let productname = productData?.productName;
-        navigate('/invoice', { state: { quantity, price, realprice, productname, unit } });
-      } else {
-        showError('Something went wrong');
+
+      const session = sessionRes.data;
+      sessionStorage.setItem('invoiceData', JSON.stringify({
+        quantity,
+        price,
+        realprice,
+        productname: productData?.productName,
+        unit,
+      }));
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+      setIsCircularLoader(false);
+      if (result.error) {
+        console.error(result.error.message);
+        setIsCircularLoader(false);
+        showError('Stripe redirect error');
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
-      showError('error')
+      console.error('Error:', error);
+      setIsCircularLoader(false);
+      showError('Something went wrong');
     }
-  }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -147,19 +180,25 @@ function View() {
     setActiveAccordion(activeAccordion === index ? null : index);
   };
   const handleQuantityChange = (e) => {
-    const value = e.target.value;
+    setQuantityError('');
+    let rawValue = e.target.value;
+
+    // Remove leading zeros, but preserve "0" or "0.x" type values
+    const value = rawValue.replace(/^0+(?!\.)/, '');
+
+    if (!/^\d*\.?\d*$/.test(value)) return; // Allow only numbers and decimal
     if (parseFloat(value) < 0) return;
 
     const basePricePerQuintal = parseFloat(productData?.price || 0);
     const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
-    let enteredQuantity = parseFloat(value) || 0;
-    let quantityInQuintal = unit === 'kg' ? enteredQuantity / 100 : enteredQuantity;
+    const enteredQuantity = parseFloat(value) || 0;
+    const quantityInQuintal = unit === 'kg' ? enteredQuantity / 100 : enteredQuantity;
 
     if (quantityInQuintal > totalAvailableQuintal) {
-      showError(`Only ${totalAvailableQuintal} quintals available.`);
-      return; 
+      setQuantityError(`Only ${totalAvailableQuintal} quintals available.`);
+      return;
     }
 
     if (lastChanged === 'price') {
@@ -179,19 +218,23 @@ function View() {
   };
 
   const handlePriceChange = (e) => {
-    const value = e.target.value;
+    setQuantityError('');
+    setPriceError('')
+    let rawValue = e.target.value;
+    const value = rawValue.replace(/^0+(?!\.)/, '');
+    if (!/^\d*\.?\d*$/.test(value)) return;
     if (parseFloat(value) < 0) return;
 
     const basePricePerQuintal = parseFloat(productData?.price || 0);
     const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
-    let enteredPrice = parseFloat(value) || 0;
-    let calculatedQty = enteredPrice / unitPrice;
-    let quantityInQuintal = unit === 'kg' ? calculatedQty / 100 : calculatedQty;
+    const enteredPrice = parseFloat(value) || 0;
+    const calculatedQty = enteredPrice / unitPrice;
+    const quantityInQuintal = unit === 'kg' ? calculatedQty / 100 : calculatedQty;
 
     if (quantityInQuintal > totalAvailableQuintal) {
-      showError(`Only ${totalAvailableQuintal} quintals available.`);
+      setQuantityError(`Only ${totalAvailableQuintal} quintals available.`);
       return;
     }
 
@@ -211,13 +254,12 @@ function View() {
     }
   };
 
-
   const BuyNowHandler = () => {
     if (user) {
       setShowPopup(true)
     }
     else {
-      navigate('/auth',{ state: { login:'viewpage' }})
+      navigate('/auth', { state: { login: 'viewpage' } })
     }
   }
 
@@ -306,7 +348,7 @@ function View() {
             <div className="leftviewdiv" ref={scrollRef} onScroll={handleScroll}>
               {productData?.images?.map((img, index) => (
                 <div className="imagecontainerview" key={index}>
-                  <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${img}`} alt={`product-${index}`} />
+                  <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
                 </div>
               ))}
             </div>
@@ -444,27 +486,20 @@ function View() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>0x8f2e54...</td>
-                    <td>Arun</td>
-                    <td>Karan</td>
-                    <td>2025</td>
-                    <td>2025</td>
-                  </tr>
-                  <tr>
-                    <td>0x8f2e54...</td>
-                    <td>Abhay</td>
-                    <td>shahil</td>
-                    <td>20</td>
-                    <td>2025</td>
-                  </tr>
-                  <tr>
-                    <td>0x8f2e54...</td>
-                    <td>Tushar</td>
-                    <td>Aashish</td>
-                    <td>30:00</td>
-                    <td>2025</td>
-                  </tr>
+                  {
+                    history?.length > 0 ?
+                      history?.map((ele, i) =>
+                        <tr key={i}>
+                          <td>{ele?.transactionId}</td>
+                          <td>{ele?.seller}</td>
+                          <td>{ele?.buyer}</td>
+                          <td>₹ {ele?.price}</td>
+                          <td>{ele?.quantity}</td>
+                        </tr>
+                      )
+                      :
+                      <p>No history available</p>
+                  }
                 </tbody>
               </table>
             </div>
@@ -472,67 +507,69 @@ function View() {
         </div>
       </div>
 
-       {showPopup && (
-                  <div className="popupOverlay">
-                    <div ref={popupRef} className="popup animatedPopup">
-                      <h2 className="popupTitle">Buy Product</h2>
 
-                      <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
-                        <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.quantityProcessed}</span></p>
-                        <div className='quantity_box'>
-                          <input
-                            type="number"
-                            placeholder="Enter Quantity"
-                            className="inputQunatity"
-                            value={quantity}
-                            onChange={handleQuantityChange}
-                            disabled={editableField !== 'quantity'}
-                          />
-                          <select
-                            value={unit}
-                            onChange={(e) => handleUnitChange(e)}
-                            disabled={editableField !== 'quantity'}
-                            className="select"
-                          >
-                            <option value="kg">kg</option>
-                            <option value="quintal">quintal</option>
-                          </select>
 
-                        </div>
-                        {quantityError && <p className='errorclass'>{quantityError}</p>}
-                      </div>
+      {showPopup && (
+        <div className="popupOverlay">
+          <div ref={popupRef} className="popup animatedPopup">
+            <h2 className="popupTitle">Buy Product</h2>
 
-                      <button className="arrowButton" onClick={toggleEditable}>
-                        {editableField === 'quantity' ? '↑' : '↓'}
-                      </button>
+            <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
+              <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.quantityProcessed}</span></p>
+              <div className='quantity_box'>
+                <input
+                  type="number"
+                  placeholder="Enter Quantity"
+                  className="inputQunatity"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  disabled={editableField !== 'quantity'}
+                />
+                <select
+                  value={unit}
+                  onChange={(e) => handleUnitChange(e)}
+                  disabled={editableField !== 'quantity'}
+                  className="select"
+                >
+                  <option value="kg">kg</option>
+                  <option value="quintal">quintal</option>
+                </select>
 
-                      <div className={`inputBlock2 ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
-                        <label>Total Price</label>
-                        <input
-                          type="number"
-                          placeholder="Enter Price"
-                          className="inputQunatity2"
-                          value={price}
-                          onChange={handlePriceChange}
-                          disabled={editableField !== 'price'}
-                        />
-                        {priceError && <p className='errorclass'>{priceError}</p>}
-                      </div>
+              </div>
+              {quantityError && <p className='errorclass'>{quantityError}</p>}
+            </div>
 
-                      <div className="actions">
-                        <button
-                          onClick={() => handlebuynow(quantity, price, productData?.price)}
-                          className="confirmButton"
-                        >
-                          Confirm
-                        </button>
-                        <button onClick={handleClosepopup} className="cancelButton">
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+            <button className="arrowButton" onClick={toggleEditable}>
+              {editableField === 'quantity' ? '↑' : '↓'}
+            </button>
+
+            <div className={`inputBlock2 ${editableField !== 'price' ? 'disabledBlock' : ''}`}>
+              <label>Total Price</label>
+              <input
+                type="number"
+                placeholder="Enter Price"
+                className="inputQunatity2"
+                value={price}
+                onChange={handlePriceChange}
+                disabled={editableField !== 'price'}
+              />
+              {priceError && <p className='errorclass'>{priceError}</p>}
+            </div>
+
+            <div className="actions">
+              <button
+                onClick={() => handlebuynow(quantity, price, productData?.price)}
+                className="confirmButton"
+              >
+               {isCircularloader ? <CircularLoader size={15}/> :'confirm'} 
+              </button>
+              <button onClick={handleClosepopup} className="cancelButton">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

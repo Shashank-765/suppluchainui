@@ -174,8 +174,10 @@
 
   >h2 {
     font-size: 20px;
+
     >a {
       width: fit-content;
+
       >img {
         width: 20px;
         margin-right: 10px;
@@ -222,9 +224,10 @@
   background: #235f48;
   color: white;
 }
-.errorclass{
- color: red;
- margin: 0;
+
+.errorclass {
+  color: red;
+  margin: 0;
 }
 
 .about-vegitable {
@@ -328,7 +331,8 @@
   table th {
     padding: 18px 11px;
     text-align: left;
-    font-size: 20px;
+    font-size: 13px;
+    overflow: hidden;
   }
 }
 
@@ -367,6 +371,14 @@
     border-radius: 10px;
     text-align: center;
     overflow: hidden;
+
+    table td,
+    table th {
+      padding: 18px 11px;
+      text-align: left;
+      font-size: 13px;
+      overflow: hidden;
+    }
   }
 
   .parentdesciptionofboth {
@@ -452,7 +464,8 @@
     table th {
       padding: 18px 11px;
       text-align: left;
-      font-size: 25px;
+      font-size: 8px;
+      overflow: hidden;
     }
   }
 }
@@ -480,7 +493,6 @@
 }
 
 .viewtablehistory {
-
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
@@ -556,14 +568,16 @@
   margin-bottom: 6px;
   color: #444;
 }
-.inputBlock{
- 
-  .totalquantityblock{
+
+.inputBlock {
+
+  .totalquantityblock {
     margin: 10px 0;
     display: flex;
     justify-content: start;
-    >span{
-     margin-left: 10px;
+
+    >span {
+      margin-left: 10px;
     }
   }
 }
@@ -623,7 +637,8 @@
 }
 
 .confirmButton {
-  flex: 1;
+  width: 103%;
+  flex: 1 1;
   background-color: #28a745;
   color: white;
   padding: 10px;
@@ -632,10 +647,6 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-.confirmButton:hover {
-  background-color: #218838;
 }
 
 .cancelButton {
@@ -648,10 +659,6 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-.cancelButton:hover {
-  background-color: #c82333;
 }
 
 /* Animation */

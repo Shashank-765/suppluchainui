@@ -71,7 +71,6 @@ router.post('/buyProduct', async (req, res) => {
 
 router.get('/getmyproducts', async (req, res) => {
   try {
-    console.log('req.query', req.query);
     const is_id = req.query.id;
 
     if (!is_id) {
@@ -116,7 +115,6 @@ router.get('/getmyproducts', async (req, res) => {
 
 router.get('/getProductById', async (req, res) => {
   try {
-    console.log('req.query', req.query)
     const is_id = req.query.id
     if (is_id) {
       const product = await TrackingModel.findOne({ _id: is_id });

@@ -1,10 +1,27 @@
 import React from 'react'
 import './Invoice.css'
+import { useEffect,useState } from 'react'
 import qrcode from '../../Imges/qrcode.jpg'
-import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 function Invoice() {
-const location = useLocation();
-const { quantity,price,realprice,productname,unit } = location.state || {};
+
+  const [invoiceData, setInvoiceData] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('invoiceData');
+    if (storedData) {
+      setInvoiceData(JSON.parse(storedData));
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  if (!invoiceData) {
+    return <div>Loading...</div>; 
+  }
+
+  const { quantity, price, realprice, productname, unit } = invoiceData;
+
   return (
     <div>
       <div className="invoice-container">
@@ -150,7 +167,7 @@ const { quantity,price,realprice,productname,unit } = location.state || {};
       </div>
 
       <div className='printbutton-container'>
-      <button className='print-button'>Print</button>
+        <button className='print-button'>Print</button>
       </div>
     </div>
   )

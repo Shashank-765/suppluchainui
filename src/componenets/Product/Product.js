@@ -10,7 +10,6 @@ function Product() {
     const handleClick = (ele) => {
         navigate('/viewpage', { state: { product: ele } });
     }
-
     const [data, setData] = React.useState([]);
     const fetchallproducts = async () => {
         try {
@@ -46,7 +45,7 @@ function Product() {
                             return (
                                 <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                     <div className='productimagecontianer'>
-                                        <img src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${ele?.images[0]}`} />
+                                        <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} />
                                     </div>
                                     <div className='productdetailscontainer'>
                                         <div className='productdetailscontainerdetails'>

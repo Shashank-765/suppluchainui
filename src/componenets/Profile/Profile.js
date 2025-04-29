@@ -236,7 +236,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                                                     <div className="productimagecontianer">
                                                         {product?.images?.length > 0 && (
                                                             <img
-                                                                src={`https://lfgkx3p7-5000.inc1.devtunnels.ms${product.images[0]}`}
+                                                                src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.images[0]}`}
                                                                 alt={`product-${i}`}
                                                                 className="product-image"
                                                             />

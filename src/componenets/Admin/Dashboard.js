@@ -72,7 +72,6 @@ const Dashboard = () => {
     const [userForm, setUserForm] = useState({
         name: '',
         email: '',
-        password: '',
         contact: '',
         role: '',
     });
@@ -97,7 +96,7 @@ const Dashboard = () => {
     useEffect(() => {
         const handleClickOutsideModal = (event) => {
             if (modalUserRef.current && !modalUserRef.current.contains(event.target)) {
-                setShowUserModal(false);
+            setIsCircularLoader(false);
             }
         };
 
@@ -114,7 +113,7 @@ const Dashboard = () => {
     useEffect(() => {
         const handleClickOutsideModal = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
-                setShowBatchModal(false); 
+                setShowBatchModal(false);
             }
         };
 
@@ -166,7 +165,6 @@ const Dashboard = () => {
     };
 
     const HandleBatchviewPage = (batch) => {
-        console.log(batch);
         navigate('/batchprogress', { state: { batch } });
     }
 
@@ -299,10 +297,17 @@ const Dashboard = () => {
         setIsCircularLoader(true);
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/createBatch`, formData);
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/createBatch`, formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user?.token}`,
+                    },
+                }
+            );
             if (res.data) {
                 setIsCircularLoader(false);
                 showSuccess("Batch Created")
+                setToggle(!toggle);
                 setShowBatchModal(false);
                 setFormData({
                     farmerRegNo: "",
@@ -349,19 +354,21 @@ const Dashboard = () => {
             if (response.data) {
                 showSuccess("User Created succefully")
                 setIsCircularLoader(false);
+                setToggle(!toggle);
                 setShowUserModal(false);
                 setUserForm({
                     name: '',
                     email: '',
-                    password: '',
                     contact: '',
                     role: ''
                 });
             } else {
                 console.error('Failed to create user');
+                  setIsCircularLoader(false);
                 showError("Failed to create user")
             }
         } catch (err) {
+          setIsCircularLoader(false);
             console.error('Error:', err);
             showError("Failed to create user")
         }
@@ -572,7 +579,6 @@ const Dashboard = () => {
         document.body.removeChild(link);
     };
 
-
     const fetchbatch = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatch`, {
@@ -581,7 +587,11 @@ const Dashboard = () => {
                     limit: usersPerPage,
                     search: searchBatchTerm,
                 },
+                headers: {
+                    Authorization: `Bearer ${user?.token}`,
+                },
             });
+
             setAllBatch(response.data.batches);
             setTotalBatch(response.data.totalBatches);
             setTotalBatchPage(response.data.totalPages);
@@ -674,7 +684,12 @@ const Dashboard = () => {
     };
     const deleteBatch = async (id) => {
         try {
-            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/batch/deletebatch?batchId=${id}`)
+            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/batch/deletebatch?batchId=${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user?.token}`,
+                    },
+                })
             if (response?.data) {
                 setToggle(!toggle);
                 showSuccess("Batch deleted succefully")
@@ -686,12 +701,12 @@ const Dashboard = () => {
     }
     useEffect(() => {
         fetchbatch();
-    }, [currnetBatchPage, searchBatchTerm, showBatchModal, toggle]);
+    }, [currnetBatchPage, searchBatchTerm, toggle]);
 
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage, searchTerm, showUserModal, toggle]);
+    }, [currentPage, searchTerm, toggle]);
 
     const fetchRoles = async () => {
         try {
@@ -876,7 +891,7 @@ const Dashboard = () => {
                                                 <img src={view} />
                                             </button>
                                             {
-                                                batch?.tracking?.isProcessed ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
+                                                batch?.tracking?.isInspexted ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
                                                     <img src={deleteimage} />
                                                 </button>
                                             }
@@ -1335,7 +1350,7 @@ const Dashboard = () => {
                                 {userErrors.email && <span className={styles.errorText}>{userErrors.email}</span>}
                             </div>
 
-                            <div className={styles.formGroup}>
+                            {/* <div className={styles.formGroup}>
                                 <input
                                     type="password"
                                     name="password"
@@ -1346,7 +1361,7 @@ const Dashboard = () => {
                                     className={styles.inputtextclasses}
                                 />
                                 {userErrors.password && <span className={styles.errorText}>{userErrors.password}</span>}
-                            </div>
+                            </div> */}
 
                             <div className={styles.formGroup}>
                                 <input

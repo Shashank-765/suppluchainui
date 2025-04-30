@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import './Product.css'
+import image1 from '../../Imges/Image6.png'
 import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -34,18 +35,24 @@ function Product() {
     return (
         <>
             <div className='productsection'>
-                 <div className='contactcoverimagecontianer'>
-       <img  src={coverImage}/>
-        <h1>Products</h1>
-    </div>
+                <div className='contactcoverimagecontianer'>
+                    <img src={coverImage} />
+                    <h1>Products</h1>
+                </div>
                 <div className='productmaincontainer'>
                     {
 
-                     data.length > 0 ?   data?.map((ele, i) => {
+                        data.length > 0 ? data?.map((ele, i) => {
                             return (
                                 <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                     <div className='productimagecontianer'>
-                                        <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} />
+
+                                        {
+                                            ele?.images[0] ?
+                                                <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} />
+                                                :
+                                                <img src={image1} alt='images' />
+                                        }
                                     </div>
                                     <div className='productdetailscontainer'>
                                         <div className='productdetailscontainerdetails'>
@@ -57,10 +64,10 @@ function Product() {
                                 </div>
                             )
                         })
-                        :
-                        <div className='no-product-container'>
-                          <p>No Product Available </p>
-                        </div>
+                            :
+                            <div className='no-product-container'>
+                                <p>No Product Available </p>
+                            </div>
                     }
 
                 </div>

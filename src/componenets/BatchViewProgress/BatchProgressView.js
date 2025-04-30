@@ -25,8 +25,7 @@ const BatchProgressView = () => {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchById?id=${batch?.batchId}`, {
-      });
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchById?id=${batch?.batchId}`);
 
       if (response.data) {
         setAllBatch(response?.data?.batch);
@@ -40,7 +39,7 @@ const BatchProgressView = () => {
   }, [])
   return (
     <div className={styles.wrapper}>
-      <h2 className={styles.title}>Batch Progress: #Pine</h2>
+      <h2 className={styles.title}>Batch Progress</h2>
       <p className={styles.subtitle}>
         Batch No: {allBatch?.batchId} <br />
       </p>

@@ -8,6 +8,7 @@ const User = require('../Models/userModel.js');
 const BatchModel = require('../Models/BatchModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const Role = require('../Models/RolesModel.js');
+const { authorize } = require('../Auth/Authenticate.js');
 const QRCode = require('qrcode');
 
 
@@ -35,16 +36,13 @@ const upload = multer({
 
 
 
-router.post('/createBatch', async (req, res) => {
+router.post('/createBatch', authorize, async (req, res) => {
   try {
     const { farmerRegNo, farmerName, farmerAddress, farmInspectionName, harvesterName, processorName, exporterName, importerName, coffeeType } = req.body;
-    console.log('req.body', req.body)
-
     if (!farmerRegNo || !farmerName || !farmerAddress || !farmInspectionName || !harvesterName || !processorName || !exporterName || !importerName || !coffeeType) {
       return res.status(400).json({ message: 'Please fill all required fields' });
     }
 
-    // Create a new batch without worrying about batchId
     let farmInspectionId = null;
     let harvesterId = null;
     let processorId = null;
@@ -103,18 +101,16 @@ router.post('/createBatch', async (req, res) => {
     return res.status(500).json({ message: 'Server error while creating batch' });
   }
 });
-router.delete('/deletebatch', async (req, res) => {
+router.delete('/deletebatch', authorize, async (req, res) => {
   try {
     const { batchId } = req.query;
-    console.log(batchId, 'batch ids');
 
     if (!batchId) {
       return res.status(400).json({ message: 'batchId is required' });
     }
 
-    // Delete the batch using the batchId field
     const deleted = await BatchModel.findOneAndDelete({ batchId: batchId });
-    const delted2 = await TrackingModel.findOneAndDelete({batchId: batchId})
+    const delted2 = await TrackingModel.findOneAndDelete({ batchId: batchId })
 
     if (!deleted && !delted2) {
       return res.status(404).json({ message: 'Batch not found' });
@@ -126,7 +122,7 @@ router.delete('/deletebatch', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-router.get('/getBatch', async (req, res) => {
+router.get('/getBatch', authorize, async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
 
@@ -159,13 +155,11 @@ router.get('/getBatch', async (req, res) => {
 
     const trackBatches = await TrackingModel.find({ batchId: { $in: batchIds } });
 
-    // Map tracking data by batchId
     const trackingMap = {};
     trackBatches.forEach(track => {
       trackingMap[track.batchId] = track;
     });
 
-    // Merge tracking info into each batch
     const mergedBatches = batches.map(batch => {
       const batchObj = batch.toObject();
       batchObj.tracking = trackingMap[batch.batchId] || null;
@@ -224,10 +218,9 @@ router.get('/getBatchById', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batch' });
   }
 });
-router.get('/getBatchByUserId', async (req, res) => {
+router.get('/getBatchByUserId', authorize, async (req, res) => {
   try {
     const { id, search = '', page = 1, limit = 5 } = req.query;
-    console.log('req.body', req.query)
     if (!id) {
       return res.status(400).json({ message: 'ID is required in query parameters.' });
     }
@@ -272,15 +265,13 @@ router.get('/getBatchByUserId', async (req, res) => {
 
     const trackBatches = await TrackingModel.find({ batchId: { $in: batchIds } });
 
-    // Create a map for faster lookup of tracking data
     const trackingMap = {};
     trackBatches.forEach(track => {
       trackingMap[track.batchId] = track;
     });
 
-    // Merge tracking data into each batch
     const mergedBatches = batches.map(batch => {
-      const batchObj = batch.toObject(); // Convert Mongoose doc to plain object
+      const batchObj = batch.toObject();
       batchObj.tracking = trackingMap[batch.batchId] || null;
       return batchObj;
     });
@@ -297,8 +288,7 @@ router.get('/getBatchByUserId', async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batches.' });
   }
 });
-router.post('/updateBatch', upload, async (req, res) => {
-  console.log('req.body', req.body)
+router.post('/updateBatch', authorize, upload, async (req, res) => {
   try {
     const {
       batchId,
@@ -348,7 +338,10 @@ router.post('/updateBatch', upload, async (req, res) => {
       warehouseAddress,
       destination,
       price,
-      processingStatus
+      processingStatus,
+
+      existingImages,
+      existingInspectedImages
     } = req.body;
 
     if (!batchId) {
@@ -359,17 +352,14 @@ router.post('/updateBatch', upload, async (req, res) => {
 
     const updatedFields = {};
 
-    // FARM INSPECTION LOGIC
-    if (farmInspectionId || farmInspectionName || certificateNo || certificateFrom || typeOfFertilizer || fertilizerUsed || productName || inspectionStatus) {
-      const imagePaths = [];
+    const existingImagesArr = existingImages ? JSON.parse(existingImages) : [];
+    const existingInspectedImagesArr = existingInspectedImages ? JSON.parse(existingInspectedImages) : [];
 
-      if (req.files) {
-        if (req.files.images) {
-          imagePaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
-        }
-        if (req.files.inspectedImages) {
-          imagePaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
-        }
+    if (farmInspectionId && farmInspectionName && certificateNo && certificateFrom && typeOfFertilizer && fertilizerUsed && productName && inspectionStatus) {
+      const inspectedPaths = [...existingInspectedImagesArr];
+
+      if (req.files?.inspectedImages) {
+        inspectedPaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
       }
 
       updatedFields.certificateNo = certificateNo;
@@ -379,26 +369,24 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.farmInspectionName = farmInspectionName;
       updatedFields.typeOfFertilizer = typeOfFertilizer;
       updatedFields.fertilizerUsed = fertilizerUsed;
-      updatedFields.isInspexted = inspectionStatus==='Completed'? true:false;
+      updatedFields.isInspexted = inspectionStatus === 'Completed';
       updatedFields.inspectionDate = new Date();
-      updatedFields.inspectedImages = imagePaths;
+      updatedFields.inspectedImages = inspectedPaths;
       updatedFields.inspectionStatus = inspectionStatus;
     }
 
-    // HARVESTER LOGIC
-    if (harvesterId || harvesterName || cropSampling || temperatureLevel || humidity || harvestStatus) {
+    if (harvesterId && harvesterName && cropSampling && temperatureLevel && humidity && harvestStatus) {
       updatedFields.harvesterId = harvesterId;
       updatedFields.harvesterName = harvesterName;
       updatedFields.cropSampling = cropSampling;
       updatedFields.temperatureLevel = temperatureLevel;
       updatedFields.humidity = humidity;
-      updatedFields.isHarvested = harvestStatus==='Completed'? true:false;
+      updatedFields.isHarvested = harvestStatus === 'Completed';
       updatedFields.harvestDate = new Date();
       updatedFields.harvestStatus = harvestStatus;
     }
 
-    // EXPORTER LOGIC
-    if (exporterId || coordinationAddress || shipName || shipNo || departureDate || estimatedDate || exportedTo || exportStatus) {
+    if (exporterId && coordinationAddress && shipName && shipNo && departureDate && estimatedDate && exportedTo && exportStatus) {
       updatedFields.exporterId = exporterId;
       updatedFields.exporterName = exporterName;
       updatedFields.coordinationAddress = coordinationAddress;
@@ -407,13 +395,12 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.departureDate = departureDate;
       updatedFields.estimatedDate = estimatedDate;
       updatedFields.exportedTo = exportedTo;
-      updatedFields.isExported = exportStatus==='Completed' || 'Shipped'? true:false;
+      updatedFields.isExported = exportStatus === 'Shipped';
       updatedFields.exportDate = new Date();
       updatedFields.exportStatus = exportStatus;
     }
 
-    // IMPORTER LOGIC
-    if (importerId || quantityImported || shipStorage || arrivalDate || warehouseLocation || warehouseArrivalDate || importerAddress || importStatus) {
+    if (importerId && quantityImported && shipStorage && arrivalDate && warehouseLocation && warehouseArrivalDate && importerAddress && importStatus) {
       updatedFields.importerId = importerId;
       updatedFields.importerName = importerName;
       updatedFields.quantityImported = quantityImported;
@@ -422,26 +409,18 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.warehouseLocation = warehouseLocation;
       updatedFields.warehouseArrivalDate = warehouseArrivalDate;
       updatedFields.importerAddress = importerAddress;
-      updatedFields.isImported =importStatus==='Completed' || 'Received'? true:false;
+      updatedFields.isImported = importStatus === 'Received';
       updatedFields.importDate = new Date();
       updatedFields.importStatus = importStatus;
     }
 
+    if (processorId && quantityProcessed && processingMethod && packaging && packagedDate && warehouse && warehouseAddress && destination && price && processingStatus) {
+      const processedPaths = [...existingImagesArr];
 
-
-    // PROCESSOR LOGIC
-    if (processorId || quantityProcessed || processingMethod || packaging || packagedDate || warehouse || warehouseAddress || destination ||  price || processingStatus) {
-
-      const imagePaths = [];
-
-      if (req.files) {
-        if (req.files.images) {
-          imagePaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
-        }
-        if (req.files.inspectedImages) {
-          imagePaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
-        }
+      if (req.files?.images) {
+        processedPaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
       }
+
       updatedFields.price = price;
       updatedFields.processorId = processorId;
       updatedFields.processorName = processorName;
@@ -452,19 +431,18 @@ router.post('/updateBatch', upload, async (req, res) => {
       updatedFields.warehouse = warehouse;
       updatedFields.warehouseAddress = warehouseAddress;
       updatedFields.destination = destination;
-      updatedFields.isProcessed = processingStatus==='Completed'|| 'Processed' ? true:false;
+      updatedFields.isProcessed = processingStatus === 'Processed';
       updatedFields.processedDate = new Date();
-      updatedFields.images = imagePaths;
+      updatedFields.images = processedPaths;
       updatedFields.processingStatus = processingStatus;
     }
 
-    // Always ensure batchId is in the update set (required for upsert)
     updatedFields.batchId = batchId;
 
     const updatedBatch = await TrackingModel.findOneAndUpdate(
       { batchId },
       { $set: updatedFields },
-      { new: true, upsert: true } // Create new if not found
+      { new: true, upsert: true }
     );
 
     return res.status(200).json({
@@ -477,7 +455,6 @@ router.post('/updateBatch', upload, async (req, res) => {
     return res.status(500).json({ message: 'Server error while updating batch' });
   }
 });
-
 
 
 module.exports = router;

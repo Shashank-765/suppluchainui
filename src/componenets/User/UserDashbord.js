@@ -17,6 +17,7 @@ function UserDashBoard() {
   const [searchBatchTerm, setSearchBatchTerm] = useState('');
   const [totalBatchPage, setTotalBatchPage] = useState(0);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [inspectedImagePreviews, setInspectedImagePreviews] = useState([]);
   const [hoveredBatchId, setHoveredBatchId] = useState(null);
   const [isCircularloader, setIsCircularLoader] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
@@ -25,8 +26,9 @@ function UserDashBoard() {
   const [pendingArgs, setPendingArgs] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const fileInputRef = useRef();
   const [toggle, setToggle] = useState(false);
+  const processorFileInputRef = useRef(null);
+  const inspectorFileInputRef = useRef(null);
 
   const popupRef = useRef();
 
@@ -56,9 +58,8 @@ function UserDashBoard() {
     setPopupOpen(false);
   };
   const { userdata } = location.state || {};
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     batchId: '',
-    // Common fields
     farmInspectionId: '',
     farmInspectionName: '',
     productName: '',
@@ -108,7 +109,10 @@ function UserDashBoard() {
     price: '',
     images: [],
     processingStatus: ''
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
+
   const handleImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
     const updatedImages = [...formData.images, ...newFiles];
@@ -116,12 +120,13 @@ function UserDashBoard() {
 
     setFormData(prev => ({
       ...prev,
-      images: [...prev.images, ...newFiles]
+      images: updatedImages
     }));
     setImagePreviews(prev => [...prev, ...newPreviews]);
 
-    fileInputRef.current.value = '';
+    processorFileInputRef.current.value = '';
   };
+
   const handleInspectedImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
     const updatedImages = [...formData.inspectedImages, ...newFiles];
@@ -129,12 +134,11 @@ function UserDashBoard() {
 
     setFormData(prev => ({
       ...prev,
-      inspectedImages: [...prev.images, ...newFiles]
+      inspectedImages: updatedImages
     }));
-    setImagePreviews(prev => [...prev, ...newPreviews]);
+    setInspectedImagePreviews(prev => [...prev, ...newPreviews]);
 
-
-    fileInputRef.current.value = '';
+    inspectorFileInputRef.current.value = '';
   };
 
   const handleRemoveImage = (index) => {
@@ -146,10 +150,10 @@ function UserDashBoard() {
   };
   const handleRemoveInspectedImage = (index) => {
     const updatedImages = formData.inspectedImages.filter((_, i) => i !== index);
-    const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+    const updatedPreviews = inspectedImagePreviews.filter((_, i) => i !== index);
 
     setFormData(prev => ({ ...prev, inspectedImages: updatedImages }));
-    setImagePreviews(updatedPreviews);
+    setInspectedImagePreviews(updatedPreviews);
   };
 
 
@@ -165,10 +169,12 @@ function UserDashBoard() {
   };
 
   const toggleForm = (id) => {
-    // Find the batch data with the given batchId
     const selectedBatch = batchData.find(batch => String(batch.batchId) === String(id));
 
     if (selectedBatch) {
+      const inspectedImages = selectedBatch?.tracking?.inspectedImages || [];
+      const processingImages = selectedBatch?.tracking?.images || [];
+
       setFormData(prevData => ({
         ...prevData,
         batchId: selectedBatch?.batchId || '',
@@ -222,6 +228,22 @@ function UserDashBoard() {
         images: selectedBatch?.tracking?.images || [],
         processingStatus: selectedBatch?.tracking?.processingStatus || ''
       }));
+      setImagePreviews(
+        processingImages.map(img =>
+          typeof img === 'string'
+            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+            : URL.createObjectURL(img)
+        )
+      );
+
+      setInspectedImagePreviews(
+        inspectedImages.map(img =>
+          typeof img === 'string'
+            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+            : URL.createObjectURL(img)
+        )
+      );
+
 
       setShowForm(true);
     } else {
@@ -250,13 +272,21 @@ function UserDashBoard() {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchByUserId?id=${userdata ? userdata?._id : user?._id}`, {
-        params: {
-          page: currnetBatchPage,
-          limit: usersPerPage,
-          search: searchBatchTerm,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/batch/getBatchByUserId`,
+        {
+          params: {
+            id: userdata?._id || user?._id,
+            page: currnetBatchPage,
+            limit: usersPerPage,
+            search: searchBatchTerm,
+          },
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
 
       if (response.data) {
         setBatchData(response?.data?.batches);
@@ -281,7 +311,7 @@ function UserDashBoard() {
     if (!currentRoleFields.includes(name)) {
       return error;
     }
-
+    console.log(value, 'error values')
     if (!value && value !== 0) {
       error = 'This field is required';
       return error;
@@ -334,6 +364,16 @@ function UserDashBoard() {
           error = 'Maximum quantity cannot be less than minimum';
         }
         break;
+      case 'inspectionStatus':
+      case 'harvestStatus':
+      case 'exportStatus':
+      case 'importStatus':
+      case 'processingStatus':
+        if (value === '' || value === 'Select Status') {
+          error = 'Please select a valid status';
+        }
+        break;
+
       default:
         break;
     }
@@ -410,6 +450,7 @@ function UserDashBoard() {
     currentRoleFields.forEach(key => {
       if (key !== 'images' && key !== 'inspectedImages') {
         const error = validateField(key, formData[key]);
+        console.log(error, 'this is the error')
         if (error) newErrors[key] = error;
       }
     });
@@ -441,6 +482,7 @@ function UserDashBoard() {
 
   const handlePopupSubmit = async (e) => {
     e.preventDefault();
+
     const allTouched = {};
     Object.keys(formData).forEach(key => {
       if (key !== 'images' && key !== 'inspectedImages') {
@@ -451,98 +493,53 @@ function UserDashBoard() {
 
     if (!validateForm()) {
       setIsCircularLoader(false);
-      showError('Please fix the errors in the form');
       return;
     }
     showPopup(' submit this form ', handleSubmit, [e]);
 
   };
-  console.log(batchData, 'batches data')
   const handleSubmit = async () => {
     setIsCircularLoader(true);
 
     try {
-
       const payload = new FormData();
 
+      const existingImages = formData.images.filter(img => typeof img === 'string');
+      const newImages = formData.images.filter(img => typeof img !== 'string');
+      const existingInspectedImages = formData.inspectedImages.filter(img => typeof img === 'string');
+      const newInspectedImages = formData.inspectedImages.filter(img => typeof img !== 'string');
+      newImages.forEach(image => payload.append('images', image));
+      newInspectedImages.forEach(image => payload.append('inspectedImages', image));
+      payload.append('existingImages', JSON.stringify(existingImages));
+      payload.append('existingInspectedImages', JSON.stringify(existingInspectedImages));
       for (const key in formData) {
-        if (key === 'images') {
-          formData.images.forEach((image) => {
-            payload.append('images', image);
-          });
-        } else if (key === 'inspectedImages') {
-          formData.inspectedImages.forEach((image) => {
-            payload.append('inspectedImages', image);
-          });
-        } else {
+        if (key !== 'images' && key !== 'inspectedImages') {
           payload.append(key, formData[key]);
         }
       }
 
+      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/updateBatch`, payload, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
 
-
-      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/updateBatch`, payload);
       if (res) {
         setIsCircularLoader(false);
         toggleForm();
-        setToggle(!toggle)
+        setToggle(!toggle);
         setImagePreviews([]);
-        setFormData({
-          batchId: '',
-          farmInspectionId: '',
-          farmInspectionName: '',
-          productName: '',
-          certificateNo: '',
-          certificateFrom: '',
-          typeOfFertilizer: '',
-          fertilizerUsed: '',
-          inspectedImages: [],
-          harvesterId: '',
-          harvesterName: '',
-          cropSampling: '',
-          temperatureLevel: '',
-          humidity: '',
-          exporterId: '',
-          exporterName: '',
-          coordinationAddress: '',
-          shipName: '',
-          shipNo: '',
-          departureDate: '',
-          estimatedDate: '',
-          exportedTo: '',
-          importerId: '',
-          importerName: '',
-          quantityImported: '',
-          shipStorage: '',
-          arrivalDate: '',
-          warehouseLocation: '',
-          warehouseArrivalDate: '',
-          importerAddress: '',
-          processorId: '',
-          processorName: '',
-          quantityProcessed: '',
-          processingMethod: '',
-          packaging: '',
-          packagedDate: '',
-          warehouse: '',
-          warehouseAddress: '',
-          destination: '',
-          price: '',
-          images: [],
-          inspectionStatus: '',
-          harvestStatus: '',
-          exportStatus: '',
-          importStatus: '',
-          processingStatus: ''
-        });
-        showSuccess('submitted successfully')
+        setInspectedImagePreviews([]);
+        setFormData({ ...initialFormData }); // use a defined initialFormData object if possible
+        showSuccess('Submitted successfully');
       }
     } catch (err) {
       setIsCircularLoader(false);
       console.error(err);
       showError('Failed to update batch.');
     }
-  }
+  };
+
   useEffect(() => {
     fetchbatchbyid();
   }, [searchBatchTerm, currnetBatchPage, toggle]);
@@ -560,7 +557,8 @@ function UserDashBoard() {
             disabled={disabled}
             className={errors[name] && touched[name] ? styles.errorInput : ''}
           >
-            {options.map((option, idx) => (
+            <option value="" disabled>Select Status</option>
+            {options.slice(1).map((option, idx) => (
               <option key={idx} value={option}>
                 {option}
               </option>
@@ -606,7 +604,7 @@ function UserDashBoard() {
                     {renderInput('productName', 'Product Name')}
                     {renderInput('typeOfFertilizer', 'Type of Fertilizer')}
                     {renderInput('fertilizerUsed', 'Fertilizer Used')}
-                    {renderInput('inspectionStatus', 'Inspection Status', 'select', false, ['Ready to Inspect', 'Pending', 'Completed'])}
+                    {renderInput('inspectionStatus', 'Inspection Status', 'select', false, ['Select Status', 'Pending', 'Completed'])}
 
 
                     <div className='custom-file-upload'>
@@ -621,13 +619,13 @@ function UserDashBoard() {
                         multiple
                         accept='image/*'
                         onChange={handleInspectedImageChange}
-                        ref={fileInputRef}
+                        ref={inspectorFileInputRef}
                         className={styles.custom_file_input}
                       />
                     </div>
 
                     <div className='preview-container'>
-                      {imagePreviews.map((src, idx) => (
+                      {inspectedImagePreviews.map((src, idx) => (
                         <div key={idx} className='preview-item'>
                           <img src={src} alt={`fruit-${idx}`} className='preview-image' />
                           <span
@@ -649,7 +647,7 @@ function UserDashBoard() {
                     {renderInput('cropSampling', 'Crop Sampling')}
                     {renderInput('temperatureLevel', 'Temperature Level')}
                     {renderInput('humidity', 'Humidity')}
-                    {renderInput('harvestStatus', 'Harvest Status', 'select', false, ['Ready to Harvest', 'Pending', 'Completed'])}
+                    {renderInput('harvestStatus', 'Harvest Status', 'select', false, ['Select Status', 'Pending', 'Completed'])}
                   </>
                 )}
 
@@ -663,7 +661,7 @@ function UserDashBoard() {
                     {renderInput('departureDate', 'Departure Date', 'date')}
                     {renderInput('estimatedDate', 'Estimated Date', 'date')}
                     {renderInput('exportedTo', 'Exported To')}
-                    {renderInput('exportStatus', 'Export Status', 'select', false, ['Ready for Export', 'Pending', 'Shipped'])}
+                    {renderInput('exportStatus', 'Export Status', 'select', false, ['Select Status', 'Pending', 'Shipped'])}
                   </>
                 )}
 
@@ -677,7 +675,7 @@ function UserDashBoard() {
                     {renderInput('warehouseLocation', 'Warehouse Location')}
                     {renderInput('warehouseArrivalDate', 'Warehouse Arrival Date', 'date')}
                     {renderInput('importerAddress', 'Importer Address')}
-                    {renderInput('importStatus', 'Import Status', 'select', false, ['Ready for Import', 'Pending', 'Received'])}
+                    {renderInput('importStatus', 'Import Status', 'select', false, ['Select Status', 'Pending', 'Received'])}
                   </>
                 )}
 
@@ -693,7 +691,7 @@ function UserDashBoard() {
                     {renderInput('warehouseAddress', 'Warehouse Address')}
                     {renderInput('destination', 'Destination')}
                     {renderInput('price', 'Price')}
-                    {renderInput('processingStatus', 'Processing Status', 'select', false, ['Ready for Processing', 'Pending', 'Processed'])}
+                    {renderInput('processingStatus', 'Processing Status', 'select', false, ['Select Status', 'Pending', 'Processed'])}
 
                     <div className='custom-file-upload'>
                       <label htmlFor='fruit-images' className='upload-button'>
@@ -707,7 +705,7 @@ function UserDashBoard() {
                         multiple
                         accept='image/*'
                         onChange={handleImageChange}
-                        ref={fileInputRef}
+                        ref={processorFileInputRef}
                         className={styles.custom_file_input}
                       />
                     </div>
@@ -1047,7 +1045,7 @@ function UserDashBoard() {
                           onClick={() => HandleBatchviewPage(batch)}
                           className={styles.editButton}
                         >
-                          <img src={view} />
+                          <img src={view} alt='images' />
                         </button>
                       </td>
                     </tr>

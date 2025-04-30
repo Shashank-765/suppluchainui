@@ -85,3 +85,9 @@
   cursor: pointer;
   font-size: 14px;
 }
+.error-text {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+}

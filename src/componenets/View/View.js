@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
 import './View.css';
+import image1 from '../../Imges/Image6.png'
 import uparrow from '../../Imges/down-arrow.png';
 import downarrow from '../../Imges/arrow.png';
 import CircularLoader from '../CircularLoader/CircularLoader'
@@ -15,12 +16,11 @@ function View() {
   const location = useLocation();
   const navigate = useNavigate();
   const { product } = location.state || {};
-  console.log('product ids', product?._id);
   const user = JSON.parse(localStorage.getItem('user')) || null;
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [productData, setProductsData] = useState([]);
-  const [isCircularloader, setIsCircularLoader] = useState(false  );
+  const [isCircularloader, setIsCircularLoader] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
@@ -67,7 +67,6 @@ function View() {
       console.log(error)
     }
   }
-  console.log(history, 'history')
 
   useEffect(() => {
     fetchHistory();
@@ -147,14 +146,14 @@ function View() {
       });
       setIsCircularLoader(false);
       if (result.error) {
-        console.error(result.error.message);
+        console.log(result.error.message);
         setIsCircularLoader(false);
         showError('Stripe redirect error');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:====>', error);
       setIsCircularLoader(false);
-      showError('Something went wrong');
+      showError(error?.response?.data?.message);
     }
   };
 
@@ -183,10 +182,9 @@ function View() {
     setQuantityError('');
     let rawValue = e.target.value;
 
-    // Remove leading zeros, but preserve "0" or "0.x" type values
     const value = rawValue.replace(/^0+(?!\.)/, '');
 
-    if (!/^\d*\.?\d*$/.test(value)) return; // Allow only numbers and decimal
+    if (!/^\d*\.?\d*$/.test(value)) return;
     if (parseFloat(value) < 0) return;
 
     const basePricePerQuintal = parseFloat(productData?.price || 0);
@@ -346,11 +344,16 @@ function View() {
         <div className='viewmaincontainer'>
           <div className="carousel-wrapper">
             <div className="leftviewdiv" ref={scrollRef} onScroll={handleScroll}>
-              {productData?.images?.map((img, index) => (
-                <div className="imagecontainerview" key={index}>
-                  <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
-                </div>
-              ))}
+              {
+                productData?.images?.length > 0 ? productData?.images?.map((img, index) => (
+                  <div className="imagecontainerview" key={index}>
+                    <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
+                  </div>
+                )) :
+                  <div className="imagecontainerview">
+                    <img src={image1} />
+                  </div>
+              }
             </div>
 
             <div className="dot-indicators">
@@ -498,7 +501,13 @@ function View() {
                         </tr>
                       )
                       :
-                      <p>No history available</p>
+                      (
+                        <tr>
+                          <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
+                            No history available
+                          </td>
+                        </tr>
+                      )
                   }
                 </tbody>
               </table>
@@ -561,7 +570,7 @@ function View() {
                 onClick={() => handlebuynow(quantity, price, productData?.price)}
                 className="confirmButton"
               >
-               {isCircularloader ? <CircularLoader size={15}/> :'confirm'} 
+                {isCircularloader ? <CircularLoader size={15} /> : 'confirm'}
               </button>
               <button onClick={handleClosepopup} className="cancelButton">
                 Cancel

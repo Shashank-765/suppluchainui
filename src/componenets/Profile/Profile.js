@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import profileImage from '../../Imges/portrait-322470_1280.jpg';
 import profilecover from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
+import CircularLoader from '../CircularLoader/CircularLoader'
+
 
 import './Profile.css';
 import axios from 'axios';
@@ -13,6 +15,8 @@ function Profile({ setIsAuthenticated, setUser }) {
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({ name: '', email: '', userType: '', address: '', contact: '' });
+    const [isCircularloader, setIsCircularLoader] = useState(false);
+
 
     useEffect(() => {
         if (isEditing)
@@ -66,8 +70,9 @@ function Profile({ setIsAuthenticated, setUser }) {
                 const updatedProducts = response.data.products.map((product) => {
                     let totalQuantityQuintal = 0;
 
-                    (product.purchaseHistory || []).forEach((history) => {
-                        const quantityStr = history.quantityBought || '';
+                    (product?.purchaseHistory || [])?.forEach((history) => {
+                        const quantityStr = String(history?.quantityBought || '');
+
                         const matches = quantityStr.match(/([\d.]+)\s*\/?\s*(kg|quintal)?/i);
 
                         if (matches) {
@@ -82,10 +87,10 @@ function Profile({ setIsAuthenticated, setUser }) {
                         }
                     });
 
-                    // Attach totalQuantity to product
+
                     return {
                         ...product,
-                        totalQuantityQuintal: totalQuantityQuintal.toFixed(2), // added this field per product
+                        totalQuantityQuintal: totalQuantityQuintal.toFixed(2),
                     };
                 });
 
@@ -95,6 +100,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                 showError('Failed to fetch products');
             }
         } catch (error) {
+            console.log(error)
             showError('Error fetching products');
         }
     };
@@ -121,15 +127,16 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const handleSave = async () => {
         try {
-
+            setIsCircularLoader(true);
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/updateprofile`, formData)
             if (response?.data) {
                 setIsEditing(false);
+                setIsCircularLoader(false);
                 showSuccess('Profile updated!');
             }
         } catch (error) {
             setIsEditing(true);
-
+            setIsCircularLoader(false);
             showError('Failed to update profile')
         }
 
@@ -152,7 +159,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                                 </label>
                                 <label>
                                     Contact:
-                                    <input type="number" name="contact" value={formData.contact} onChange={handleChange} />
+                                    <input type="number" className='contacteditnumber' name="contact" value={formData.contact} onChange={handleChange} />
                                 </label>
                                 <label>
                                     Address:
@@ -169,14 +176,16 @@ function Profile({ setIsAuthenticated, setUser }) {
                                             required
                                         >
                                             <option value="buyer">Buyer</option>
-                                            <option value="seller">Seller</option>
                                             <option value="retailer">Retailer</option>
                                         </select>
                                     </label>
                                 ) : null}
 
-                                <button onClick={handleSave} className="profile-save-btn">Save</button>
-                                <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                                <div className='buttoncancesave'>
+                                    <button onClick={handleSave} className="profile-save-btn">{isCircularloader ? <CircularLoader size={13} /> : 'save'}</button>
+                                    <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                                </div>
+
                             </div>
                         </div>
                     ) : null}

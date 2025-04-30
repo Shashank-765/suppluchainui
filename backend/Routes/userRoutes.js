@@ -21,7 +21,6 @@ let transporter = nodemailer.createTransport({
 router.post('/register', async (req, res) => {
 
   try {
-    console.log('req.body', req.body)
     const { name, email, password, contact, role, userType, address } = req.body;
     if (!name || !email || !password || !contact) {
       return res.status(400).json({ message: 'Please fill all fields' });
@@ -64,10 +63,18 @@ router.post('/register', async (req, res) => {
 router.post('/createuser', async (req, res) => {
 
   try {
-    console.log('req.body', req.body)
-    const { name, email, password, contact, role, userType, address } = req.body;
-    if (!name || !email || !password || !contact) {
+    const { name, email, contact, role, userType, address } = req.body;
+    if (!name || !email || !contact) {
       return res.status(400).json({ message: 'Please fill all fields' });
+    }
+    const userCount = await User.countDocuments();
+
+    let generatedPassword = '';
+    if (name && contact && contact.length >= 7) {
+      const namePart = name.slice(0, 3);
+      const contactLast3 = contact.slice(-3);
+      const lastDigit = contact.slice(-1);
+      generatedPassword = `${namePart}${contactLast3}${lastDigit}@${userCount + 1}`;
     }
 
     const existingUser = await User.findOne({ email });
@@ -78,7 +85,7 @@ router.post('/createuser', async (req, res) => {
     const user = new User({
       name,
       email,
-      password,
+      password: generatedPassword,
       role,
       userType,
       contact,
@@ -93,7 +100,7 @@ router.post('/createuser', async (req, res) => {
       await user.save();
     }
 
-      const mailOptions = {
+    const mailOptions = {
       from: 'arun@bastionex.net',
       to: email,
       subject: "Verify your email address",
@@ -146,7 +153,7 @@ router.post('/createuser', async (req, res) => {
                                 <p style="color:#000;text-align:center;font-size:16px;margin-bottom:20px;">
                                    Email ---  ${email}
                                    <br/>
-                                   Password --- ${password}
+                                   Password --- ${generatedPassword}
                                 </p>
                             </td>
                         </tr>
@@ -158,7 +165,7 @@ router.post('/createuser', async (req, res) => {
         </html>
 
       `,
-    };    
+    };
     await transporter.sendMail(mailOptions);
 
     return res.status(200).json({ user, message: 'User registered successfully' });
@@ -173,7 +180,6 @@ router.post('/createuser', async (req, res) => {
 router.post('/updateprofile', async (req, res) => {
   try {
     const { email, name, contact, address, userType } = req.body;
-    console.log(req.body);
 
     const isExist = await User.findOne({ email });
     if (!isExist) {
@@ -214,9 +220,9 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-     if(user?.isBlocked){
-         return res.status(400).json({message:'This user has been blocked'})
-     }
+    if (user?.isBlocked) {
+      return res.status(400).json({ message: 'This user has been blocked' })
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Wrong Password' });
@@ -275,7 +281,6 @@ router.get('/fetchalluser', async (req, res) => {
 router.post('/blockUser', async (req, res) => {
   try {
     const { id } = req.query;
-    console.log('req.body', req.query)
 
     const updatedUser = await User.findOne({ _id: id });
     if (!updatedUser) {
@@ -293,7 +298,6 @@ router.post('/blockUser', async (req, res) => {
 router.post('/unblockUser', async (req, res) => {
   try {
     const { id } = req.query;
-    console.log('req.body', req.query)
 
     const updatedUser = await User.findOne({ _id: id });
     if (!updatedUser) {
@@ -356,7 +360,6 @@ router.get('/getimages', async (req, res) => {
   try {
     const trackingRecords = await TrackingModel.find({});
 
-    // Collect all images from all records
     let allInspectedImages = [];
     let allImages = [];
 
@@ -369,7 +372,6 @@ router.get('/getimages', async (req, res) => {
       }
     });
 
-    // Shuffle and pick up to 3 images from each list
     const randomInspectedImages = getRandomImages(allInspectedImages, 3);
     const randomImages = getRandomImages(allImages, 3);
 

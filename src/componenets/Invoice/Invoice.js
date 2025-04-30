@@ -91,13 +91,6 @@ function Invoice() {
                 <td>₹{realprice}/{unit}</td>
                 <td>₹{price}</td>
               </tr>
-              {/* <tr>
-                <td>2</td>
-                <td>Baby Potatoes</td>
-                <td>300 kg</td>
-                <td>₹18/kg</td>
-                <td>₹5,400</td>
-              </tr> */}
             </tbody>
             <tfoot>
               <tr>

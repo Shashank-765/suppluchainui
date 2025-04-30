@@ -3,14 +3,17 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const TrackingModel = require('../Models/BatchProductModel.js');
 const TransactionModel = require('../Models/TransactionHistoryModel.js');
 const User = require('../Models/userModel.js');
-
-
 const router = express.Router();
+
+
 router.post('/create-checkout-session', async (req, res) => {
     const { price, batchId, quantity, buyerId, sellerId, unit, productId } = req.body;
 
     if (!price || isNaN(price)) {
-        return res.status(400).json({ error: 'Invalid price' });
+        return res.status(400).json({ message: 'Invalid price' });
+    }
+    if (price < '50') {
+        return res.status(400).json({ message: 'Minimum payment amount is ₹50' });
     }
     try {
         const session = await stripe.checkout.sessions.create({
@@ -50,12 +53,12 @@ router.post('/create-checkout-session', async (req, res) => {
 
 router.get('/gettransactionhistory', async (req, res) => {
     try {
-        const { productId } = req.query;       
+        const { productId } = req.query;
         const Data = await TransactionModel.find({ productId });
-         if(!Data){
-            return res.status(400).json({message:'invalid product id'})
-         }
-         else return res.status(200).json({ Data, message: 'transaction fetched sucessfully' })
+        if (!Data) {
+            return res.status(400).json({ message: 'invalid product id' })
+        }
+        else return res.status(200).json({ Data, message: 'transaction fetched sucessfully' })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: error })
@@ -74,8 +77,6 @@ const webhookHandler = async (req, res) => {
         console.error('Webhook signature verification failed:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
-
-    console.log(event?.data?.object.payment_intent, 'information about transaction');
 
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
@@ -130,8 +131,6 @@ const webhookHandler = async (req, res) => {
                     price,
                     quantity: `${quantity} ${unit}`,
                 });
-
-                console.log('✅ Product purchase saved successfully.');
             } catch (err) {
                 console.error('Error processing webhook event:', err);
                 return res.status(500).json({ message: 'Internal server error' });

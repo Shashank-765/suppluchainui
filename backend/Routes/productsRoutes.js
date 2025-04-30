@@ -25,7 +25,6 @@ router.get('/getproducttomarkiting', async (req, res) => {
 router.post('/buyProduct', async (req, res) => {
   try {
     const { ownerId, batchId, quantity, price, buyerId, unit } = req.body;
-    console.log('Incoming buyProduct request:', req.body);
 
     const product = await TrackingModel.findOne({ batchId });
     if (!product) {
@@ -77,7 +76,7 @@ router.get('/getmyproducts', async (req, res) => {
       return res.status(400).json({ message: 'User ID missing in request' });
     }
 
-    const objectId = new mongoose.Types.ObjectId(is_id); // Convert id into ObjectId
+    const objectId = new mongoose.Types.ObjectId(is_id); 
 
     const products = await TrackingModel.aggregate([
       {

@@ -35,7 +35,7 @@ function UserDashBoard() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
-        setShowForm(false); // close popup
+        setShowForm(false); 
       }
     };
 
@@ -235,7 +235,6 @@ function UserDashBoard() {
             : URL.createObjectURL(img)
         )
       );
-
       setInspectedImagePreviews(
         inspectedImages.map(img =>
           typeof img === 'string'
@@ -243,8 +242,6 @@ function UserDashBoard() {
             : URL.createObjectURL(img)
         )
       );
-
-
       setShowForm(true);
     } else {
       console.error('Batch not found');
@@ -727,8 +724,8 @@ function UserDashBoard() {
                 )}
 
                 <div className={styles.formActions}>
-                  <button type="submit">{isCircularloader ? <CircularLoader size={18} /> : 'Submit'}</button>
                   <button type="button" onClick={toggleFormClose}>Cancel</button>
+                  <button type="submit">{isCircularloader ? <CircularLoader size={18} /> : 'Submit'}</button>
                 </div>
               </form>
 

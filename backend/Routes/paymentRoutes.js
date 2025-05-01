@@ -12,7 +12,7 @@ router.post('/create-checkout-session', async (req, res) => {
     if (!price || isNaN(price)) {
         return res.status(400).json({ message: 'Invalid price' });
     }
-    if (price < '50') {
+    if (price < 50) {
         return res.status(400).json({ message: 'Minimum payment amount is ₹50' });
     }
     try {
@@ -51,20 +51,52 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
+// router.get('/gettransactionhistory', async (req, res) => {
+//     try {
+//         const { productId } = req.query;
+//         const Data = await TransactionModel.find({ productId });
+//         if (!Data) {
+//             return res.status(400).json({ message: 'invalid product id' })
+//         }
+//         else return res.status(200).json({ Data, message: 'transaction fetched sucessfully' })
+//     } catch (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: error })
+//     }
+// })
 router.get('/gettransactionhistory', async (req, res) => {
     try {
-        const { productId } = req.query;
-        const Data = await TransactionModel.find({ productId });
+        const { productId, page = 1, limit = 10 } = req.query;
+        const skip = (page - 1) * limit;
+        
+        const total = await TransactionModel.countDocuments({ productId });
+        
+        const Data = await TransactionModel.find({ productId })
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort({ createdAt: -1 });
+            
         if (!Data) {
             return res.status(400).json({ message: 'invalid product id' })
         }
-        else return res.status(200).json({ Data, message: 'transaction fetched sucessfully' })
+        
+        return res.status(200).json({ 
+            Data, 
+            pagination: {
+                total,
+                currentPage: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: (page * limit) < total,
+                hasPrevPage: page > 1
+            },
+            message: 'transaction fetched successfully' 
+        });
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: error })
     }
 })
-
 const webhookHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.WEB_HOOK_SECRET;

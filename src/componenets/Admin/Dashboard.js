@@ -1312,8 +1312,8 @@ const Dashboard = () => {
                         ) : null}
 
                         <div className={styles.formActions}>
-                            <button onClick={() => showPopup("edit this user", handleSave)} className="profile-save-btn">{isCircularloader ? <CircularLoader size={15} /> : 'Submit'}</button>
                             <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                            <button onClick={() => showPopup("edit this user", handleSave)} className="profile-save-btn">{isCircularloader ? <CircularLoader size={15} /> : 'Submit'}</button>
                         </div>
                     </div>
                 </div>

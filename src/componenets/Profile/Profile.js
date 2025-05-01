@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
+import image1 from '../../Imges/Image6.png'
 import profileImage from '../../Imges/portrait-322470_1280.jpg';
 import profilecover from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import CircularLoader from '../CircularLoader/CircularLoader'
@@ -235,7 +236,7 @@ function Profile({ setIsAuthenticated, setUser }) {
 
                         {
 
-                            user?.userType === 'user' || user?.userType === 'admin' ? '' :
+                            // user?.userType === 'user' || user?.userType === 'admin' ? '' :
                                 <div className="my-product-continer">
                                     <h2 className="my-products-only">My Products</h2>
                                     <div className="productmaincontainer">
@@ -243,13 +244,15 @@ function Profile({ setIsAuthenticated, setUser }) {
                                             products.map((product, i) => (
                                                 <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
                                                     <div className="productimagecontianer">
-                                                        {product?.images?.length > 0 && (
+                                                        {product?.images?.length > 0 ?(
                                                             <img
                                                                 src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.images[0]}`}
                                                                 alt={`product-${i}`}
                                                                 className="product-image"
                                                             />
-                                                        )}
+                                                        ):
+                                                          <img src={image1} alt='images' />
+                                                        }
                                                     </div>
                                                     <div className="productdetailscontainer">
                                                         <div className="productdetailscontainerdetails">

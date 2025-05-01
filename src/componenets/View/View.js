@@ -29,6 +29,57 @@ function View() {
   const [quantityError, setQuantityError] = useState('');
   const [priceError, setPriceError] = useState('');
   const popupRef = useRef(null);
+  const [history, setHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    limit: 5,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
+  const [loading, setLoading] = useState(false);
+
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // const handleLimitChange = (newLimit) => {
+  //   const limitValue = Number(newLimit);
+  //   setPagination(prev => ({
+  //     ...prev,
+  //     limit: limitValue
+  //   }));
+  //   // No need to setCurrentPage(1) here as the useEffect will trigger
+  // };
+
+  // const getPageNumbers = () => {
+  //   const pages = [];
+  //   const maxVisiblePages = 5;
+
+  //   if (pagination.totalPages <= maxVisiblePages) {
+  //     for (let i = 1; i <= pagination.totalPages; i++) {
+  //       pages.push(i);
+  //     }
+  //   } else {
+  //     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  //     let endPage = startPage + maxVisiblePages - 1;
+
+  //     if (endPage > pagination.totalPages) {
+  //       endPage = pagination.totalPages;
+  //       startPage = endPage - maxVisiblePages + 1;
+  //     }
+
+  //     for (let i = startPage; i <= endPage; i++) {
+  //       pages.push(i);
+  //     }
+  //   }
+
+  //   return pages;
+  // };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -56,21 +107,33 @@ function View() {
     const index = Math.round(scrollLeft / width);
     setActiveIndex(index);
   };
-  const [history, setHistory] = useState([]);
   const fetchHistory = async () => {
     try {
-      const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/gettransactionhistory?productId=${product?._id}`)
+      const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/gettransactionhistory`, {
+        params: {
+          productId: product?._id,
+          page: currentPage,
+          limit: pagination.limit
+        }
+      });
+
       if (resp?.data) {
         setHistory(resp?.data?.Data);
+        setPagination({
+          ...resp?.data?.pagination,
+          limit: pagination.limit // Keep our local limit setting
+        });
       }
     } catch (error) {
-      console.log(error)
+      console.error('Error fetching history:', error);
     }
   }
 
   useEffect(() => {
     fetchHistory();
-  }, [])
+  }, [currentPage, pagination.limit, product?._id]);
+
+
   const handleUnitChange = (e) => {
     const newUnit = e.target.value;
     setUnit(newUnit);
@@ -260,7 +323,6 @@ function View() {
       navigate('/auth', { state: { login: 'viewpage' } })
     }
   }
-
   const handleClosepopup = () => {
     setQuantity('');
     setPrice('');
@@ -268,8 +330,6 @@ function View() {
     setQuantityError('')
     setShowPopup(false)
   }
-
-
 
   const dummyData = [
     {
@@ -355,7 +415,6 @@ function View() {
                   </div>
               }
             </div>
-
             <div className="dot-indicators">
               {productData?.images?.map((_, index) => (
                 <span
@@ -365,7 +424,6 @@ function View() {
                 />
               ))}
             </div>
-
           </div>
           <div className='rightviewdiv'>
             <div className='rightviewfirstdiv'>
@@ -483,35 +541,147 @@ function View() {
                   <tr>
                     <th>Transaction</th>
                     <th>From</th>
-                    <th>TO</th>
+                    <th>To</th>
                     <th>Price</th>
                     <th>Quantity</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {
-                    history?.length > 0 ?
-                      history?.map((ele, i) =>
-                        <tr key={i}>
-                          <td>{ele?.transactionId}</td>
-                          <td>{ele?.seller}</td>
-                          <td>{ele?.buyer}</td>
-                          <td>₹ {ele?.price}</td>
-                          <td>{ele?.quantity}</td>
-                        </tr>
-                      )
-                      :
-                      (
-                        <tr>
-                          <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
-                            No history available
-                          </td>
-                        </tr>
-                      )
-                  }
+                  {loading ? (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
+                        Loading...
+                      </td>
+                    </tr>
+                  ) : history?.length > 0 ? (
+                    history.map((ele, i) => (
+                      <tr key={i}>
+                        <td>{ele?.transactionId}</td>
+                        <td>{ele?.seller}</td>
+                        <td>{ele?.buyer}</td>
+                        <td>₹ {ele?.price}</td>
+                        <td>{ele?.quantity}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
+                        No history available
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+
+
             </div>
+            {history?.length > 0 && (
+              <div className="pagination-container" style={{
+                marginTop: '20px',
+                display: 'flex',
+                justifyContent: 'end',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '10px'
+              }}>
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ marginRight: '10px' }}>Items per page:</span>
+                    <select
+                      value={pagination.limit}
+                      onChange={(e) => handleLimitChange(e.target.value)}
+                      style={{ padding: '5px', borderRadius: '4px' }}
+                      disabled={loading}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={20}>20</option>
+                    </select>
+                  </div> */}
+
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1 || loading}
+                    style={{
+                      padding: '5px 10px',
+                      border: '1px solid #ddd',
+                      background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    ◀◀
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1 || loading}
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #ddd',
+                      background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    ◀
+                  </button>
+
+                  {/* {getPageNumbers().map(page => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        disabled={loading}
+                        style={{
+                          padding: '5px 10px',
+                          border: '1px solid #ddd',
+                          background: currentPage === page ? '#007bff' : '#fff',
+                          color: currentPage === page ? '#fff' : '#000',
+                          cursor: 'pointer',
+                          borderRadius: '4px',
+                          minWidth: '36px'
+                        }}
+                      >
+                        {page}
+                      </button>
+                    ))} */}
+                  <div style={{ color: '#666', fontSize: '0.9em',display:'flex',alignItems:'center' }}>
+                    Page {currentPage} of {pagination.totalPages}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages || loading}
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #ddd',
+                      background: currentPage === pagination.totalPages ? '#f5f5f5' : '#fff',
+                      cursor: currentPage === pagination.totalPages ? 'not-allowed' : 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    ▶
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    disabled={currentPage === pagination.totalPages || loading}
+                    style={{
+                      padding: '5px 10px',
+                      border: '1px solid #ddd',
+                      background: currentPage === pagination.totalPages ? '#f5f5f5' : '#fff',
+                      cursor: currentPage === pagination.totalPages ? 'not-allowed' : 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    ▶▶
+                  </button>
+                </div>
+
+
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -566,15 +736,16 @@ function View() {
             </div>
 
             <div className="actions">
+             <button onClick={handleClosepopup} className="cancelButton">
+                Cancel
+              </button>
               <button
                 onClick={() => handlebuynow(quantity, price, productData?.price)}
                 className="confirmButton"
               >
                 {isCircularloader ? <CircularLoader size={15} /> : 'confirm'}
               </button>
-              <button onClick={handleClosepopup} className="cancelButton">
-                Cancel
-              </button>
+             
             </div>
           </div>
         </div>

@@ -259,7 +259,8 @@ router.get('/fetchalluser', async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const allUsers = await User.find(query)
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
 
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / limit);

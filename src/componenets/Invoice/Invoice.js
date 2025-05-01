@@ -3,9 +3,11 @@ import './Invoice.css'
 import { useEffect,useState } from 'react'
 import qrcode from '../../Imges/qrcode.jpg'
 import { useNavigate } from 'react-router-dom'
+import { usePDF } from 'react-to-pdf';
 function Invoice() {
 
   const [invoiceData, setInvoiceData] = useState(null);
+  const { toPDF, targetRef } = usePDF({filename: 'invoice.pdf'});
   const navigate = useNavigate();
   useEffect(() => {
     const storedData = sessionStorage.getItem('invoiceData');
@@ -20,11 +22,16 @@ function Invoice() {
     return <div>Loading...</div>; 
   }
 
+    const handlePrint = () => {
+    toPDF().then(() => {
+      navigate('/product')})
+  };
+
   const { quantity, price, realprice, productname, unit } = invoiceData;
 
   return (
     <div>
-      <div className="invoice-container">
+      <div className="invoice-container" ref={targetRef}>
         <header className="invoice-header">
           <div className="brand">
             <h1>INVOICE</h1>
@@ -160,7 +167,7 @@ function Invoice() {
       </div>
 
       <div className='printbutton-container'>
-        <button className='print-button'>Print</button>
+        <button className='print-button' onClick={handlePrint}>Print</button>
       </div>
     </div>
   )

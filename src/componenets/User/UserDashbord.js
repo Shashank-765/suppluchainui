@@ -238,7 +238,7 @@ function UserDashBoard() {
       setInspectedImagePreviews(
         inspectedImages.map(img =>
           typeof img === 'string'
-            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+            ? `${process.env.REACT_APP_BACKEND_IMAGE_URv}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
         )
       );
@@ -736,7 +736,7 @@ function UserDashBoard() {
 
       <div className={styles.batchesOverview}>
         <div className={styles.batchoverviewimagecontainer}>
-          <img src={profileImage} />
+          <img src={profileImage} alt='images' />
           <h1>Batches Overview</h1>
         </div>
         <input

@@ -888,11 +888,11 @@ const Dashboard = () => {
                                         </td>
                                         <td>
                                             <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
-                                                <img src={view} />
+                                                <img src={view} alt='images' />
                                             </button>
                                             {
                                                 batch?.tracking?.isInspexted ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
-                                                    <img src={deleteimage} />
+                                                    <img src={deleteimage} alt='images' />
                                                 </button>
                                             }
 
@@ -1032,15 +1032,15 @@ const Dashboard = () => {
                                                     ) : ' -----'}
                                                 </td>
                                                 <td>
-                                                    <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} /></button>
+                                                    <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} alt='images' /></button>
                                                     {
                                                         !user?.isBlocked ? (
-                                                            <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} /></button>
+                                                            <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
                                                         ) : (
-                                                            <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} /></button>
+                                                            <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
                                                         )}
 
-                                                    <button onClick={() => userview(user)} className={styles.editButton}><img src={view} /></button>
+                                                    <button onClick={() => userview(user)} className={styles.editButton}><img src={view} alt='images' /></button>
                                                 </td>
                                             </tr>
                                         ))

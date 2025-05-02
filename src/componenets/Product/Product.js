@@ -36,7 +36,7 @@ function Product() {
         <>
             <div className='productsection'>
                 <div className='contactcoverimagecontianer'>
-                    <img src={coverImage} />
+                    <img src={coverImage} alt='images'/>
                     <h1>Products</h1>
                 </div>
                 <div className='productmaincontainer'>
@@ -49,7 +49,7 @@ function Product() {
 
                                         {
                                             ele?.images[0] ?
-                                                <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} />
+                                                <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} alt='images' />
                                                 :
                                                 <img src={image1} alt='images' />
                                         }

@@ -15,12 +15,11 @@ import Profile from './componenets/Profile/Profile';
 import Dashboard from './componenets/Admin/Dashboard';
 import UserDashBoard from './componenets/User/UserDashbord';
 import BatchProgressView from './componenets/BatchViewProgress/BatchProgressView';
+import NotificationPage from './componenets/Notifications/NotificationPage';
 import ScreeningPage from './componenets/QrscanerPage/ScreeningPage';
 import { ToastContainer } from 'react-toastify';
+import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
-
-
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -40,6 +39,34 @@ function App() {
       setIsAuthenticated(true);
     }
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        if (!userData?.token) return;
+
+        const res = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/users/renewtoken?userId=${userData?._id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${userData.token}`,
+            },
+          }
+        );
+
+        const updatedUser = { ...userData, token: res.data.token };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Token renewal failed", err);
+      }
+    }, 270000); 
+
+    return () => clearInterval(interval);
+  }, []);
+
+
 
   const userType = userData?.userType;
 
@@ -88,6 +115,8 @@ function App() {
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/batchprogress" element={<BatchProgressView />} />
               <Route path="/screening" element={<ScreeningPage />} />
+              <Route path="/notifications" element={<NotificationPage />} />
+
               <Route
                 path="/profile"
                 element={<Profile setIsAuthenticated={setIsAuthenticated} />}

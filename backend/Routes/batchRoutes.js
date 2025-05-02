@@ -8,6 +8,7 @@ const User = require('../Models/userModel.js');
 const BatchModel = require('../Models/BatchModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const Role = require('../Models/RolesModel.js');
+const NotifyModel = require('../Models/NotifictionModel.js')
 const { authorize } = require('../Auth/Authenticate.js');
 const QRCode = require('qrcode');
 
@@ -92,8 +93,26 @@ router.post('/createBatch', authorize, async (req, res) => {
       newBatch.qrCode = qrCode;
       await newBatch.save();
     }
+    const readStatus = {
+      [farmInspectionId?._id]: false,
+      [harvesterId?._id]: false,
+      [importerId?._id]: false,
+      [exporterId?._id]: false,
+      [processorId?._id]: false
+    };
 
-    console.log('Batch created successfully:', newBatch);
+    const notification = new NotifyModel({
+      batchId: newBatch?.batchId,
+      farmInspection: farmInspectionId?._id,
+      harvester: harvesterId?._id,
+      importer: importerId?._id,
+      exporter: exporterId?._id,
+      processor: processorId?._id,
+      createdBy: req.userData.id,
+      readStatus
+    });
+
+    await notification.save();
     return res.status(200).json({ batch: newBatch, message: 'Batch created successfully' });
 
   } catch (error) {

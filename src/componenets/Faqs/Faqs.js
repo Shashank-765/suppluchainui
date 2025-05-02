@@ -32,7 +32,8 @@ const Faqs = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.maincontainer}>
+     <div className={styles.container}>
       <h1 className={styles.heading}>Frequently Asked Questions</h1>
       <div className={styles.faqList}>
         {faqs.map((faq, index) => (
@@ -46,6 +47,7 @@ const Faqs = () => {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 };

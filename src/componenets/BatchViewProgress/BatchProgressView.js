@@ -135,8 +135,8 @@ const BatchProgressView = () => {
               {allBatch?.tracking?.images?.length > 0 && (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
-                    <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} /></button>
-                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow} /></button>
+                    <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow}alt='images' /></button>
                   </div>
                   <div className={styles.sliderContainer}>
                     {allBatch.tracking.images.map((img, idx) => {
@@ -246,8 +246,8 @@ const BatchProgressView = () => {
               {allBatch?.tracking?.inspectedImages?.length > 0 && (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
-                    <button className={styles.navButton} onClick={prevInspected}><img src={leftarrow} /></button>
-                    <button className={styles.navButton} onClick={nextInspected}><img src={rightarrow} /></button>
+                    <button className={styles.navButton} onClick={prevInspected}><img src={leftarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={nextInspected}><img src={rightarrow} alt='images' /></button>
                   </div>
                   <div className={styles.sliderContainer}>
                     {allBatch.tracking.inspectedImages.map((img, idx) => {

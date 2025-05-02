@@ -51,19 +51,6 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
-// router.get('/gettransactionhistory', async (req, res) => {
-//     try {
-//         const { productId } = req.query;
-//         const Data = await TransactionModel.find({ productId });
-//         if (!Data) {
-//             return res.status(400).json({ message: 'invalid product id' })
-//         }
-//         else return res.status(200).json({ Data, message: 'transaction fetched sucessfully' })
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({ message: error })
-//     }
-// })
 router.get('/gettransactionhistory', async (req, res) => {
     try {
         const { productId, page = 1, limit = 10 } = req.query;
@@ -97,6 +84,7 @@ router.get('/gettransactionhistory', async (req, res) => {
         return res.status(500).json({ message: error })
     }
 })
+
 const webhookHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.WEB_HOOK_SECRET;
@@ -172,7 +160,6 @@ const webhookHandler = async (req, res) => {
 
     res.json({ received: true });
 };
-
 
 module.exports = {
     router,

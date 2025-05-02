@@ -343,6 +343,7 @@
 
 .boxessecond {
     height: 380px;
+    width: 20%;
     margin: 20px;
     text-align: center;
     display: flex;

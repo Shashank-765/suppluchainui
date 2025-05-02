@@ -193,7 +193,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                     <>
                         <div className="profile-card">
                             <div className="profile-banner">
-                                <img src={profilecover} />
+                                <img src={profilecover} alt='images' />
                                 <h1>Welcome, {userData.name}</h1>
                             </div>
                             <div className="profile-content">

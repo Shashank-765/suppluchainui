@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../Models/userModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const nodemailer = require("nodemailer")
+const {authorize} = require('../Auth/Authenticate.js')
 const bcrypt = require('bcryptjs');
 const { generateToken, generateWallet } = require('../Auth/Authenticate.js');
 
@@ -48,9 +49,6 @@ router.post('/register', async (req, res) => {
       user.token = jwtToken;
       await user.save();
     }
-
-
-    console.log('User registered successfully:', user);
     return res.status(200).json({ user, message: 'User registered successfully' });
   } catch (error) {
     console.error(error);
@@ -233,7 +231,6 @@ router.post('/login', async (req, res) => {
       user.token = jwtToken;
       await user.save();
     }
-    console.log('User logged in successfully:', user);
     return res.status(200).json({ user, message: 'User logged in successfully' });
   }
   catch (error) {
@@ -386,6 +383,7 @@ router.get('/getimages', async (req, res) => {
   }
 });
 
+
 function getRandomImages(arr, maxCount) {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -394,6 +392,25 @@ function getRandomImages(arr, maxCount) {
   }
   return shuffled.slice(0, maxCount);
 }
+
+
+router.post('/renewtoken', async (req, res) => {
+  try {
+    const userId = req?.query?.userId;
+    const newToken = generateToken(userId);
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.token = newToken;
+    await user.save();
+
+    return res.json({ token: newToken });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Token renewal failed' });
+  }
+});
 
 
 module.exports = router;

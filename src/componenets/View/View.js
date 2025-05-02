@@ -9,7 +9,7 @@ import downarrow from '../../Imges/arrow.png';
 import CircularLoader from '../CircularLoader/CircularLoader'
 import informat from '../../Imges/information.png';
 import locationImage from '../../Imges/location.png';
-import { showSuccess, showError } from '../ToastMessage/ToastMessage';
+import { showError } from '../ToastMessage/ToastMessage';
 const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
 
 function View() {
@@ -411,7 +411,7 @@ function View() {
                   </div>
                 )) :
                   <div className="imagecontainerview">
-                    <img src={image1} />
+                    <img src={image1}  alt='images'/>
                   </div>
               }
             </div>
@@ -459,14 +459,14 @@ function View() {
                 <div className='description-container'>
                   <div onClick={() => handleAccordion(index)} className='about-vegitable'>
                     <div className='iconvegtble'>
-                      <img src={informat} />
+                      <img src={informat} alt='images' />
                       <p className='descriptionimage'>{item?.heading}</p>
                     </div>
                     <div className='righticon'>
                       {activeAccordion === index ? (
-                        <img src={downarrow} />
+                        <img src={downarrow} alt='images' />
                       ) : (
-                        <img src={uparrow} />
+                        <img src={uparrow} alt='images'/>
                       )}
                     </div>
                   </div>
@@ -547,13 +547,7 @@ function View() {
                   </tr>
                 </thead>
                 <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
-                        Loading...
-                      </td>
-                    </tr>
-                  ) : history?.length > 0 ? (
+                  { history?.length > 0 ? (
                     history.map((ele, i) => (
                       <tr key={i}>
                         <td>{ele?.transactionId}</td>

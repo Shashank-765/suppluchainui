@@ -12,7 +12,7 @@ function Footer() {
             <div className='footerleftIcon'>
                 <div className='footerleftIconcontainer'>
 
-                    <img onClick={navigatetohome} src={Image1} />
+                    <img onClick={navigatetohome} src={Image1} alt='images' />
                 </div>
                 <p>© 2025 Bastionex Infotech, Inc.
                     All rights reserved.</p>

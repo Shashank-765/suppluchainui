@@ -6,7 +6,7 @@ function Contact() {
   return (
     <div className="contact-wrapper">
     <div className='contactcoverimagecontianer'>
-       <img  src={coverImage}/>
+       <img  src={coverImage} alt='images'/>
         <h1>Contact Us</h1>
     </div>
      

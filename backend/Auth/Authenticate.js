@@ -8,7 +8,7 @@ const SECRET = process.env.JWT_SECRET;
 
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, SECRET, { expiresIn: "1d" });
+    return jwt.sign({ id }, SECRET, { expiresIn: "15m" });
 };
 
 const generateWallet = async () => {

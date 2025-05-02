@@ -1,6 +1,9 @@
 .faqs-conatainer{
  height: 100vh;
 }
+.maincontainer{
+ height: 100vh;
+}
 .container {
   max-width: 800px;
   margin: 40px auto;

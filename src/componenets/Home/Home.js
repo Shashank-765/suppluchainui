@@ -57,16 +57,16 @@ function Home() {
           <h1>🌾 Welcome to AgriChain – Blockchain-Powered Crop Supply Chain</h1>
           <h3>Built on Hyperledger Fabric for Secure, Transparent, and Trusted Agriculture</h3>
           <p>AgriChain is an enterprise-grade crop supply chain management platform that leverages the power of Hyperledger Fabric to ensure transparency, traceability, and trust across all agricultural processes — from sowing to sale.</p>
-          <div className='greenleasvehorizontl'><img src={image14} /></div>
+          <div className='greenleasvehorizontl'><img src={image14} alt='images' /></div>
           <button className='button-explore'onClick={hangelesinghup}>Get Started</button>
-          <div className='greenleasveverticle'><img src={image13} /></div>
-          <div className='reddotimage'><img src={image12} /></div>
+          <div className='greenleasveverticle'><img src={image13} alt='images' /></div>
+          <div className='reddotimage'><img src={image12} alt='images' /></div>
         </div>
 
         <div className='image-container'>
-          <img src={section2} alt='photo' />
+          <img src={section2} alt='images' />
           <div className='imagesection-image'>
-            <img src={image11} />
+            <img src={image11} alt='images' />
           </div>
           <div className='imagesectionblock'>
             <h1>🔐 Why Hyperledger Fabric?</h1>
@@ -122,8 +122,8 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
             {
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} />
-              : <img src={image1} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} alt='images' />
+              : <img src={image1} alt='images' />
             }
               
             </div>
@@ -131,8 +131,8 @@ function Home() {
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>{
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} />
-              : <img src={image2} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} alt='images' />
+              : <img src={image2} alt='images' />
             } 
             </div>
             <p> Ensure Quality and Freshness</p>
@@ -140,8 +140,8 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
               {
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} />
-              : <img src={image3} />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} alt='images' />
+              : <img src={image3} alt='images' />
             }
             </div>
             
@@ -150,7 +150,7 @@ function Home() {
          
         </div>
         <div className='blankimagecontainer'>
-          <img src={image4} />
+          <img src={image4} alt='images' />
           <h2>🚜 Why Choose Our Platform?</h2>
           <div >
 
@@ -189,7 +189,7 @@ function Home() {
 
             </div>
             <div className='sector5-boxes2'>
-              <img src={Image10} alt='photo'></img>
+              <img src={Image10} alt='images'></img>
             </div>
           </div>
         </div>
@@ -204,21 +204,21 @@ function Home() {
             <div className='section-6imgcontainer'>
 
             {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} />
-                : <img  src={image5}/>
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} alt='images' />
+                : <img  src={image5} alt='images'/>
             }
               
             </div>
             <div className='section-6imgcontainer'>
               {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} />
-                : <img  src={image6}/>
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} alt='images' />
+                : <img  src={image6} alt='images'/>
             }
             </div>
             <div className='section-6imgcontainer'>
              {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} />
-                : <img  src={image7}/>
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} alt='images' />
+                : <img  src={image7} alt='images'/>
             }
             </div>
           </div>

@@ -163,16 +163,19 @@
     }
   }
 }
+
 @media screen and (max-width:900px) {
-   .navafterbutton {
+  .navafterbutton {
     margin-top: 33%;
   }
 }
+
 @media screen and (max-width:800px) {
-   .navafterbutton {
+  .navafterbutton {
     margin-top: 35%;
   }
 }
+
 @media screen and (max-width:740px) {
   .navbarsection {
     display: flex;
@@ -261,58 +264,37 @@
     margin-top: 52%;
   }
 }
+
 @media screen and (max-width:510px) {
   .navafterbutton {
     margin-top: 57%;
   }
 }
+
 @media screen and (max-width:480px) {
   .navafterbutton {
     margin-top: 64%;
   }
 }
+
 @media screen and (max-width:420px) {
   .navafterbutton {
     margin-top: 75%;
   }
 }
 
-
-
-/* Style the dropdown container */
 .dropdown {
   position: relative;
   list-style: none;
 }
 
-/* Trigger text */
 .dropdown-toggle {
   cursor: pointer;
   display: inline-block;
-  /* padding: 8px 12px; */
 }
 
-/* Hidden by default */
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background-color: #FEF7F0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  list-style: none;
-  padding: 10px 0;
-  min-width: 150px;
-  z-index: 1000;
-  border-radius: 6px;
-}
-
-/* Show on hover */
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-/* Inner items */
 .dropdown-menu li {
-  padding: 8px 16px;
+  padding: 8px 20px;
 }
 
 .dropdown-menu li:hover {
@@ -322,4 +304,80 @@
 .dropdown-menu a {
   text-decoration: none;
   color: #333;
+}
+
+.dropdown {
+  position: relative;
+  list-style: none;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+
+  >img {
+    width: 20px;
+  }
+
+  >span {
+    font-size: 18px;
+    position: absolute;
+    margin-top: -30%;
+    margin-left: -15%;
+    color: #1d6f31;
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #FEF7F0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 10px 0;
+  min-width: 240px;
+  max-height: 250px;
+  margin-top: 1rem;
+  overflow-x: scroll;
+  z-index: 1000;
+  border-radius: 6px;
+}
+
+.seemorebutton {
+  border: none;
+  align-items: center;
+  width: 100%;
+  font-size: 15px;
+  background: none;
+  margin-bottom: -2px;
+  cursor: pointer;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, and Opera */
+}
+
+.dropdown-menu {
+  z-index: 9999;
+}
+
+.notificationli {
+  font-size: 13px;
+  font-weight: 100;
+  text-align: start;
+  border-bottom: 1px solid green;
+  margin: -3px 5px;
+
+  .notification-date {
+    font-size: 10px;
+    font-weight: 50;
+    text-align: end;
+  }
+}
+
+.notificationlino {
+  font-size: 13px;
+  font-weight: 100;
+  text-align: center;
+  margin: -3px 5px;
 }

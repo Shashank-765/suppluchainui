@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../axios'
 import edit from '../../Imges/edit (1).png'
 import view from '../../Imges/eye.png'
 import deleteimage from '../../Imges/delete.png'
@@ -10,6 +10,7 @@ import CircularLoader from '../CircularLoader/CircularLoader'
 import Popup from '../Popups/Popup'
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
+import axios from 'axios';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -40,8 +41,6 @@ const Dashboard = () => {
     const [popupAction, setPopupAction] = useState('');
     const [pendingFunction, setPendingFunction] = useState(null);
     const [pendingArgs, setPendingArgs] = useState([]);
-
-
 
     useEffect(() => {
         if (showBatchModal || showUserModal || isEditing)
@@ -96,7 +95,7 @@ const Dashboard = () => {
     useEffect(() => {
         const handleClickOutsideModal = (event) => {
             if (modalUserRef.current && !modalUserRef.current.contains(event.target)) {
-            setIsCircularLoader(false);
+                setIsCircularLoader(false);
             }
         };
 
@@ -146,7 +145,7 @@ const Dashboard = () => {
         }
         try {
 
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/updateprofile`, edituserdata)
+            const response = await api.post(`/users/updateprofile`, edituserdata)
             if (response?.data) {
                 setIsEditing(false);
                 setIsCircularLoader(false);
@@ -297,14 +296,35 @@ const Dashboard = () => {
         setIsCircularLoader(true);
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/createBatch`, formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                }
-            );
+            const res = await api.post(`/batch/createBatch`, formData);
             if (res.data) {
+
+                const couchdb = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addbatch', {
+                    batchId:( res.data?.batch?.batchId).toString(),
+                    farmerRegNo: res.data?.batch?.farmerRegNo,
+                    farmerName: res.data?.batch?.farmerName,
+                    farmerAddress: res.data?.batch?.farmerAddress,
+                    farmInspectionName: res.data?.batch?.farmInspectionName,
+                    harvesterName: res.data?.batch?.harvesterName,
+                    processorName: res.data?.batch?.processorName,
+                    exporterName: res.data?.batch?.exporterName,
+                    importerName: res.data?.batch?.importerName,
+                    coffeeType: res.data?.batch?.coffeeType,
+                    qrCode: res.data?.batch?.qrCode,
+                    farmInspectionId: res.data?.batch?.farmInspectionId,
+                    harvesterId: res.data?.batch?.harvesterId,
+                    processorId: res.data?.batch?.processorId,
+                    exporterId: res.data?.batch?.exporterId,
+                    importerId: res.data?.batch?.importerId
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+
+                if (couchdb) {
+                    console.log(couchdb)
+                }
                 setIsCircularLoader(false);
                 showSuccess("Batch Created")
                 setToggle(!toggle);
@@ -350,7 +370,7 @@ const Dashboard = () => {
 
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/createuser`, userForm);
+            const response = await api.post(`/users/createuser`, userForm);
             if (response.data) {
                 showSuccess("User Created succefully")
                 setIsCircularLoader(false);
@@ -364,11 +384,11 @@ const Dashboard = () => {
                 });
             } else {
                 console.error('Failed to create user');
-                  setIsCircularLoader(false);
+                setIsCircularLoader(false);
                 showError("Failed to create user")
             }
         } catch (err) {
-          setIsCircularLoader(false);
+            setIsCircularLoader(false);
             console.error('Error:', err);
             showError("Failed to create user")
         }
@@ -493,7 +513,7 @@ const Dashboard = () => {
 
     const blockhandler = async (user) => {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/blockUser?id=${user._id}`);
+            const response = await api.post(`/users/blockUser?id=${user._id}`);
             if (response.data) {
                 // console.log('User blocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User Blocked Succefully')
@@ -510,7 +530,7 @@ const Dashboard = () => {
 
     const unblockhandler = async (user) => {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/unblockUser?id=${user?._id}`,);
+            const response = await api.post(`/users/unblockUser?id=${user?._id}`,);
             if (response.data) {
                 // console.log('User unblocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User unblocked successfully!');
@@ -550,13 +570,19 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/fetchalluser`, {
+            const response = await api.get(`/users/fetchalluser`, {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
                     search: searchTerm,
                 },
             });
+            // const resp = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batchs`,{
+            //     headers:{
+            //         contentType:'application/json'
+            //     }
+            // });
+            // console.log(resp)
             setAllUser(response.data.allUsers);
             setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
             setTotalPages(response.data.totalPages);
@@ -581,16 +607,14 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatch`, {
+            const response = await api.get("/batch/getBatch", {
                 params: {
                     page: currnetBatchPage,
                     limit: usersPerPage,
                     search: searchBatchTerm,
-                },
-                headers: {
-                    Authorization: `Bearer ${user?.token}`,
-                },
+                }
             });
+
 
             setAllBatch(response.data.batches);
             setTotalBatch(response.data.totalBatches);
@@ -684,12 +708,7 @@ const Dashboard = () => {
     };
     const deleteBatch = async (id) => {
         try {
-            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/batch/deletebatch?batchId=${id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                })
+            const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
             if (response?.data) {
                 setToggle(!toggle);
                 showSuccess("Batch deleted succefully")
@@ -710,7 +729,7 @@ const Dashboard = () => {
 
     const fetchRoles = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getRoles`);
+            const res = await api.get(`/batch/getRoles`);
             if (res.data?.roles) {
                 setRoles(res.data?.roles);
                 setTotalRoles(res?.data?.totalCount)

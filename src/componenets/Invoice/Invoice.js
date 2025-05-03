@@ -1,13 +1,16 @@
 import React from 'react'
 import './Invoice.css'
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
+import CircularLoader from '../CircularLoader/CircularLoader'
 import qrcode from '../../Imges/qrcode.jpg'
 import { useNavigate } from 'react-router-dom'
 import { usePDF } from 'react-to-pdf';
 function Invoice() {
 
   const [invoiceData, setInvoiceData] = useState(null);
-  const { toPDF, targetRef } = usePDF({filename: 'invoice.pdf'});
+  const [isCircularloader, setIsCircularLoader] = useState(false);
+
+  const { toPDF, targetRef } = usePDF({ filename: 'invoice.pdf' });
   const navigate = useNavigate();
   useEffect(() => {
     const storedData = sessionStorage.getItem('invoiceData');
@@ -19,12 +22,16 @@ function Invoice() {
   }, [navigate]);
 
   if (!invoiceData) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
-    const handlePrint = () => {
+  const handlePrint = () => {
+    setIsCircularLoader(true);
     toPDF().then(() => {
-      navigate('/product')})
+      setIsCircularLoader(false);
+      navigate('/product')
+    })
+    setIsCircularLoader(false);
   };
 
   const { quantity, price, realprice, productname, unit } = invoiceData;
@@ -167,7 +174,7 @@ function Invoice() {
       </div>
 
       <div className='printbutton-container'>
-        <button className='print-button' onClick={handlePrint}>Print</button>
+        <button className='print-button' onClick={handlePrint}>{isCircularloader ? <CircularLoader size={20} /> : 'Print'}</button>
       </div>
     </div>
   )

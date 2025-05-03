@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import api from '../../axios'
 import "./Home.css"
 import section2 from '../../Imges/BG.png'
 import Image10 from '../../Imges/Multicropping.webp'
@@ -14,7 +15,6 @@ import image12 from '../../Imges/Image 3.png'
 import image13 from '../../Imges/Image 2.png'
 import image14 from '../../Imges/Image 1.png'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'
 
 function Home() {
   const Navigate = useNavigate();
@@ -36,7 +36,7 @@ function Home() {
  }
   const getimages = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/getimages`)
+      const response = await api.get(`/users/getimages`)
       if (response?.data) {
         setInspectedImages(response?.data?.randomInspectedImages)
         setImages(response?.data?.randomImages)

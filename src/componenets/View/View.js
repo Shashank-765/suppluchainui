@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../axios'
 import { loadStripe } from '@stripe/stripe-js';
 import './View.css';
 import image1 from '../../Imges/Image6.png'
@@ -109,7 +109,7 @@ function View() {
   };
   const fetchHistory = async () => {
     try {
-      const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/gettransactionhistory`, {
+      const resp = await api.get(`/payments/gettransactionhistory`, {
         params: {
           productId: product?._id,
           page: currentPage,
@@ -186,7 +186,7 @@ function View() {
     setIsCircularLoader(true);
     try {
       const stripe = await stripePromise;
-      const sessionRes = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/payments/create-checkout-session`, {
+      const sessionRes = await api.post(`/payments/create-checkout-session`, {
         batchId: productData?.batchId,
         quantity,
         price,
@@ -222,7 +222,7 @@ function View() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getProductById?id=${product?._id}`);
+      const response = await api.get(`/products/getProductById?id=${product?._id}`);
       if (response.data) {
         setProductsData(response.data.product);
       } else {

@@ -3,6 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const TrackingModel = require('../Models/BatchProductModel.js');
 const TransactionModel = require('../Models/TransactionHistoryModel.js');
 const User = require('../Models/userModel.js');
+const { authorize } = require('../Auth/Authenticate.js')
 const router = express.Router();
 
 
@@ -51,7 +52,7 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
-router.get('/gettransactionhistory', async (req, res) => {
+router.get('/gettransactionhistory',authorize, async (req, res) => {
     try {
         const { productId, page = 1, limit = 10 } = req.query;
         const skip = (page - 1) * limit;

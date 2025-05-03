@@ -3,9 +3,9 @@ const router = express.Router();
 const User = require('../Models/userModel.js');
 const TrackingModel = require('../Models/BatchProductModel.js');
 const nodemailer = require("nodemailer")
-const {authorize} = require('../Auth/Authenticate.js')
+const { authorize } = require('../Auth/Authenticate.js')
 const bcrypt = require('bcryptjs');
-const { generateToken, generateWallet } = require('../Auth/Authenticate.js');
+const { generateToken, generateWallet, generateRefreshToken } = require('../Auth/Authenticate.js');
 
 
 let transporter = nodemailer.createTransport({
@@ -58,7 +58,7 @@ router.post('/register', async (req, res) => {
 
 })
 
-router.post('/createuser', async (req, res) => {
+router.post('/createuser', authorize, async (req, res) => {
 
   try {
     const { name, email, contact, role, userType, address } = req.body;
@@ -175,7 +175,7 @@ router.post('/createuser', async (req, res) => {
 
 })
 
-router.post('/updateprofile', async (req, res) => {
+router.post('/updateprofile', authorize, async (req, res) => {
   try {
     const { email, name, contact, address, userType } = req.body;
 
@@ -208,7 +208,6 @@ router.post('/updateprofile', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -227,10 +226,18 @@ router.post('/login', async (req, res) => {
     }
 
     const jwtToken = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
     if (jwtToken) {
       user.token = jwtToken;
       await user.save();
     }
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,           
+      sameSite: "None",      
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     return res.status(200).json({ user, message: 'User logged in successfully' });
   }
   catch (error) {
@@ -240,7 +247,7 @@ router.post('/login', async (req, res) => {
 }
 )
 
-router.get('/fetchalluser', async (req, res) => {
+router.get('/fetchalluser', authorize, async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
 
@@ -276,7 +283,7 @@ router.get('/fetchalluser', async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching users' });
   }
 });
-router.post('/blockUser', async (req, res) => {
+router.post('/blockUser', authorize, async (req, res) => {
   try {
     const { id } = req.query;
 
@@ -293,7 +300,7 @@ router.post('/blockUser', async (req, res) => {
   }
 }
 );
-router.post('/unblockUser', async (req, res) => {
+router.post('/unblockUser', authorize, async (req, res) => {
   try {
     const { id } = req.query;
 
@@ -354,7 +361,7 @@ router.post('/unblockUser', async (req, res) => {
 //   }
 // });
 
-router.get('/getimages', async (req, res) => {
+router.get('/getimages', authorize, async (req, res) => {
   try {
     const trackingRecords = await TrackingModel.find({});
 
@@ -394,23 +401,23 @@ function getRandomImages(arr, maxCount) {
 }
 
 
-router.post('/renewtoken', async (req, res) => {
-  try {
-    const userId = req?.query?.userId;
-    const newToken = generateToken(userId);
+// router.post('/renewtoken', async (req, res) => {
+//   try {
+//     const userId = req?.query?.userId;
+//     const newToken = generateToken(userId);
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+//     const user = await User.findById(userId);
+//     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.token = newToken;
-    await user.save();
+//     user.token = newToken;
+//     await user.save();
 
-    return res.json({ token: newToken });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Token renewal failed' });
-  }
-});
+//     return res.json({ token: newToken });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: 'Token renewal failed' });
+//   }
+// });
 
 
 module.exports = router;

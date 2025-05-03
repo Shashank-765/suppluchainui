@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const User = require('../Models/userModel.js');
 const mongoose = require('mongoose');
+const { authorize } = require('../Auth/Authenticate.js')
+
 
 const TrackingModel = require('../Models/BatchProductModel.js');
 
 
-router.get('/getproducttomarkiting', async (req, res) => {
+router.get('/getproducttomarkiting',authorize, async (req, res) => {
   try {
     const trackingDetails = await TrackingModel.find({ isProcessed: true })
     if (!trackingDetails) {
@@ -22,7 +24,7 @@ router.get('/getproducttomarkiting', async (req, res) => {
 );
 
 
-router.post('/buyProduct', async (req, res) => {
+router.post('/buyProduct',authorize, async (req, res) => {
   try {
     const { ownerId, batchId, quantity, price, buyerId, unit } = req.body;
 
@@ -68,7 +70,7 @@ router.post('/buyProduct', async (req, res) => {
   }
 });
 
-router.get('/getmyproducts', async (req, res) => {
+router.get('/getmyproducts',authorize, async (req, res) => {
   try {
     const is_id = req.query.id;
 
@@ -112,7 +114,7 @@ router.get('/getmyproducts', async (req, res) => {
 });
 
 
-router.get('/getProductById', async (req, res) => {
+router.get('/getProductById',authorize, async (req, res) => {
   try {
     const is_id = req.query.id
     if (is_id) {

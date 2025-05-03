@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './UserDashboard.module.css';
-import axios from 'axios';
+import api from '../../axios'
 import view from '../../Imges/eye.png'
 import { useNavigate, useLocation } from 'react-router-dom';
 import profileImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
@@ -269,8 +269,8 @@ function UserDashBoard() {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/batch/getBatchByUserId`,
+      const response = await api.get(
+        `/batch/getBatchByUserId`,
         {
           params: {
             id: userdata?._id || user?._id,
@@ -515,7 +515,7 @@ function UserDashBoard() {
         }
       }
 
-      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/batch/updateBatch`, payload, {
+      const res = await api.post(`/batch/updateBatch`, payload, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../axios'
 import CircularLoader from '../CircularLoader/CircularLoader'
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import './Signup.css';
@@ -101,7 +101,7 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
 
         if (isSignup) {
             try {
-                const registeredUser = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/register`, formData, {
+                const registeredUser = await api.post(`/users/register`, formData, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -126,7 +126,7 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
             }
         } else {
             try {
-                const loggedInUser = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/login`, formData, {
+                const loggedInUser = await api.post(`/users/login`, formData, {
                     headers: {
                         'Content-Type': 'application/json',
                     },

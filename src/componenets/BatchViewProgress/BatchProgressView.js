@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-
+import api from '../../axios'
 import certificqte from '../../Imges/certificqte.jpg'
 import check from '../../Imges/check.png'
 import No from '../../Imges/no.png'
 import styles from "./BatchProgressView.module.css";
 import leftarrow from '../../Imges/left-chevron.png'
 import rightarrow from '../../Imges/right-chevron.png'
-import axios from "axios";
 import { useLocation } from "react-router-dom";
 const BatchProgressView = () => {
   const location = useLocation();
@@ -47,7 +46,7 @@ const BatchProgressView = () => {
 
   const fetchbatchbyid = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/batch/getBatchById?id=${batch?.batchId}`);
+      const response = await api.get(`/batch/getBatchById?id=${batch?.batchId}`);
 
       if (response.data) {
         setAllBatch(response?.data?.batch);
@@ -56,12 +55,13 @@ const BatchProgressView = () => {
       console.error('Error fetching batch:', error);
     }
   }
+  
   useEffect(() => {
     fetchbatchbyid();
   }, [])
   return (
     <div className={styles.wrapper}>
-      <h2 className={styles.title}>Batch Progress</h2>
+      <h2 className={styles.title}>Batch Progress for {allBatch?.coffeeType}</h2>
       <p className={styles.subtitle}>
         Batch No: {allBatch?.batchId} <br />
       </p>

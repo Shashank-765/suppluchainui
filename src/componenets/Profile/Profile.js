@@ -5,10 +5,10 @@ import image1 from '../../Imges/Image6.png'
 import profileImage from '../../Imges/portrait-322470_1280.jpg';
 import profilecover from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import CircularLoader from '../CircularLoader/CircularLoader'
-
+import api from '../../axios'
 
 import './Profile.css';
-import axios from 'axios';
+
 
 function Profile({ setIsAuthenticated, setUser }) {
     const popupRef = useRef(null);
@@ -66,7 +66,7 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getmyproducts?id=${user._id}`);
+            const response = await api.get(`/products/getmyproducts?id=${user._id}`);
             if (response.data) {
                 const updatedProducts = response.data.products.map((product) => {
                     let totalQuantityQuintal = 0;
@@ -129,7 +129,7 @@ function Profile({ setIsAuthenticated, setUser }) {
     const handleSave = async () => {
         try {
             setIsCircularLoader(true);
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/users/updateprofile`, formData)
+            const response = await api.post(`/users/updateprofile`, formData)
             if (response?.data) {
                 setIsEditing(false);
                 setIsCircularLoader(false);

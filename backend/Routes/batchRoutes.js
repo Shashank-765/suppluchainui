@@ -29,12 +29,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }, 
 }).fields([
   { name: 'images', maxCount: 15 },
   { name: 'inspectedImages', maxCount: 15 }
 ]);
-
 
 
 router.post('/createBatch', authorize, async (req, res) => {
@@ -197,7 +196,7 @@ router.get('/getBatch', authorize, async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching batches' });
   }
 });
-router.get('/getRoles', async (req, res) => {
+router.get('/getRoles',authorize, async (req, res) => {
   try {
     const roles = await Role.find({});
     const totalCount = await Role.countDocuments();
@@ -214,7 +213,7 @@ router.get('/getRoles', async (req, res) => {
     });
   }
 });
-router.get('/getBatchById', async (req, res) => {
+router.get('/getBatchById',authorize, async (req, res) => {
   try {
     const { id } = req.query;
 

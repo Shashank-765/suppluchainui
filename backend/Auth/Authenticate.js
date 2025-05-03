@@ -5,10 +5,12 @@ const User = require('../Models/userModel.js');
 const mnemonic = process.env.mnemonic;
 const SECRET = process.env.JWT_SECRET;
 
-
-
 const generateToken = (id) => {
-    return jwt.sign({ id }, SECRET, { expiresIn: "15m" });
+    return jwt.sign({ id }, SECRET, { expiresIn: "1d" });
+};
+
+const generateRefreshToken = (id) => {
+    return jwt.sign({ id }, SECRET, { expiresIn: "7d" });
 };
 
 const generateWallet = async () => {
@@ -28,6 +30,7 @@ const generateWallet = async () => {
 const authorize = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    // const token = '1234567890oiuytrewqwdfgh';
     if (!token) {
         return res.status(401).json({ success: false, message: 'Token missing' });
     }
@@ -50,5 +53,6 @@ const authorize = async (req, res, next) => {
 module.exports = {
     generateToken,
     generateWallet,
+    generateRefreshToken,
     authorize
 };

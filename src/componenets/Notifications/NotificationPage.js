@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../axios'
 import styles from './NotificationPage.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,10 +9,45 @@ const NotificationPage = () => {
     const [notifyToggle, setNotifyToggle] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
 
+    function formatNotificationDate(createdAt) {
+        const now = new Date();
+        const createdDate = new Date(createdAt);
+        const diffMs = now - createdDate;
+
+        if (diffMs < 0) {
+            const futureDiff = createdDate - now;
+            const futureDays = Math.floor(futureDiff / (1000 * 60 * 60 * 24));
+            return futureDays <= 1 ? 'Tomorrow' : createdDate.toLocaleDateString();
+        }
+
+        const diffSec = Math.floor(diffMs / 1000);
+        const diffMin = Math.floor(diffSec / 60);
+        const diffHr = Math.floor(diffMin / 60);
+        const diffDays = Math.floor(diffHr / 24);
+
+        if (diffSec < 60) {
+            return `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
+        }
+
+        if (diffMin < 60) {
+            return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+        }
+
+        if (diffHr < 24) {
+            return `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
+        }
+
+        if (diffDays < 7) {
+            return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+        }
+
+        return createdDate.toLocaleDateString();
+    }
+
     const fetchNotifications = async () => {
         try {
-            const res = await axios.get(
-                `${process.env.REACT_APP_BACKEND_URL}/notify/getallnotifications`,
+            const res = await api.get(
+                `/notify/getallnotifications`,
                 {
                     headers: {
                         Authorization: `Bearer ${user?.token}`,
@@ -27,7 +62,7 @@ const NotificationPage = () => {
 
     const markAsRead = async (id) => {
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/notify/notified?notificationId=${id}`, {}, {
+            await api.post(`/notify/notified?notificationId=${id}`, {}, {
                 headers: {
                     Authorization: `Bearer ${user?.token}`,
                 },
@@ -49,7 +84,7 @@ const NotificationPage = () => {
 
     const handleDelete = async (id) => {
         try {
-            const deletednoti = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/notify/deletenotification?id=${id}`, {}, {
+            const deletednoti = await api.post(`/notify/deletenotification?id=${id}`, {}, {
                 headers: {
                     Authorization: `Bearer ${user?.token}`,
                 },
@@ -77,7 +112,7 @@ const NotificationPage = () => {
                                     {note.message || 'New Notification'}
                                 </div>
                                 <div className={styles.date}>
-                                    {new Date(note.createdAt).toLocaleString()}
+                                    {formatNotificationDate(note.createdAt)}
                                 </div>
                             </div>
                             <button className={styles.deleteButton} onClick={() => handleDelete(note._id)}>

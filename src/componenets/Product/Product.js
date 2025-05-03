@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import './Product.css'
+import api from '../../axios'
 import image1 from '../../Imges/Image6.png'
 import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 
 function Product() {
@@ -14,7 +14,7 @@ function Product() {
     const [data, setData] = React.useState([]);
     const fetchallproducts = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/products/getproducttomarkiting`);
+            const response = await api.get(`/products/getproducttomarkiting`);
 
             if (response.data) {
                 setData(response.data.trackingDetails);

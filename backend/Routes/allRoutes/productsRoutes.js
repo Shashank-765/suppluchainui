@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Models/userModel.js');
+const User = require('../../Models/userModel.js');
 const mongoose = require('mongoose');
-const { authorize } = require('../Auth/Authenticate.js')
+const { authorize } = require('../../Auth/Authenticate.js')
 
 
-const TrackingModel = require('../Models/BatchProductModel.js');
+const TrackingModel = require('../../Models/BatchProductModel.js');
 
 
 router.get('/getproducttomarkiting',authorize, async (req, res) => {

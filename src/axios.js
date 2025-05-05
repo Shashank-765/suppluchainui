@@ -25,12 +25,12 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/refreshtoken")
+      !originalRequest.url.includes("/refreshtoken/newtoken")
     ) {
       originalRequest._retry = true;
       const userBeforeRefresh = JSON.parse(localStorage.getItem("user")) || {};
       try {
-        const { data } = await api.post("/refreshtoken");
+        const { data } = await api.post("/refreshtoken/newtoken");
         const updatedUser = { ...userBeforeRefresh, token: data.accessToken };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 

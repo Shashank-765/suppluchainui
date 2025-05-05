@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Models/userModel.js');
-const NotifyModel = require('../Models/NotifictionModel.js')
-const { authorize } = require('../Auth/Authenticate.js');
+const User = require('../../Models/userModel.js');
+const NotifyModel = require('../../Models/NotifictionModel.js')
+const { authorize } = require('../../Auth/Authenticate.js');
 
 
 router.get('/notifications', authorize, async (req, res) => {

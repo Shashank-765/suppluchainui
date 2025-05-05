@@ -1,9 +1,9 @@
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const TrackingModel = require('../Models/BatchProductModel.js');
-const TransactionModel = require('../Models/TransactionHistoryModel.js');
-const User = require('../Models/userModel.js');
-const { authorize } = require('../Auth/Authenticate.js')
+const TrackingModel = require('../../Models/BatchProductModel.js');
+const TransactionModel = require('../../Models/TransactionHistoryModel.js');
+const User = require('../../Models/userModel.js');
+const { authorize } = require('../../Auth/Authenticate.js')
 const router = express.Router();
 
 

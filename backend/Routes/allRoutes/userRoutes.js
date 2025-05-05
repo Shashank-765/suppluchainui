@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Models/userModel.js');
-const TrackingModel = require('../Models/BatchProductModel.js');
+const User = require('../../Models/userModel.js');
+const TrackingModel = require('../../Models/BatchProductModel.js');
 const nodemailer = require("nodemailer")
-const { authorize } = require('../Auth/Authenticate.js')
+const { authorize } = require('../../Auth/Authenticate.js')
 const bcrypt = require('bcryptjs');
-const { generateToken, generateWallet, generateRefreshToken } = require('../Auth/Authenticate.js');
+const { generateToken, generateWallet, generateRefreshToken } = require('../../Auth/Authenticate.js');
 
 
 let transporter = nodemailer.createTransport({

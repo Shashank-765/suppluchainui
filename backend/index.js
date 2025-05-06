@@ -8,15 +8,16 @@ const PORT = process.env.PORT || 5000;
 const morgan = require('morgan');
 app.use(morgan('dev'));
 dotenv.config();
+
 app.use(cors({
   origin: (origin, callback) => callback(null, origin),
   credentials: true
 }));
+
 app.use("/uploads", express.static('uploads'));
 app.use(helmet());
 
-app.use('/api',require('./Routes/allRouting.js'))
-
+app.use('/api',require('./Routes/Routes.js'))
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

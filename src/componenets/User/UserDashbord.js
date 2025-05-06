@@ -28,9 +28,15 @@ function UserDashBoard() {
   const [pendingArgs, setPendingArgs] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const [processorData, setProcessorData] = useState(null);
   const [toggle, setToggle] = useState(false);
   const processorFileInputRef = useRef(null);
   const inspectorFileInputRef = useRef(null);
+  const [harvesterData, setHarvesterData] = useState([]);
+  const [exporterData, setExporterData] = useState([]);
+  const [importerData, setImporterData] = useState([]);
+  const [inspectorData, setInspectorData] = useState([]);
+  const [toUpdate, setToUpdate] = useState(null);
 
   const popupRef = useRef();
 
@@ -171,64 +177,119 @@ function UserDashBoard() {
   };
 
   const toggleForm = (id) => {
-    const selectedBatch = batchData.find(batch => String(batch.batchId) === String(id));
 
+    const selectedBatch = batchData.find(batch => String(batch.batchId) === String(id));
+    let selectedUser;
+    if (user?.role?.label === 'Processor') {
+      selectedUser = processorData.find(
+        item => item.batchId === `${id}`
+      );
+      if (selectedUser) {
+        setToUpdate(true);
+      } else {
+        setToUpdate(false);
+      }
+    }
+    if (user?.role?.label === 'Exporter') {
+      selectedUser = exporterData.find(
+        item => item.batchId === `${id}_${user?._id}`
+      );
+      if (selectedUser) {
+        setToUpdate(true);
+      } else {
+        setToUpdate(false);
+      }
+    }
+    if (user?.role?.label === 'Importer') {
+      selectedUser = importerData.find(
+        item => item.batchId === `${id}_${user?._id}`
+      );
+      if (selectedUser) {
+        setToUpdate(true);
+      } else {
+        setToUpdate(false);
+      }
+    }
+    if (user?.role?.label === 'Harvester') {
+      selectedUser = harvesterData.find(
+        item => item.batchId === `${id}_${user?._id}`
+      );
+      if (selectedUser) {
+        setToUpdate(true);
+      } else {
+        setToUpdate(false);
+      }
+    }
+    if (user?.role?.label === 'Farm Inspection') {
+      selectedUser = inspectorData.find(
+        item => item.batchId === `${id}`
+      );
+      if (selectedUser) {
+        setToUpdate(true);
+      } else {
+        setToUpdate(false);
+      }
+    }
+    console.log('slecteduser', selectedUser)
+    console.log('processorData', inspectorData)
     if (selectedBatch) {
       const inspectedImages = selectedBatch?.tracking?.inspectedImages || [];
       const processingImages = selectedBatch?.tracking?.images || [];
+
+
 
       setFormData(prevData => ({
         ...prevData,
         batchId: selectedBatch?.batchId || '',
         farmInspectionId: selectedBatch?.farmInspectionId || '',
         farmInspectionName: selectedBatch?.farmInspectionName || '',
-        productName: selectedBatch?.tracking?.productName || '',
-        certificateNo: selectedBatch?.tracking?.certificateNo || '',
-        certificateFrom: selectedBatch?.tracking?.certificateFrom || '',
-        typeOfFertilizer: selectedBatch?.tracking?.typeOfFertilizer || '',
-        fertilizerUsed: selectedBatch?.tracking?.fertilizerUsed || '',
-        inspectedImages: selectedBatch?.tracking?.inspectedImages || [],
-        inspectionStatus: selectedBatch?.tracking?.inspectionStatus || '',
+        productName: selectedUser?.productName || '',
+        certificateNo: selectedUser?.certificateNo || '',
+        certificateFrom: selectedUser?.certificateFrom || '',
+        typeOfFertilizer: selectedUser?.typeOfFertilizer || '',
+        fertilizerUsed: selectedUser?.fertilizerUsed || '',
+        inspectedImages: selectedUser?.inspectedImages || [],
+        inspectionStatus: selectedUser?.inspectionStatus || '',
 
         harvesterId: selectedBatch?.harvesterId || '',
         harvesterName: selectedBatch?.harvesterName || '',
-        cropSampling: selectedBatch?.tracking?.cropSampling || '',
-        temperatureLevel: selectedBatch?.tracking?.temperatureLevel || '',
-        humidity: selectedBatch?.tracking?.humidity || '',
-        harvestStatus: selectedBatch?.tracking?.harvestStatus || '',
+        cropSampling: selectedUser?.cropSampling || '',
+        temperatureLevel: selectedUser?.temperatureLevel || '',
+        humidity: selectedUser?.humidityLevel || '',
+        harvestStatus: selectedUser?.harvestStatus || '',
 
         exporterId: selectedBatch?.exporterId || '',
         exporterName: selectedBatch?.exporterName || '',
-        coordinationAddress: selectedBatch?.tracking?.coordinationAddress || '',
-        shipName: selectedBatch?.tracking?.shipName || '',
-        shipNo: selectedBatch?.tracking?.shipNo || '',
-        departureDate: selectedBatch?.tracking?.departureDate || '',
-        estimatedDate: selectedBatch?.tracking?.estimatedDate || '',
-        exportedTo: selectedBatch?.tracking?.exportedTo || '',
-        exportStatus: selectedBatch?.tracking?.exportStatus || '',
+        coordinationAddress: selectedUser?.coordinationAddress || '',
+        shipName: selectedUser?.shipName || '',
+        shipNo: selectedUser?.shipNo || '',
+        departureDate: selectedUser?.departureDate || '',
+        estimatedDate: selectedUser?.estimatedDate || '',
+        exportedTo: selectedUser?.exportedTo || '',
+        exportStatus: selectedUser?.exporterStatus || '',
 
         importerId: selectedBatch?.importerId || '',
         importerName: selectedBatch?.importerName || '',
-        quantityImported: selectedBatch?.tracking?.quantityImported || '',
-        shipStorage: selectedBatch?.tracking?.shipStorage || '',
-        arrivalDate: selectedBatch?.tracking?.arrivalDate || '',
-        warehouseLocation: selectedBatch?.tracking?.warehouseLocation || '',
-        warehouseArrivalDate: selectedBatch?.tracking?.warehouseArrivalDate || '',
-        importerAddress: selectedBatch?.tracking?.importerAddress || '',
-        importStatus: selectedBatch?.tracking?.importStatus || '',
+        quantityImported: selectedUser?.quantity || '',
+        shipStorage: selectedUser?.shipStorage || '',
+        arrivalDate: selectedUser?.arrivalDate || '',
+        warehouseLocation: selectedUser?.warehouseLocation || '',
+        warehouseArrivalDate: selectedUser?.warehouseArrivalDate || '',
+        importerAddress: selectedUser?.importerAddress || '',
+        importStatus: selectedUser?.importerStatus || '',
 
         processorId: selectedBatch?.processorId || '',
         processorName: selectedBatch?.processorName || '',
-        quantityProcessed: selectedBatch?.tracking?.quantityProcessed || '',
-        processingMethod: selectedBatch?.tracking?.processingMethod || '',
-        packaging: selectedBatch?.tracking?.packaging || '',
-        packagedDate: selectedBatch?.tracking?.packagedDate || '',
-        warehouse: selectedBatch?.tracking?.warehouse || '',
-        warehouseAddress: selectedBatch?.tracking?.warehouseAddress || '',
-        destination: selectedBatch?.tracking?.destination || '',
-        price: selectedBatch?.tracking?.price || '',
-        images: selectedBatch?.tracking?.images || [],
-        processingStatus: selectedBatch?.tracking?.processingStatus || ''
+        quantityProcessed: selectedUser?.quantity || '',
+        processingMethod: selectedUser?.processingMethod || '',
+        packaging: selectedUser?.packaging || '',
+        packagedDate: selectedUser?.packagedDate || '',
+        warehouse: selectedUser?.warehouse || '',
+        warehouseAddress: selectedUser?.warehouseLocation || '',
+        destination: selectedUser?.destination || '',
+        price: selectedUser?.price || '',
+        images: selectedUser?.images || [""],
+        processingStatus: selectedUser?.processorStatus || ''
       }));
       setImagePreviews(
         processingImages.map(img =>
@@ -276,10 +337,21 @@ function UserDashBoard() {
     'Exporter': 'exporterId',
     'Processor': 'processorId',
   };
+
+
   const fetchbatchbyid = async () => {
+  setIsCircularLoader(true);
     const userrole = roleToFieldMap[user?.role?.label];
     try {
-      const response = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batches/filter?${userrole}=${user?._id}`
+      const response = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batches/filter?${userrole}=${user?._id}`,
+        {
+          params: {
+            id: userdata?._id || user?._id,
+            page: currnetBatchPage,
+            limit: usersPerPage,
+            search: searchBatchTerm,
+          },
+        }
         // const response = await api.get(
         // `/batch/getBatchByUserId`,
         // {
@@ -296,32 +368,77 @@ function UserDashBoard() {
       );
 
       if (response.data) {
-        const harvetserdata = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/harvester/6811eb9f6010c799871d808b`)
-        if (harvetserdata) {
-          console.log('harvesterdata', harvetserdata)
+        const batchList = response?.data?.data;
+        const userId = user?._id;
+        if (user?.role?.label === 'Farm Inspection') {
+          const harvesterData = await Promise.all(
+            batchList.map((ele) =>
+              axios
+                .get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/farmInspector/${ele?.batchId}_${userId}`)
+                .then(res => res.data)
+                .catch(err => null)
+            )
+          );
+          setInspectorData(harvesterData.filter(Boolean));
         }
-        const exporterdata = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/exporter/6811ebcd6010c799871d80b7`)
-        if (exporterdata) {
-          console.log('exporterdata', exporterdata)
-        }
-        const importerdata = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/importer/6811eb7e6010c799871d805f`)
-        if (importerdata) {
-          console.log('importerdata', importerdata)
-        }
-        const processordata = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/processor/6811ebf26010c799871d80e3`)
-        if (processordata) {
-          console.log('processordata', processordata)
-        }
-        // await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/farmInspector/6811eb5c6010c799871d8033`)
 
-        setBatchData(response?.data?.data);
+        if (user?.role?.label === 'Harvester') {
+          const harvesterData = await Promise.all(
+            batchList.map((ele) =>
+              axios
+                .get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/harvester/${ele?.batchId}_${userId}`)
+                .then(res => res.data)
+                .catch(err => null)
+            )
+          );
+          setHarvesterData(harvesterData.filter(Boolean));
+        }
+
+        if (user?.role?.label === 'Exporter') {
+          const exporterData = await Promise.all(
+            batchList.map((ele) =>
+              axios
+                .get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/exporter/${ele?.batchId}_${userId}`)
+                .then(res => res.data)
+                .catch(err => null)
+            )
+          );
+          setExporterData(exporterData.filter(Boolean));
+        }
+
+        if (user?.role?.label === 'Importer') {
+          const importerData = await Promise.all(
+            batchList.map((ele) =>
+              axios
+                .get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/importer/${ele?.batchId}_${userId}`)
+                .then(res => res.data)
+                .catch(err => null)
+            )
+          );
+          setImporterData(importerData.filter(Boolean));
+        }
+
+        if (user?.role?.label === 'Processor') {
+          const processorDataFetched = await Promise.all(
+            batchList.map((ele) =>
+              axios
+                .get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/processor/${ele?.batchId}_${userId}`)
+                .then(res => res.data)
+                .catch(err => null)
+            )
+          );
+          setProcessorData(processorDataFetched.filter(Boolean));
+        }
+         setIsCircularLoader(false)
+        setBatchData(batchList);
         setTotalBatchPage(response.data.totalPages);
       }
+
     } catch (error) {
+     setIsCircularLoader(false)
       console.error('Error fetching batch:', error);
     }
   }
-
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
@@ -547,124 +664,144 @@ function UserDashBoard() {
           Authorization: `Bearer ${user?.token}`,
         },
       });
+
       if (res) {
-        if (user?.role?.label === 'Farm Inspection') {
-          const farmdata = await axios.put(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateInspector/44_6811eb5c6010c799871d8033`, {
-            batchId: res?.data?.batch?.batchId,
-            farmInspectionId: res?.data?.batch?.batchId + '_' + res?.data?.batch?.farmInspectionId,
-            farmInspectionName: res?.data?.batch?.farmInspectionName,
-            certificateNo: res?.data?.batch?.certificateNo,
-            certificateFrom: res?.data?.batch?.certificateFrom,
-            productName: res?.data?.batch?.productName,
-            typeOfFertilizer: res?.data?.batch?.typeOfFertilizer,
-            fertilizerUsed: res?.data?.batch?.fertilizerUsed,
-            image: res?.data?.batch?.inspectedImages
-          })
-          console.log('farmdata', farmdata)
-        }
-        else if (user?.role?.label === 'Exporter') {
-          const farmdata = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addExporter', {
-            batchId: res?.data?.batch?.batchId,
-            exporterId: res?.data?.batch?.batchId + '_' + res?.data?.batch?.exporterId,
-            coordinationAddress: res?.data?.batch?.coordinationAddress,
-            shipName: res?.data?.batch?.shipName,
-            shipNo: res?.data?.batch?.shipNo,
-            departureDate: res?.data?.batch?.departureDate,
-            estimatedDate: res?.data?.batch?.estimatedDate,
-            exportedTo: res?.data?.batch?.exportedTo,
-            exporterStatus: res?.data?.batch?.exportStatus,
-            exporterCreated: res?.data?.batch?.isExported || 'true',
-            exporterUpdated: res?.data?.batch?.exporterUpdated || 'false',
-            exporterDeleted: res?.data?.batch?.exporterDeleted || 'false'
-          })
-          console.log('farmdata', farmdata)
-        }
-        else if (user?.role?.label === 'Harvester') {
-          const farmdata = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addHarvester', {
-            batchId: res?.data?.batch?.batchId,
-            harvestId: res?.data?.batch?.batchId + '_' + res?.data?.batch?.harvesterId,
-            importerName: res?.data?.batch?.harvesterName,
-            cropSampling: res?.data?.batch?.cropSampling,
-            temperatureLevel: res?.data?.batch?.temperatureLevel,
-            humidityLevel: res?.data?.batch?.humidity,
-            harvestStatus: res?.data?.batch?.harvestStatus,
-            harvestCreated: res?.data?.batch?.isHarvested || 'true',
-            harvestUpdated: res?.data?.batch?.harvestUpdated || 'false',
-            harvestDeleted: res?.data?.batch?.harvestUpdated || 'false',
-          })
-          console.log('farmdata', farmdata)
+        const batch = res?.data?.batch;
+        const batchId = batch?.batchId;
+        const userId = user?._id;
+        const combinedId = `${batchId}_${userId}`;
+        let farmdata;
 
-        }
-        else if (user?.role?.label === 'Importer') {
-          const farmdata = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addImporter', {
-            batchId: res?.data?.batch?.batchId,
-            importerId: res?.data?.batch?.batchId + '_' + res?.data?.batch?.importerId,
-            quantity: res?.data?.batch?.quantityImported,
-            shipStorage: res?.data?.batch?.shipStorage,
-            arrivalDate: res?.data?.batch?.arrivalDate,
-            warehouseLocation: res?.data?.batch?.warehouseLocation,
-            warehouseArrivalDate: res?.data?.batch?.warehouseArrivalDate,
-            importerAddress: res?.data?.batch?.importerAddress,
-            importerStatus: res?.data?.batch?.importStatus,
-            importerCreated: res?.data?.batch?.isImported || 'true',
-            importerUpdated: res?.data?.batch?.importerUpdated || 'false',
-            importerDeleted: res?.data?.batch?.importerDeleted || 'false'
-          });
-          console.log('farmdata', farmdata);
-        }
-        else if (user?.role?.label === 'Processor') {
-          const farmdata = await axios.put(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateProcessor/${res?.data?.batch?.batchId + '_' + res?.data?.batch?.processorId}`, {
-            batchId: res?.data?.batch?.batchId,
-            processorId: res?.data?.batch?.batchId + '_' + res?.data?.batch?.processorId,
-            quantity: res?.data?.batch?.quantityProcessed,
-            processingMethod: res?.data?.batch?.processingMethod,
-            packaging: res?.data?.batch?.packaging,
-            packagedDate: res?.data?.batch?.packagedDate,
-            warehouse: res?.data?.batch?.warehouse,
-            warehouseLocation: res?.data?.batch?.warehouseAddress,
-            destination: res?.data?.batch?.destination,
-            processorStatus: res?.data?.batch?.processingStatus,
-            processorCreated: res?.data?.batch?.isProcessed || 'true',
-            processorUpdated: res?.data?.batch?.processorUpdated || 'false',
-            processorDeleted: res?.data?.batch?.processorDeleted || 'false',
-            image: []
-          });
-          console.log('farmdata', farmdata);
-        }
+        try {
+          if (user?.role?.label === 'Farm Inspection') {
+            const url = true
+              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateInspector/${combinedId}`
+              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addInspector`;
+            const method = true ? axios.put : axios.post;
 
-        // else if (user?.role?.label === 'User') {
-        //   const userData = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addUser', {
-        //     userId: res?.data?.user?.userId,
-        //     userType: res?.data?.user?.userType,
-        //     userName: res?.data?.user?.userName,
-        //     userEmail: res?.data?.user?.userEmail,
-        //     userPhone: res?.data?.user?.userPhone,
-        //     userAddress: res?.data?.user?.userAddress,
-        //     userStatus: res?.data?.user?.userStatus,
-        //     userCreatedAt: res?.data?.user?.userCreatedAt,
-        //     userUpdatedAt: res?.data?.user?.userUpdatedAt,
-        //     userDeletedAt: res?.data?.user?.userDeletedAt,
-        //     userCreatedBy: res?.data?.user?.userCreatedBy,
-        //     userUpdatedBy: res?.data?.user?.userUpdatedBy,
-        //     userDeletedBy: res?.data?.user?.userDeletedBy
-        //   });
-        //   console.log('userData', userData);
-        // }
+            farmdata = await method(url, {
+              batchId,
+              farmInspectionId: combinedId,
+              farmInspectionName: batch?.farmInspectionName,
+              certificateNo: batch?.certificateNo,
+              certificateFrom: batch?.certificateFrom,
+              productName: batch?.productName,
+              typeOfFertilizer: batch?.typeOfFertilizer,
+              fertilizerUsed: batch?.fertilizerUsed,
+              image: batch?.inspectedImages
+            });
+          }
 
-        setIsCircularLoader(false);
-        toggleForm();
-        setToggle(!toggle);
-        setImagePreviews([]);
-        setInspectedImagePreviews([]);
-        // setFormData({ ...initialFormData });
-        showSuccess('Submitted successfully');
+          else if (user?.role?.label === 'Exporter') {
+            const url = toUpdate
+              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateExporter/${combinedId}`
+              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addExporter`;
+            const method = toUpdate ? axios.put : axios.post;
+
+            farmdata = await method(url, {
+              batchId,
+              exporterId: combinedId,
+              coordinationAddress: batch?.coordinationAddress,
+              shipName: batch?.shipName,
+              shipNo: batch?.shipNo,
+              departureDate: batch?.departureDate,
+              estimatedDate: batch?.estimatedDate,
+              exportedTo: batch?.exportedTo,
+              exporterStatus: batch?.exportStatus,
+              exporterCreated: batch?.isExported || 'true',
+              exporterUpdated: batch?.exporterUpdated || 'false',
+              exporterDeleted: batch?.exporterDeleted || 'false'
+            });
+          }
+
+          else if (user?.role?.label === 'Harvester') {
+            const url = toUpdate
+              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateHarvester/${combinedId}`
+              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addHarvester`;
+            const method = toUpdate ? axios.put : axios.post;
+
+            farmdata = await method(url, {
+              batchId,
+              harvestId: combinedId,
+              importerName: batch?.harvesterName,
+              cropSampling: batch?.cropSampling,
+              temperatureLevel: batch?.temperatureLevel,
+              humidityLevel: batch?.humidity,
+              harvestStatus: batch?.harvestStatus,
+              harvestCreated: batch?.isHarvested || 'true',
+              harvestUpdated: batch?.harvestUpdated || 'false',
+              harvestDeleted: batch?.harvestDeleted || 'false'
+            });
+          }
+
+          else if (user?.role?.label === 'Importer') {
+            const url = toUpdate
+              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateImporter/${combinedId}`
+              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addImporter`;
+            const method = toUpdate ? axios.put : axios.post;
+
+            farmdata = await method(url, {
+              batchId,
+              importerId: combinedId,
+              quantity: batch?.quantityImported,
+              shipStorage: batch?.shipStorage,
+              arrivalDate: batch?.arrivalDate,
+              warehouseLocation: batch?.warehouseLocation,
+              warehouseArrivalDate: batch?.warehouseArrivalDate,
+              importerAddress: batch?.importerAddress,
+              importerStatus: batch?.importStatus,
+              importerCreated: batch?.isImported || 'true',
+              importerUpdated: batch?.importerUpdated || 'false',
+              importerDeleted: batch?.importerDeleted || 'false'
+            });
+          }
+
+          else if (user?.role?.label === 'Processor') {
+            const url = toUpdate
+              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateProcessor/${combinedId}`
+              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addProcessor`;
+            const method = toUpdate ? axios.put : axios.post;
+
+            farmdata = await method(url, {
+              batchId,
+              processorId: combinedId,
+              quantity: batch?.quantityProcessed,
+              processingMethod: batch?.processingMethod,
+              packaging: batch?.packaging,
+              packagedDate: batch?.packagedDate,
+              warehouse: batch?.warehouse,
+              warehouseLocation: batch?.warehouseAddress,
+              destination: batch?.destination,
+              processorStatus: batch?.processingStatus,
+              processorCreated: batch?.isProcessed || 'true',
+              processorUpdated: batch?.processorUpdated || 'false',
+              processorDeleted: batch?.processorDeleted || 'false',
+              image: ['nil']
+            });
+          }
+
+          showSuccess('Submitted successfully');
+          setIsCircularLoader(false);
+          toggleForm();
+          setToggle(!toggle);
+          setImagePreviews([]);
+          setInspectedImagePreviews([]);
+
+        } catch (err) {
+          setIsCircularLoader(false);
+          console.error(err);
+          showError('Failed to update batch.');
+        }
       }
-    } catch (err) {
+
+    } catch (error) {
+      console.error("Outer try error:", error);
       setIsCircularLoader(false);
-      console.error(err);
-      showError('Failed to update batch.');
+      showError('Something went wrong while submitting the form.');
     }
-  };
+  }
+
+
 
   useEffect(() => {
     fetchbatchbyid();
@@ -720,7 +857,6 @@ function UserDashBoard() {
                 <h2>{user?.role?.label}</h2>
               </div>
               <form onSubmit={handlePopupSubmit}>
-                {/* Farm Inspector */}
                 {user?.role?.label === 'Farm Inspection' && (
                   <>
                     {renderInput('farmInspectionId', 'Farm Inspection Id', 'text', true)}
@@ -956,9 +1092,11 @@ function UserDashBoard() {
                             }}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Harvester' &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Harvester'
+                                //  &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             onMouseEnter={() => user?.role?.label === 'Harvester' && setHoveredBatchId(batch?.batchId)}
@@ -971,18 +1109,20 @@ function UserDashBoard() {
                             className={styles.pendingBtn}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Harvester' &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Harvester'
+                                //  &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             style={{
-                              cursor: userdata
-                                ? 'not-allowed'
-                                : user?.role?.label === 'Harvester' &&
-                                  batch?.tracking?.isInspexted
-                                  ? 'pointer'
-                                  : 'not-allowed',
+                              // cursor: userdata
+                              //   ? 'not-allowed'
+                              //   : user?.role?.label === 'Harvester' &&
+                              //     batch?.tracking?.isInspexted
+                              //     ? 'pointer'
+                              //     : 'not-allowed',
                             }}
                           >
                             Pending
@@ -1008,10 +1148,12 @@ function UserDashBoard() {
                             }}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Importer' &&
-                                batch?.tracking?.isHarvested &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Importer'
+                                //  &&
+                                // batch?.tracking?.isHarvested &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             onMouseEnter={() => user?.role?.label === 'Importer' && setHoveredBatchId(batch?.batchId)}
@@ -1024,20 +1166,22 @@ function UserDashBoard() {
                             className={styles.pendingBtn}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Importer' &&
-                                batch?.tracking?.isHarvested &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Importer'
+                                // &&
+                                // batch?.tracking?.isHarvested &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             style={{
-                              cursor: userdata
-                                ? 'not-allowed'
-                                : user?.role?.label === 'Importer' &&
-                                  batch?.tracking?.isHarvested &&
-                                  batch?.tracking?.isInspexted
-                                  ? 'pointer'
-                                  : 'not-allowed',
+                              // cursor: userdata
+                              //   ? 'not-allowed'
+                              //   : user?.role?.label === 'Importer' &&
+                              //     batch?.tracking?.isHarvested &&
+                              //     batch?.tracking?.isInspexted
+                              //     ? 'pointer'
+                              //     : 'not-allowed',
                             }}
                           >
                             Pending
@@ -1064,11 +1208,13 @@ function UserDashBoard() {
                             }}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Exporter' &&
-                                batch?.tracking?.isImported &&
-                                batch?.tracking?.isHarvested &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Exporter'
+                                //  &&
+                                // batch?.tracking?.isImported &&
+                                // batch?.tracking?.isHarvested &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             onMouseEnter={() => user?.role?.label === 'Exporter' && setHoveredBatchId(batch?.batchId)}
@@ -1081,22 +1227,24 @@ function UserDashBoard() {
                             className={styles.pendingBtn}
                             onClick={
                               !userdata &&
-                                user?.role?.label === 'Exporter' &&
-                                batch?.tracking?.isImported &&
-                                batch?.tracking?.isHarvested &&
-                                batch?.tracking?.isInspexted
-                                ? () => toggleForm(batch?.batchId)
+                                user?.role?.label === 'Exporter'
+                                //  &&
+                                // batch?.tracking?.isImported &&
+                                // batch?.tracking?.isHarvested &&
+                                // batch?.tracking?.isInspexted
+                                ?
+                                () => toggleForm(batch?.batchId)
                                 : undefined
                             }
                             style={{
-                              cursor: userdata
-                                ? 'not-allowed'
-                                : user?.role?.label === 'Exporter' &&
-                                  batch?.tracking?.isImported &&
-                                  batch?.tracking?.isHarvested &&
-                                  batch?.tracking?.isInspexted
-                                  ? 'pointer'
-                                  : 'not-allowed',
+                              // cursor: userdata
+                              //   ? 'not-allowed'
+                              //   : user?.role?.label === 'Exporter' &&
+                              //     batch?.tracking?.isImported &&
+                              //     batch?.tracking?.isHarvested &&
+                              //     batch?.tracking?.isInspexted
+                              //     ? 'pointer'
+                              //     : 'not-allowed',
                             }}
                           >
                             Pending
@@ -1179,7 +1327,7 @@ function UserDashBoard() {
                     </tr>
                   ))
                   :
-                  <td colSpan="7" className={styles.noData}>No Data Available</td>
+                  <td colSpan="7" className={styles.noData}>{ isCircularloader ? <CircularLoader size={20}/> :'No Data Available'}</td>
               }
             </tbody>
 
@@ -1199,7 +1347,7 @@ function UserDashBoard() {
       </div>
 
       <footer className={styles.footer}>
-        © 2025 Coffee SupplyChain by <a href="https://bastionex.net/" target="_blank" rel="noopener noreferrer">Bastionex Infotech Pvt Ltd</a>
+        © 2025 Food SupplyChain by <a href="https://bastionex.net/" target="_blank" rel="noopener noreferrer">Bastionex Infotech Pvt Ltd</a>
       </footer>
 
 

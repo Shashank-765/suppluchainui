@@ -185,7 +185,7 @@ function Navbar({ isAuthenticated }) {
                 <ul className="dropdown-menu">
                   {notifications.length > 0 ? (
                     <>
-                      {notifications.map((note, index) => (
+                      {notifications.slice(0, 5).map((note, index) => (
                         <li key={index} className="notificationli">
                           <div className="notification-header" onClick={() => handleNotification(note)}>
                             {note.batchId && note.message
@@ -197,7 +197,8 @@ function Navbar({ isAuthenticated }) {
                           </div>
                         </li>
                       ))}
-                      {notifications.length > 2 && (
+
+                      {notifications.length > 5 && (
                         <li className="notification-see-more">
                           <button className='seemorebutton' onClick={() => seemoreHandler()}>
                             See more

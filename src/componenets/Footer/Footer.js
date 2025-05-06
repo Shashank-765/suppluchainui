@@ -27,7 +27,7 @@ function Footer() {
                 </div>
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Exolore More</p>
-                    <p className='footerlink'>FAQ</p>
+                    <p className='footerlink'><Link to='/faqs'>Faq</Link></p>
                     <p className='footerlink'>Privacy Policy</p>
                     <p className='footerlink'>Term of service</p>
                     <p className='footerlink'>Carrer Apportunities</p>

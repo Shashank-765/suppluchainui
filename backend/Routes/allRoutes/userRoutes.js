@@ -194,6 +194,7 @@ router.post('/updateprofile', authorize, async (req, res) => {
     return res.status(200).json({
       message: 'Profile updated successfully',
       user: {
+        id: isExist?._id,
         email: isExist.email,
         name: isExist.name,
         contact: isExist.contact,
@@ -233,8 +234,8 @@ router.post('/login', async (req, res) => {
     }
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,           
-      sameSite: "None",      
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 

@@ -144,13 +144,34 @@ const Dashboard = () => {
             return;
         }
         try {
+            const response = await api.post(`/users/updateprofile`, edituserdata);
 
-            const response = await api.post(`/users/updateprofile`, edituserdata)
             if (response?.data) {
+                const updatedUser = response.data.user;
+
+                const updateRes = await axios.put(
+                    `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateUser/${updatedUser.id}`,
+                    {
+                        userId: updatedUser.id,
+                        userType: updatedUser.userType,
+                        userName: updatedUser.name,
+                        userEmail: updatedUser.email,
+                        userPhone: updatedUser.contact,
+                        userAddress: updatedUser.address,
+                        userStatus: updatedUser.isBlocked || "True",
+                        userCreatedAt: updatedUser.userCreatedAt || 'null',
+                        userUpdatedAt: updatedUser.userUpdatedAt || 'null',
+                        userDeletedAt: updatedUser.userDeletedAt || 'null',
+                        userCreatedBy: updatedUser.userCreatedBy || 'null',
+                        userUpdatedBy: updatedUser.userUpdatedBy || 'null',
+                        userDeletedBy: updatedUser.userDeletedBy || 'null'
+                    }
+                );
+
                 setIsEditing(false);
                 setIsCircularLoader(false);
                 setToggle(!toggle);
-                showSuccess('Profile updated succefully');
+                showSuccess("Profile updated successfully");
             }
         } catch (error) {
             setIsEditing(true);
@@ -300,7 +321,7 @@ const Dashboard = () => {
             if (res.data) {
 
                 const couchdb = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addbatch', {
-                    batchId:( res.data?.batch?.batchId).toString(),
+                    batchId: (res.data?.batch?.batchId).toString(),
                     farmerRegNo: res.data?.batch?.farmerRegNo,
                     farmerName: res.data?.batch?.farmerName,
                     farmerAddress: res.data?.batch?.farmerAddress,
@@ -370,8 +391,25 @@ const Dashboard = () => {
 
 
         try {
-            const response = await api.post(`/users/createuser`, userForm);
-            if (response.data) {
+            const res = await api.post(`/users/createuser`, userForm);
+            if (res.data) {
+
+                const userdata = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addUser', {
+                    userId: res?.data?.user?._id,
+                    userType: res?.data?.user?.userType,
+                    userName: res?.data?.user?.name,
+                    userEmail: res?.data?.user?.email,
+                    userPhone: res?.data?.user?.contact,
+                    userAddress: res?.data?.user?.walletAddress,
+                    userStatus: res?.data?.user?.isBlocked || "True",
+                    userCreatedAt: res?.data?.user?.userCreatedAt || 'null',
+                    userUpdatedAt: res?.data?.user?.userUpdatedAt || 'null',
+                    userDeletedAt: res?.data?.user?.userDeletedAt || 'null',
+                    userCreatedBy: res?.data?.user?.userCreatedBy || 'null',
+                    userUpdatedBy: res?.data?.user?.userUpdatedBy || 'null',
+                    userDeletedBy: res?.data?.user?.userDeletedBy || 'null'
+                })
+                console.log(userdata, 'user created successfully');
                 showSuccess("User Created succefully")
                 setIsCircularLoader(false);
                 setToggle(!toggle);
@@ -607,16 +645,26 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            const response = await api.get("/batch/getBatch", {
+            // const response = await api.get("/batch/getBatch", {
+            //     params: {
+            //         page: currnetBatchPage,
+            //         limit: usersPerPage,
+            //         search: searchBatchTerm,
+            //     }
+            // });
+
+            const response = await axios.get('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batchs',
+             {
                 params: {
                     page: currnetBatchPage,
                     limit: usersPerPage,
                     search: searchBatchTerm,
                 }
-            });
+            }
+            )
 
 
-            setAllBatch(response.data.batches);
+            setAllBatch(response.data.data);
             setTotalBatch(response.data.totalBatches);
             setTotalBatchPage(response.data.totalPages);
         } catch (error) {
@@ -1058,7 +1106,6 @@ const Dashboard = () => {
                                                         ) : (
                                                             <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
                                                         )}
-
                                                     <button onClick={() => userview(user)} className={styles.editButton}><img src={view} alt='images' /></button>
                                                 </td>
                                             </tr>

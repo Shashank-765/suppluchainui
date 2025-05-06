@@ -7,13 +7,19 @@ import styles from "./BatchProgressView.module.css";
 import leftarrow from '../../Imges/left-chevron.png'
 import rightarrow from '../../Imges/right-chevron.png'
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 const BatchProgressView = () => {
   const location = useLocation();
   const { batch } = location.state || {};
-
+  // console.log(batch, 'this is batch data')
   const [allBatch, setAllBatch] = useState([]);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedQr, setSelectedQr] = useState(null);
+  const [harvesterData, setHarvesterData] = useState(null);
+  const [exporterData, setExporterData] = useState(null);
+  const [importerData, setImporterData] = useState(null);
+  const [processorData, setProcessorData] = useState(null);
+  const [inspectorData, setInspectorData] = useState(null);
 
   const openQrModal = (qr) => {
     setSelectedQr(qr);
@@ -44,20 +50,43 @@ const BatchProgressView = () => {
   };
 
 
-  const fetchbatchbyid = async () => {
+  const fetchBatchById = async () => {
     try {
-      const response = await api.get(`/batch/getBatchById?id=${batch?.batchId}`);
+      const response = await api.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batch/${batch?.batchId}`);
+      const data = response?.data;
 
-      if (response.data) {
-        setAllBatch(response?.data?.batch);
+      if (data) {
+        setAllBatch(data);
+        const batchId = data.batchId;
+
+        const responses = await Promise.allSettled([
+          axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/harvester/${batchId}_${data.harvesterId}`),
+          axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/exporter/${batchId}_${data.exporterId}`),
+          axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/importer/${batchId}_${data.importerId}`),
+          axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/processor/${batchId}_${data.processorId}`),
+          axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/farmInspector/${batchId}_${data.farmInspectionId}`)
+        ]);
+
+        const [harvesterRes, exporterRes, importerRes, processorRes, inspectorRes] = responses;
+
+        if (harvesterRes.status === 'fulfilled') setHarvesterData(harvesterRes.value.data);
+
+        if (exporterRes.status === 'fulfilled') setExporterData(exporterRes.value.data);
+
+        if (importerRes.status === 'fulfilled') setImporterData(importerRes.value.data);
+
+        if (processorRes.status === 'fulfilled') setProcessorData(processorRes.value.data);
+
+        if (inspectorRes.status === 'fulfilled') setInspectorData(inspectorRes.value.data);
+
       }
     } catch (error) {
-      console.error('Error fetching batch:', error);
+      console.error('Error fetching batch or related data:', error);
     }
-  }
-  
+  };
+
   useEffect(() => {
-    fetchbatchbyid();
+    fetchBatchById();
   }, [])
   return (
     <div className={styles.wrapper}>
@@ -116,7 +145,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
-            {allBatch?.tracking?.isInspexted ?
+            {inspectorData?.certificateFrom ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -126,17 +155,17 @@ const BatchProgressView = () => {
             <div className={styles.boxinnerside}>
               <h3>Farm Inspector</h3>
               <p><span className={styles.batchesheading}>Farm Inspector Id:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId}</span></p>
-              <p><span className={styles.batchesheading}>Certificate No:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.certificateNo}</span></p>
-              <p><span className={styles.batchesheading}>Certificate From:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.certificateFrom}</span></p>
-              <p><span className={styles.batchesheading}>Type of Fertilizer:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.typeOfFertilizer}</span></p>
-              <p><span className={styles.batchesheading}>Fertilizer Used:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.fertilizerUsed}</span></p>
+              <p><span className={styles.batchesheading}>Certificate No:</span><span className={styles.batchesdatavalue}>{inspectorData?.certificateNo}</span></p>
+              <p><span className={styles.batchesheading}>Certificate From:</span><span className={styles.batchesdatavalue}>{inspectorData?.certificateFrom}</span></p>
+              <p><span className={styles.batchesheading}>Type of Fertilizer:</span><span className={styles.batchesdatavalue}> {inspectorData?.typeOfFertilizer}</span></p>
+              <p><span className={styles.batchesheading}>Fertilizer Used:</span><span className={styles.batchesdatavalue}> {inspectorData?.fertilizerUsed}</span></p>
             </div>
             <div className={styles.imgecontainer}>
               {allBatch?.tracking?.images?.length > 0 && (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
                     <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} alt='images' /></button>
-                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow}alt='images' /></button>
+                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow} alt='images' /></button>
                   </div>
                   <div className={styles.sliderContainer}>
                     {allBatch.tracking.images.map((img, idx) => {
@@ -164,7 +193,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
-            {allBatch?.tracking?.isHarvested ?
+            {harvesterData?.harvestStatus ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -173,9 +202,9 @@ const BatchProgressView = () => {
           <div className={styles.box}>
             <h3>Harvester</h3>
             <p><span className={styles.batchesheading}>Harvester Id:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId}</span></p>
-            <p><span className={styles.batchesheading}>Crop Sampling:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.cropSampling}</span></p>
-            <p><span className={styles.batchesheading}>Temperature Level:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.temperatureLevel}</span></p>
-            <p><span className={styles.batchesheading}>Humidity:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.humidity}</span></p>
+            <p><span className={styles.batchesheading}>Crop Sampling:</span><span className={styles.batchesdatavalue}>{harvesterData?.cropSampling}</span></p>
+            <p><span className={styles.batchesheading}>Temperature Level:</span><span className={styles.batchesdatavalue}>{harvesterData?.temperatureLevel}</span></p>
+            <p><span className={styles.batchesheading}>Humidity:</span><span className={styles.batchesdatavalue}>{harvesterData?.humidityLevel}</span></p>
           </div>
         </div>
 
@@ -183,7 +212,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
-            {allBatch?.tracking?.isImported ?
+            {importerData?.importerStatus ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -192,18 +221,18 @@ const BatchProgressView = () => {
           <div className={styles.box}>
             <h3>Importer</h3>
             <p><span className={styles.batchesheading}>Importer ID:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId}</span></p>
-            <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.quantityImported}</span></p>
-            <p><span className={styles.batchesheading}>Ship Storage:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.shipStorage}</span></p>
-            <p><span className={styles.batchesheading}>Arrival Date:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.arrivalDate}</span></p>
-            <p><span className={styles.batchesheading}>Warehouse Location:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.warehouseLocation}</span></p>
-            <p><span className={styles.batchesheading}>Warehouse Arrival Date:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.warehouseArrivalDate}</span></p>
-            <p><span className={styles.batchesheading}>Importer Address:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.importerAddress}</span></p>
+            <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {importerData?.quantity}</span></p>
+            <p><span className={styles.batchesheading}>Ship Storage:</span><span className={styles.batchesdatavalue}> {importerData?.shipStorage}</span></p>
+            <p><span className={styles.batchesheading}>Arrival Date:</span><span className={styles.batchesdatavalue}> {importerData?.arrivalDate}</span></p>
+            <p><span className={styles.batchesheading}>Warehouse Location:</span><span className={styles.batchesdatavalue}>{importerData?.warehouseLocation}</span></p>
+            <p><span className={styles.batchesheading}>Warehouse Arrival Date:</span><span className={styles.batchesdatavalue}> {importerData?.warehouseArrivalDate}</span></p>
+            <p><span className={styles.batchesheading}>Importer Address:</span><span className={styles.batchesdatavalue}>{importerData?.importerAddress}</span></p>
           </div>
         </div>
 
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
-            {allBatch?.tracking?.isExported ?
+            {exporterData?.exporterStatus ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -212,19 +241,19 @@ const BatchProgressView = () => {
           <div className={styles.box}>
             <h3>Exporter</h3>
             <p><span className={styles.batchesheading}>Exporter ID:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId}</span></p>
-            <p><span className={styles.batchesheading}>Coordination Address:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.coordinationAddress}</span></p>
-            <p><span className={styles.batchesheading}>Ship Name:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.shipName}</span></p>
-            <p><span className={styles.batchesheading}>Ship No:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.shipNo}</span></p>
-            <p><span className={styles.batchesheading}>Departure Date:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.departureDate}</span></p>
-            <p><span className={styles.batchesheading}>Estimated Date:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.estimatedDate}</span></p>
-            <p><span className={styles.batchesheading}>Exported To:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.exportedTo}</span></p>
+            <p><span className={styles.batchesheading}>Coordination Address:</span><span className={styles.batchesdatavalue}> {exporterData?.coordinationAddress}</span></p>
+            <p><span className={styles.batchesheading}>Ship Name:</span><span className={styles.batchesdatavalue}>{exporterData?.shipName}</span></p>
+            <p><span className={styles.batchesheading}>Ship No:</span><span className={styles.batchesdatavalue}> {exporterData?.shipNo}</span></p>
+            <p><span className={styles.batchesheading}>Departure Date:</span><span className={styles.batchesdatavalue}> {exporterData?.departureDate}</span></p>
+            <p><span className={styles.batchesheading}>Estimated Date:</span><span className={styles.batchesdatavalue}> {exporterData?.estimatedDate}</span></p>
+            <p><span className={styles.batchesheading}>Exported To:</span><span className={styles.batchesdatavalue}> {exporterData?.exportedTo}</span></p>
           </div>
         </div>
 
 
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
-            {allBatch?.tracking?.isProcessed ?
+            {processorData?.processorStatus ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -234,13 +263,13 @@ const BatchProgressView = () => {
             <div>
               <h3>Processor</h3>
               <p><span className={styles.batchesheading}>Processor ID:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId}</span></p>
-              <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.quantityProcessed}</span></p>
-              <p><span className={styles.batchesheading}>Processing Method:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.processingMethod}</span></p>
-              <p><span className={styles.batchesheading}>Packaging:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.packaging}</span></p>
-              <p><span className={styles.batchesheading}>Packaged Date:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.packagedDate}</span></p>
-              <p><span className={styles.batchesheading}>Warehouse:</span><span className={styles.batchesdatavalue}>{allBatch?.tracking?.warehouse}</span></p>
-              <p><span className={styles.batchesheading}>Warehouse Address:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.warehouseAddress}</span></p>
-              <p><span className={styles.batchesheading}>Destination:</span><span className={styles.batchesdatavalue}> {allBatch?.tracking?.destination}</span></p>
+              <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {processorData?.quantity}</span></p>
+              <p><span className={styles.batchesheading}>Processing Method:</span><span className={styles.batchesdatavalue}> {processorData?.processingMethod}</span></p>
+              <p><span className={styles.batchesheading}>Packaging:</span><span className={styles.batchesdatavalue}> {processorData?.packaging}</span></p>
+              <p><span className={styles.batchesheading}>Packaged Date:</span><span className={styles.batchesdatavalue}>{processorData?.packagedDate}</span></p>
+              <p><span className={styles.batchesheading}>Warehouse:</span><span className={styles.batchesdatavalue}>{processorData?.warehouse}</span></p>
+              <p><span className={styles.batchesheading}>Warehouse Address:</span><span className={styles.batchesdatavalue}> {processorData?.warehouseLocation}</span></p>
+              <p><span className={styles.batchesheading}>Destination:</span><span className={styles.batchesdatavalue}> {processorData?.destination}</span></p>
             </div>
             <div className={styles.imgecontainer}>
               {allBatch?.tracking?.inspectedImages?.length > 0 && (

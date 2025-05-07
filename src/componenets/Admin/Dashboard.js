@@ -615,12 +615,6 @@ const Dashboard = () => {
                     search: searchTerm,
                 },
             });
-            // const resp = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batchs`,{
-            //     headers:{
-            //         contentType:'application/json'
-            //     }
-            // });
-            // console.log(resp)
             setAllUser(response.data.allUsers);
             setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
             setTotalPages(response.data.totalPages);
@@ -653,14 +647,14 @@ const Dashboard = () => {
             //     }
             // });
 
-            const response = await axios.get('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batchs',
-             {
-                params: {
-                    page: currnetBatchPage,
-                    limit: usersPerPage,
-                    search: searchBatchTerm,
+            const response = await axios.get('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batches/filter',
+                {
+                    params: {
+                        page: currnetBatchPage,
+                        limit: usersPerPage,
+                        search: searchBatchTerm,
+                    }
                 }
-            }
             )
 
 
@@ -864,101 +858,106 @@ const Dashboard = () => {
                                         </td>
                                         <td>{batch.coffeeType}</td>
                                         <td>
-
-
-                                            {
-
-                                                (batch?.tracking?.isInspexted) ? <button
-                                                    className={styles.completeBtn}
-                                                >Complete</button> :
-                                                    (!batch?.tracking?.isInspexted) ?
-                                                        <button className={styles.progressBtn}>
-                                                            Progress</button>
-                                                        :
-                                                        <button className={styles.pendingBtn}>
-                                                            Pending
-                                                        </button>
-
-                                            }
-
-
+                                            {batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? (
+                                                <button className={styles.completeBtn}>Complete</button>
+                                            ) : batch?.farmInspectionId?.farmInspectionStatus !== 'Completed' ? (
+                                                <button
+                                                    className={styles.progressBtn}
+                                                >
+                                                    Progress
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.pendingBtn}
+                                                >
+                                                    Pending
+                                                </button>
+                                            )}
                                         </td>
                                         <td>
-
-                                            {
-
-                                                (batch?.tracking?.isHarvested) ? <button
-                                                    className={styles.completeBtn}
-                                                >Complete</button> :
-
-
-                                                    (batch?.tracking?.isInspexted) ?
-                                                        <button className={styles.progressBtn}>
-                                                            Progress</button>
-                                                        :
-                                                        <button className={styles.pendingBtn}>
-                                                            Pending
-                                                        </button>
+                                            {batch?.harvesterId?.harvestStatus === 'Completed' ? (
+                                                <button className={styles.completeBtn}>Complete</button>
+                                            ) : batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? (
+                                                <button
+                                                    className={styles.progressBtn}
 
 
-                                            }
+                                                >
+                                                    Progress
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.pendingBtn}
+
+
+                                                >
+                                                    Pending
+                                                </button>
+                                            )}
                                         </td>
                                         <td>
+                                            {batch?.importerId?.importerStatus === 'Received' ? (
+                                                <button className={styles.completeBtn}>Complete</button>
+                                            ) : batch?.harvesterId?.harvestStatus === 'Completed' ? (
+                                                <button
+                                                    className={styles.progressBtn}
 
-                                            {
+                                                >
+                                                    Progress
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.pendingBtn}
 
-                                                (batch?.tracking?.isImported) ? <button
-                                                    className={styles.completeBtn}
-                                                >Complete</button> :
-                                                    (batch?.tracking?.isHarvested) ?
-                                                        <button className={styles.progressBtn}>
-                                                            Progress</button>
-                                                        :
-                                                        <button className={styles.pendingBtn}>
-                                                            Pending
-                                                        </button>
 
-                                            }
+                                                >
+                                                    Pending
+                                                </button>
+                                            )}
                                         </td>
                                         <td>
+                                            {batch?.exporterId?.exporterStatus === "Shipped" ? (
+                                                <button className={styles.completeBtn}>Complete</button>
+                                            ) : batch?.importerId?.importerStatus === 'Received' ? (
+                                                <button
+                                                    className={styles.progressBtn}
 
-                                            {
 
-                                                (batch?.tracking?.isExported) ? <button
-                                                    className={styles.completeBtn}
-                                                >Complete</button> :
-                                                    (batch?.tracking?.isImported) ?
-                                                        <button className={styles.progressBtn}>
-                                                            Progress</button>
-                                                        :
-                                                        <button className={styles.pendingBtn}>
-                                                            Pending
-                                                        </button>
+                                                >
+                                                    Progress
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.pendingBtn}
 
-                                            }
+                                                >
+                                                    Pending
+                                                </button>
+                                            )}
                                         </td>
                                         <td>
-
-                                            {
-
-                                                (batch?.tracking?.isProcessed) ? <button
-                                                    className={styles.completeBtn}
-                                                >Complete</button> :
-                                                    (batch?.tracking?.isExported) ?
-                                                        <button className={styles.progressBtn}>
-                                                            Progress</button>
-                                                        :
-                                                        <button className={styles.pendingBtn}>
-                                                            Pending
-                                                        </button>
-                                            }
+                                            {batch?.processorId?.processorStatus === 'Processed' ? (
+                                                <button className={styles.completeBtn}>Complete</button>
+                                            ) : batch?.exporterId?.exporterStatus === 'Shipped' ? (
+                                                <button
+                                                    className={styles.progressBtn}
+                                                >
+                                                    Progress
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.pendingBtn}
+                                                >
+                                                    Pending
+                                                </button>
+                                            )}
                                         </td>
                                         <td>
                                             <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
                                                 <img src={view} alt='images' />
                                             </button>
                                             {
-                                                batch?.tracking?.isInspexted ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
+                                                batch?.farmInspectionId	?.farmInspectionStatus==='Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
                                                     <img src={deleteimage} alt='images' />
                                                 </button>
                                             }

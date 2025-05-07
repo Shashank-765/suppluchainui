@@ -80,8 +80,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Common fields
     batchId: { type: String, required: true },
     isAvailable: { type: Boolean, default: true },
-    createdAt: { type: Date, default: Date.now }
-});
+},{timestamps:true});
 
 const TrackingModel = mongoose.model('TrackingDetails', trackingDetailsSchema);
 

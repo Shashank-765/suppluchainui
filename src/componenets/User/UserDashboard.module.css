@@ -1,25 +1,9 @@
 .batchViewContainer {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f9fc;
+    background-color: #FEF7F0;
+    padding: 0px 10px;
     color: #333;
     padding-bottom: 40px;
-}
-
-.header {
-    background-color: #263238;
-    padding: 20px;
-    color: white;
-}
-
-.brand {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.subBrand {
-    font-size: 14px;
-    margin-top: -5px;
-    opacity: 0.7;
 }
 
 .pageTitle {
@@ -27,75 +11,61 @@
     font-weight: 500;
 }
 
-.profileCard {
-    background: white;
-    margin: 20px auto;
-    width: 100%;
-    /* max-width: 1000px; */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.profileBanner {
-    background: #caa3f3;
-    height: 150px;
-    background-image: url('https://via.placeholder.com/800x150?text=Banner');
-    background-size: cover;
-    background-position: center;
-}
-
-.profileContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+.batchoverviewimagecontainer {
     position: relative;
-}
-
-.profileImage {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 4px solid white;
-    margin-top: -100px;
-    background-color: #eee;
-}
-
-.contactInfo,
-.roleInfo {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.settings {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    margin-top: 30px;
-    text-align: right;
-}
-
-.editBtn {
-    background-color: white;
-    border: 1px solid #00bcd4;
-    color: #00bcd4;
-    border-radius: 20px;
-    padding: 5px 15px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.editBtn:hover {
-    background-color: #00bcd4;
-    color: white;
-}
-
-.batchesOverview {
     width: 100%;
-    background: white;
+    height: 10rem;
+    margin-top: 10px;
+    overflow: hidden;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.batchoverviewimagecontainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.batchoverviewimagecontainer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* black overlay */
+    z-index: 1;
+}
+
+.batchoverviewimagecontainer h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    z-index: 2;
+    font-size: 2rem;
+    text-align: center;
+    margin: 0;
+}
+
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 740px) {
+    .tableWrapper {
+        overflow-x: scroll;
+    }
+
+    .batchTable {
+        min-width: 800px;
+        /* or however wide your table needs to be */
+    }
 }
 
 .batchTable {
@@ -116,6 +86,7 @@
     font-weight: bold;
 }
 
+
 .noData {
     color: #777;
     font-style: italic;
@@ -134,117 +105,285 @@
     text-decoration: none;
 }
 
-.profileDetails {
-    justify-content: space-around;
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.label {
-    display: inline-block;
-    padding: 0.30rem 0.5rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #fff;
-}
-
-.info {
-    background-color: #17a2b8;
-}
-
-.success {
-    background-color: #28a745;
-}
-
-.warning {
-    background-color: #ffc107;
-    color: #333;
-}
-
-.danger {
-    background-color: #dc3545;
-}
-
-.primary {
-    background-color: #007bff;
-}
-
 .popupOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.backgroundImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Replace with actual image path */
+    background-size: cover;
+    background-position: center;
+    opacity: 0.08;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 12px;
+
 }
 
 .popupForm {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 500px;
-  max-height: 90vh;
-  z-index: 1000;
-  overflow-y: none;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    width: 500px;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    /* important to contain pseudo-element */
+    padding: 0;
+    /* move padding to inner wrapper */
 }
 
+/* Pseudo-element for background image */
+.popupForm::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+}
+
+/* Inner scrollable content */
+.popupFormContent {
+    position: relative;
+    z-index: 1;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
 .popupForm h2 {
-  margin-bottom: 20px;
-  font-size: 22px;
-  color: #333;
+    text-align: center;
 }
 
 .popupForm form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 10px 35px;
 }
 
 .popupForm label {
-  display: flex;
-  flex-direction: column;
-  font-weight: 600;
-  color: #444;
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    color: #444;
+    font-size: 18px;
+
 }
 
-.popupForm input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+.popupForm input,
+select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.custom_file_input {
+    width: 95%;
 }
 
 .formActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .formActions button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
+    width: 60px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 .formActions button[type="submit"] {
-  background-color: #4CAF50;
-  color: white;
+    background-color: #4CAF50;
+    color: white;
 }
 
 .formActions button[type="button"] {
-  background-color: #f44336;
-  color: white;
+    background-color: #f44336;
+    color: white;
 }
-.popupForm::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, and Opera */
+
+.popupFormContent::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, and Opera */
+}
+
+.error {
+    color: red;
+    font-size: 0.8rem;
+    margin-left: 8px;
+}
+
+
+.verifyBtn {
+    color: white;
+    border: none;
+    overflow: hidden;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5%;
+    background: none;
+    color: black;
+}
+
+.completeBtn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    /* cursor: pointer; */
+    font-size: 16px;
+}
+
+.pendingBtn {
+    background-color: #ff2b07;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    /* cursor: pointer; */
+    font-size: 16px;
+}
+
+.progressBtn {
+    background-color: #ffc107;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    /* cursor: pointer; */
+    font-size: 16px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px;
+    gap: 6px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.pagination button {
+    padding: 4px 8px;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.searchInput {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    /* margin-right: 10px; */
+    margin-left: calc(100% - 200px);
+    margin-top: 2%;
+    font-size: 14px;
+    max-width: 200px;
+    align-self: flex-end;
+}
+
+.editButton {
+    background: transparent;
+    border: none;
+    color: green;
+
+    >img {
+        width: 20px;
+        color: green;
+        cursor: pointer;
+    }
+}
+
+.errorInput {
+    border: 1px solid red;
+}
+
+.errorMessage {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.formheaders {
+    position: relative;
+    /* To allow positioning of the overlay */
+    /* width: 126%;
+  margin-left: -13%; */
+    /* margin-top: -10px; */
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1;
+    /* Content will be above the background overlay */
+}
+
+.formheaders::before {
+    content: '';
+    /* Empty content for the overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 5px;
+    background-image: url('../../Imges/backof.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    /* Make sure the overlay stays behind the content */
+}
+
+.formheaders::after {
+    content: '';
+    /* Black overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: 5px;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Black with 60% opacity */
+    z-index: 0;
+    /* Overlay stays behind the content but above the background image */
+}
+
+.formheaders>h2 {
+    color: white;
+    /* Ensure the text stays white */
+    z-index: 2;
+    /* Text is above the overlay */
 }

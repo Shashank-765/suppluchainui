@@ -1,6 +1,7 @@
 .productsection {
     height: 100%;
-    width: 100%;
+    width: 98.70%;
+    padding: 10px 10px;
 }
 
 .productmaincontainer {
@@ -11,7 +12,7 @@
     padding: 2rem;
     background: #FEF7F0;
     box-sizing: border-box;
-
+    padding-block: 5rem;
 }
 
 .productlistheading {

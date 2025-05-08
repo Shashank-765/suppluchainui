@@ -1,10 +1,15 @@
 import React from 'react';
 import './Contact.css';
+import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
 
 function Contact() {
   return (
     <div className="contact-wrapper">
-      <h1>Contact Us</h1>
+    <div className='contactcoverimagecontianer'>
+       <img  src={coverImage} alt='images'/>
+        <h1>Contact Us</h1>
+    </div>
+     
 
       {/* Full-width Map */}
       <div className="map-fullwidth">
@@ -20,9 +25,8 @@ function Contact() {
         ></iframe>
       </div>
 
-      {/* Contact Section */}
       <div className="contact-grid below-map">
-        {/* Left: Form */}
+    
         <div className="contact-card form-card">
           <h2>Send Us a Message</h2>
           <form className="contact-form">
@@ -33,7 +37,6 @@ function Contact() {
           </form>
         </div>
 
-        {/* Right: Links + Address */}
         <div className="contact-card right-info">
           <div className="social-links">
             <h2>Connect With Us</h2>

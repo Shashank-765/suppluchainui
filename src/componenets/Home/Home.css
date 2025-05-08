@@ -1,7 +1,6 @@
 .main-container {
     width: 100%;
     height: 100%;
-    /* border: 1px solid red; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,7 +10,6 @@
 }
 
 .upper-container {
-    /* border: 1px solid red; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,12 +18,7 @@
     height: auto;
 
     >h1 {
-        width: 60%;
-        /* border: 1px solid blue; */
-        /* color: #1A553F;
-        font-style: italic;
-        font-weight: 600;
-        font: IBM Plex Mono; */
+        width: 90%;
         font-family: IBM Plex Mono;
         color: #1A553F;
         font-weight: 600;
@@ -72,6 +65,12 @@
     color: white;
     border: 1px solid #E14038;
     cursor: pointer;
+    display: flex;
+    justify-content: ceneter;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    text-decoration: none;
 }
 
 .button-explore:hover {
@@ -85,7 +84,6 @@
 .image-container {
     width: 100%;
     height: 1300px;
-    /* border: 1px solid yellow; */
 
     >img {
         height: 100%;
@@ -105,13 +103,18 @@
 }
 
 .imagesectionblock {
-    position: absolute;
+    position: relative;
     width: 45%;
     height: 300px;
-    /* border: 1px solid black; */
-    margin-top: -30%;
+    margin-top: -32%;
     margin-left: 3%;
     color: white;
+
+    >ul {
+        >li {
+            font-size: 20px;
+        }
+    }
 
     >h1 {
         font-family: IBM Plex Mono;
@@ -244,9 +247,8 @@
 .boxes {
 
     background: #DB4940;
-    width: 20%;
-    /* border: 1px solid red; */
-    height: 250px;
+    width: 25%;
+    height: 300px;
     margin: 20px;
     border-radius: 10px;
     display: flex;
@@ -256,6 +258,7 @@
     color: white;
 
     >h1 {
+        margin-top: 0;
         margin-left: 20px;
         font-family: IBM Plex Mono;
         font-weight: 600;
@@ -275,10 +278,9 @@
 }
 
 .boxes1 {
-    background: #235F48;
-    width: 20%;
-    /* border: 1px solid red; */
-    height: 250px;
+    background: #378e3e;
+    width: 25%;
+    height: 300px;
     margin: 20px;
     border-radius: 10px;
     display: flex;
@@ -288,6 +290,7 @@
     color: white;
 
     >h1 {
+        margin-top: 0;
         font-family: IBM Plex Mono;
         font-weight: 600;
         font-size: 27px;
@@ -308,9 +311,8 @@
 
 .boxes2 {
     background: #DB4940;
-    width: 20%;
-    /* border: 1px solid red; */
-    height: 250px;
+    width: 25%;
+    height: 300px;
     margin: 20px;
     border-radius: 10px;
     display: flex;
@@ -320,6 +322,7 @@
     justify-content: space-around;
 
     >h1 {
+        margin-top: 0;
         margin-left: 20px;
         font-family: IBM Plex Mono;
         font-weight: 600;
@@ -339,9 +342,8 @@
 }
 
 .boxessecond {
-    width: 20%;
-    /* border: 1px solid red; */
     height: 380px;
+    width: 20%;
     margin: 20px;
     text-align: center;
     display: flex;
@@ -357,7 +359,6 @@
         font-size: 19px;
         line-height: 163%;
         letter-spacing: 0%;
-        /* border: 1px solid red; */
         text-align: center;
     }
 }
@@ -365,28 +366,62 @@
 .boxessecondimgcontainer {
     width: 100%;
     height: 70%;
-
-    /* border: 1px solid red; */
+    overflow: hidden;
+    border-radius: 6px;
     >img {
         width: 100%;
         height: 100%;
+        transition: all 0.7s ease-in-out;
+        &:hover {
+            scale: 1.1;
+
+        }
     }
 }
 
 .blankimagecontainer {
     width: 100%;
     height: 300px;
-
-    /* border: 1px solid cyan; */
     >img {
         width: 100%;
         height: 100%;
+    }
+
+    >h2 {
+        position: relative;
+        margin-top: -18rem;
+        text-align: center;
+        color: white;
+        font-family: IBM Plex Mono;
+        font-weight: 600;
+        font-style: italic;
+        font-size: 36px;
+        line-height: 120%;
+    }
+
+    >div {
+        position: relative;
+        color: white;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        .blankomagecontainercontent {
+            width: 30%;
+            height: 170px;
+        }
+
+        .paragragraohblank {
+            font-family: Lexend;
+            font-weight: 400;
+            font-size: 22px;
+            line-height: 120%;
+        }
     }
 }
 
 .image-container2 {
     width: 100%;
-    /* margin-top: 10px; */
     margin-left: 10px;
 
 }
@@ -402,9 +437,6 @@
     }
 }
 
-
-
-
 .section-5 {
     width: 65%;
     display: flex;
@@ -417,8 +449,6 @@
 .sector5-boxes {
     width: 45%;
     height: auto;
-
-    /* border: 1px solid cyan; */
     >h2 {
         font-family: IBM Plex Mono;
         font-weight: 600;
@@ -467,10 +497,7 @@
 .sector5-boxes2 {
     width: 45%;
     height: 500px;
-
-    /* border: 1px solid cyan; */
     >img {
-
         width: 100%;
         height: 100%;
     }
@@ -525,7 +552,7 @@
 .section-6imgcontainer {
     width: 33%;
     height: 500px;
-    /* border: 1px solid red; */
+    overflow: hidden;
     margin: 10px;
     border-radius: 10px;
 
@@ -533,6 +560,11 @@
         width: 100%;
         height: 100%;
         border-radius: 10px;
+        transition: all 0.5s ease-in-out;
+        &:hover {
+            scale: 1.1;
+
+        }
     }
 }
 
@@ -548,7 +580,7 @@
         width: 45%;
         height: 300px;
         /* border: 1px solid black; */
-        margin-top: -43%;
+        margin-top: -53%;
         margin-left: 3%;
         color: white;
 
@@ -577,7 +609,6 @@
         position: absolute;
         width: 45%;
         height: 300px;
-        /* border: 1px solid black; */
         margin-top: -55%;
         margin-left: 3%;
         color: white;
@@ -607,7 +638,6 @@
         position: absolute;
         width: 80%;
         height: 300px;
-        /* border: 1px solid black; */
         margin-top: -70%;
         margin-left: 3%;
         color: white;
@@ -637,7 +667,6 @@
         position: absolute;
         width: 45%;
         height: 300px;
-        /* border: 1px solid black; */
         margin-top: -80%;
         margin-left: 3%;
         color: white;
@@ -667,7 +696,6 @@
         position: absolute;
         width: 80%;
         height: 300px;
-        /* border: 1px solid black; */
         margin-top: -95%;
         margin-left: 3%;
         color: white;
@@ -697,7 +725,6 @@
         position: absolute;
         width: 90%;
         height: 300px;
-        /* border: 1px solid black; */
         margin-top: -112%;
         margin-left: 3%;
         color: white;
@@ -739,7 +766,6 @@
 
         background: #DB4940;
         width: 54%;
-        /* border: 1px solid red; */
         height: 250px;
         margin: 20px;
         border-radius: 10px;
@@ -780,7 +806,6 @@
     .section-6imgcontainer {
         width: 130%;
         height: 500px;
-        /* border: 1px solid red; */
         margin: 10px;
 
         >img {
@@ -792,7 +817,6 @@
     .boxes1 {
         background: #235F48;
         width: 54%;
-        /* border: 1px solid red; */
         height: 250px;
         margin: 20px;
         border-radius: 10px;
@@ -824,7 +848,6 @@
     .boxes2 {
         background: #DB4940;
         width: 54%;
-        /* border: 1px solid red; */
         height: 250px;
         margin: 20px;
         border-radius: 10px;
@@ -855,7 +878,6 @@
 
     .boxessecond {
         width: 80%;
-        /* border: 1px solid red; */
         height: 380px;
         margin: 20px;
         text-align: center;
@@ -872,7 +894,6 @@
             font-size: 19px;
             line-height: 163%;
             letter-spacing: 0%;
-            /* border: 1px solid red; */
             text-align: center;
         }
     }
@@ -891,7 +912,6 @@
         width: 100%;
         height: auto;
 
-        /* border: 1px solid cyan; */
         >h2 {
             font-family: IBM Plex Mono;
             font-weight: 600;
@@ -925,10 +945,7 @@
     .sector5-boxes2 {
         width: 100%;
         height: 500px;
-
-        /* border: 1px solid cyan; */
         >img {
-
             width: 100%;
             height: 100%;
         }

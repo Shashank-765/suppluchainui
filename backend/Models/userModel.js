@@ -9,10 +9,11 @@ const UserSchema = new mongoose.Schema({
     password: { type: String },
     contact: { type: String },
     isBlocked: { type: Boolean, default: false },
-    role: { type: Object }
+    role: { type: Object },
+    address :{type:String},
+    userType: { type: String, enum: ['admin', 'user','seller','buyer','retailer'], default: 'user' },
 });
 
-// Hash the password before saving the user
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
 

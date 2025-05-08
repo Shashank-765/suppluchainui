@@ -67,15 +67,12 @@ const handleSubmit = async (e) => {
   });
 
   try {
-     console.log(formDataToSend,'fomentdased')
-    const productdata = await axios.post('http://localhost:5000/api/users/addProduct', formDataToSend, {
+    const productdata = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/products/addProduct`, formDataToSend, {
       headers: {
         'Content-Type': 'multipart/form-data',  // Important: set this for file uploads
       },
     });
-    
-    console.log('Product data:', productdata.data);
-    
+     
     if (productdata && productdata.data) {
       alert('Product added successfully!');
     }

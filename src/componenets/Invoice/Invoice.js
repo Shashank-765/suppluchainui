@@ -1,10 +1,44 @@
 import React from 'react'
 import './Invoice.css'
+import { useEffect, useState } from 'react'
+import CircularLoader from '../CircularLoader/CircularLoader'
 import qrcode from '../../Imges/qrcode.jpg'
+import { useNavigate } from 'react-router-dom'
+import { usePDF } from 'react-to-pdf';
 function Invoice() {
+
+  const [invoiceData, setInvoiceData] = useState(null);
+  const [isCircularloader, setIsCircularLoader] = useState(false);
+
+  const { toPDF, targetRef } = usePDF({ filename: 'invoice.pdf' });
+  const navigate = useNavigate();
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('invoiceData');
+    if (storedData) {
+      setInvoiceData(JSON.parse(storedData));
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  if (!invoiceData) {
+    return <div>Loading...</div>;
+  }
+
+  const handlePrint = () => {
+    setIsCircularLoader(true);
+    toPDF().then(() => {
+      setIsCircularLoader(false);
+      navigate('/product')
+    })
+    setIsCircularLoader(false);
+  };
+
+  const { quantity, price, realprice, productname, unit } = invoiceData;
+
   return (
     <div>
-      <div className="invoice-container">
+      <div className="invoice-container" ref={targetRef}>
         <header className="invoice-header">
           <div className="brand">
             <h1>INVOICE</h1>
@@ -66,23 +100,16 @@ function Invoice() {
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Organic Tomatoes</td>
-                <td>500 kg</td>
-                <td>₹20/kg</td>
-                <td>₹10,000</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Baby Potatoes</td>
-                <td>300 kg</td>
-                <td>₹18/kg</td>
-                <td>₹5,400</td>
+                <td>{productname}</td>
+                <td>{quantity} {unit}</td>
+                <td>₹{realprice}/{unit}</td>
+                <td>₹{price}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colSpan="4">Total</td>
-                <td>₹17,060</td>
+                <td>₹{price}</td>
               </tr>
             </tfoot>
           </table>
@@ -91,23 +118,23 @@ function Invoice() {
             <div className="calculations">
               <div className="calc-row">
                 <span>Subtotal</span>
-                <span>₹15,400</span>
+                <span>₹{price}</span>
               </div>
               <div className="calc-row">
                 <span>Logistics Charges</span>
-                <span>₹800</span>
+                <span>₹00</span>
               </div>
               <div className="calc-row">
-                <span>GST (5%)</span>
-                <span>₹810</span>
+                <span>GST (0%)</span>
+                <span>₹00</span>
               </div>
               <div className="calc-row">
                 <span>Blockchain Validation Fee</span>
-                <span>₹50</span>
+                <span>₹0</span>
               </div>
               <div className="calc-row total">
                 <span>Grand Total</span>
-                <span>₹17,060</span>
+                <span>₹{price}</span>
               </div>
             </div>
 
@@ -147,7 +174,7 @@ function Invoice() {
       </div>
 
       <div className='printbutton-container'>
-      <button className='print-button'>Print</button>
+        <button className='print-button' onClick={handlePrint}>{isCircularloader ? <CircularLoader size={20} /> : 'Print'}</button>
       </div>
     </div>
   )

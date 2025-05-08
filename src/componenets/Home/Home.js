@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import api from '../../axios'
 import "./Home.css"
 import section2 from '../../Imges/BG.png'
-import Image10 from '../../Imges/Image 10.png'
-import icon1 from '../../Imges/Icon.png'
-import icon2 from '../../Imges/Icon2.png'
+import Image10 from '../../Imges/Multicropping.webp'
 import image1 from '../../Imges/Image6.png'
 import image2 from '../../Imges/Image7.png'
 import image3 from '../../Imges/Image8.png'
@@ -15,98 +14,160 @@ import image11 from '../../Imges/Image 4.png'
 import image12 from '../../Imges/Image 3.png'
 import image13 from '../../Imges/Image 2.png'
 import image14 from '../../Imges/Image 1.png'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+
 function Home() {
+  const Navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem('user')) || null;
+  const [inspectedImages, setInspectedImages] = useState([]);
+  const [images, setImages] = useState([]);
+
+  const userhandler = () => {
+    Navigate('/auth')
+  }
+ const hangelesinghup =()=>{
+   if(user){
+     Navigate('/product')
+   }
+   else{
+   Navigate('/auth')
+   }
+ }
+  const getimages = async () => {
+    try {
+      const response = await api.get(`/users/getimages`)
+      if (response?.data) {
+        setInspectedImages(response?.data?.randomInspectedImages)
+        setImages(response?.data?.randomImages)
+      }
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
+  useEffect(() => {
+    getimages()
+
+  }, [])
+
   return (
     <>
       <div className='main-container'>
         <div className='upper-container'>
-          <h1>Revolutionizing Supply Chain Management for...</h1>
-          <p>Welcome to our innovative platform designed to streamline the supply chain for agricultural crops</p>
-          <div className='greenleasvehorizontl'><img src={image14} /></div>
-          <button className='button-explore'>Explore Now</button>
-          <div className='greenleasveverticle'><img src={image13} /></div>
-          <div className='reddotimage'><img src={image12} /></div>
+          <h1>🌾 Welcome to AgriChain – Blockchain-Powered Crop Supply Chain</h1>
+          <h3>Built on Hyperledger Fabric for Secure, Transparent, and Trusted Agriculture</h3>
+          <p>AgriChain is an enterprise-grade crop supply chain management platform that leverages the power of Hyperledger Fabric to ensure transparency, traceability, and trust across all agricultural processes — from sowing to sale.</p>
+          <div className='greenleasvehorizontl'><img src={image14} alt='images' /></div>
+          <button className='button-explore'onClick={hangelesinghup}>Get Started</button>
+          <div className='greenleasveverticle'><img src={image13} alt='images' /></div>
+          <div className='reddotimage'><img src={image12} alt='images' /></div>
         </div>
 
         <div className='image-container'>
-          <img src={section2} alt='photo' />
+          <img src={section2} alt='images' />
           <div className='imagesection-image'>
-            <img src={image11} />
+            <img src={image11} alt='images' />
           </div>
           <div className='imagesectionblock'>
-            <p>Empowering Farmers, Enhancing Efficiency</p>
-            <h1>Transforming Agricult...</h1>
-            <p>At the heart of our platform lies a decentralized infrastructure built on Hyperledger Fabric. This cutting-edge technology enables seamless collaboration, transparency, and traceability across the entire supply chain</p>
-            <div className='getstartedbuttoncontainer'>
-              <Link className='getstartedbutton' to="/product">Get Started</Link>
-            </div>
+            <h1>🔐 Why Hyperledger Fabric?</h1>
+            {/* <p>At the heart of our platform lies a decentralized infrastructure built on Hyperledger Fabric. This cutting-edge technology enables seamless collaboration, transparency, and traceability across the entire supply chain</p> */}
+            <ul>
+              <li>Permissioned Blockchain Network</li>
+              <p>Only authorized participants can join and interact, ensuring security and trust among all stakeholders.</p>
+              <li>Private Channels for Confidential Deals</li>
+              <p>Enable confidential transactions between specific parties (e.g., farmers and buyers) without exposing data network-wide.</p>
+              <li>Smart Contracts (Chaincode) for Automation</li>
+              <p>Automate processes like crop registration, quality verification, logistics tracking, and payments with customizable chaincode.</p>
+              <li>Immutable Ledger for End-to-End Traceability</li>
+              <p>Every action is recorded on a tamper-proof ledger, enabling full traceability of crops at every stage.</p>
+            </ul>
+            {/* <div className='getstartedbuttoncontainer'>
+              <Link classNa
+              me='getstartedbutton' to="/product">Get Started</Link>
+            </div> */}
 
           </div>
         </div>
 
         <div className='section-2'>
           <p>Streamlining the Supply Chain</p>
-          <h1>Elevating Productivity and Profitability</h1>
+          <h1>🚜 Platform Highlights</h1>
         </div>
 
         <div className='boxes_container'>
           <div className='boxes'>
-            <div className='image-container2'>
-              <div className='image-container2img'>
-                <img src={icon1} />
-              </div>
-            </div>
-            <h1>Optimize Inventory Management</h1>
-            <p>Enhance Traceability</p>
+            <h1>Farmer Onboarding & Crop Lifecycle Management</h1>
+            <p>Register crops, track growth stages, and manage resources all from a single interface.</p>
           </div>
           <div className='boxes1'>
-            <div className='image-container2'>
-              <div className='image-container2img'>
-                <img src={icon2} />
-              </div>
-            </div>
-            <h1>Reduce Operational Costs</h1>
-            <p>Enhance Traceability</p>
+            <h1>Transparent Procurement & Distribution</h1>
+            <p>From warehouses to retailers, every handoff is digitally recorded and traceable.</p>
           </div>
           <div className='boxes2'>
-            <div className='image-container2'>
-              <div className='image-container2img'>
-                <img src={icon1} />
-              </div>
-            </div>
-            <h1>Optimize Inventory Management</h1>
-            <p>Enhance Traceability</p>
+            <h1>Quality Assurance via Integrated Labs</h1>
+            <p>Third-party lab reports and certifications are securely logged on the blockchain.</p>
+          </div>
+          <div className='boxes1'>
+            <h1>Buyer & Seller Trust</h1>
+            <p>Smart contracts enforce transparent deals and help eliminate disputes.</p>
           </div>
         </div>
 
         <div className='section-3'>
-          <h1>Cultivating a Thriving Agricultural Ecosystem</h1>
+          <h1>Rooted in Trust, Grown with Blockchain</h1>
           <p>
-            Our platform harnesses the power of blockchain technology to create a decentralized, transparent, and secure supply chain management system for agricultural crops</p>
+            We’re cultivating a smarter agricultural ecosystem by combining blockchain technology with real-world farming — delivering a secure, transparent, and decentralized supply chain for crops.</p>
         </div>
         <div className='boxes_container'>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
-              <img src={image1} />
+            {
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} alt='images' />
+              : <img src={image1} alt='images' />
+            }
+              
             </div>
             <p> Achieve Increased Crop Yields</p>
           </div>
           <div className='boxessecond'>
-            <div className='boxessecondimgcontainer'>
-              <img src={image2} />
+            <div className='boxessecondimgcontainer'>{
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} alt='images' />
+              : <img src={image2} alt='images' />
+            } 
             </div>
             <p> Ensure Quality and Freshness</p>
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
-              <img src={image3} />
+              {
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} alt='images' />
+              : <img src={image3} alt='images' />
+            }
             </div>
+            
             <p>Minimize Waste and Spoilage</p>
           </div>
+         
         </div>
         <div className='blankimagecontainer'>
-          <img src={image4} />
+          <img src={image4} alt='images' />
+          <h2>🚜 Why Choose Our Platform?</h2>
+          <div >
+
+            <div className='blankomagecontainercontent' >
+              <p className='paragragraohblank'>🔗 End-to-End Traceability</p>
+              <p>Track every stage of your agricultural products' journey — from cultivation to distribution — with complete accuracy.</p>
+            </div>
+            <div className='blankomagecontainercontent' >
+              <p className='paragragraohblank'>🧑‍🌾 Empowering Farmers</p>
+              <p>Provide farmers with secure access to digital tools, fair markets, and transparent transaction records.</p>
+            </div>
+            <div className='blankomagecontainercontent' >
+              <p className='paragragraohblank'>👁 Supply Chain Visibility</p>
+              <p>Monitor and verify all crop movements and quality checks across the network in real-time.</p>
+            </div>
+
+          </div>
         </div>
 
         <div className='section45container'>
@@ -121,10 +182,14 @@ function Home() {
               <p>Our decentralized platform built on Hyperledger Fabric offers end-to-end traceability, enabling you to track the journey of your agricultural products from farm to table</p>
               <br></br>
               <p>Leveraging the power of blockchain technology, our platform provides a secure and immutable record of all transactions, eliminating the risk of fraud and enhancing trust throughout the supply chain</p>
-              <button className='joinnowbutton'>Join Now</button>
+
+              {
+                user ? '' : <button onClick={userhandler} className='joinnowbutton'>Join Now</button>
+              }
+
             </div>
             <div className='sector5-boxes2'>
-              <img src={Image10} alt='photo'></img>
+              <img src={Image10} alt='images'></img>
             </div>
           </div>
         </div>
@@ -137,13 +202,24 @@ function Home() {
           </div>
           <div className='section-6-lowercontainer'>
             <div className='section-6imgcontainer'>
-              <img src={image5} />
+
+            {
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} alt='images' />
+                : <img  src={image5} alt='images'/>
+            }
+              
             </div>
             <div className='section-6imgcontainer'>
-              <img src={image6} />
+              {
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} alt='images' />
+                : <img  src={image6} alt='images'/>
+            }
             </div>
             <div className='section-6imgcontainer'>
-              <img src={image7} />
+             {
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} alt='images' />
+                : <img  src={image7} alt='images'/>
+            }
             </div>
           </div>
         </div>

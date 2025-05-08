@@ -24,6 +24,7 @@
     height: 55px;
     min-width: 150px;
     max-width: 150px;
+    cursor: pointer;
 
     >img {
         width: 100%;
@@ -59,6 +60,16 @@
     line-height: 100%;
     letter-spacing: 0%;
     cursor: pointer;
+    >a{
+    font-family: Lexend;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    cursor: pointer;
+    text-decoration: none;
+    color:#837f7e;
+    }
 }
 
 @media screen and (max-width:770px) {

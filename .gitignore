@@ -13,10 +13,10 @@
 /backend/.gitignore
 # testing
 /coverage
-
+/.env
 # production
 /build
-
+.vscode
 # misc
 .DS_Store
 .env.local

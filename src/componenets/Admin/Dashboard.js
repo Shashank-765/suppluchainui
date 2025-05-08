@@ -150,7 +150,7 @@ const Dashboard = () => {
                 const updatedUser = response.data.user;
 
                 const updateRes = await axios.put(
-                    `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateUser/${updatedUser.id}`,
+                    `${process.env.REACT_APP_BACKEND2_URL}/updateUser/${updatedUser.id}`,
                     {
                         userId: updatedUser.id,
                         userType: updatedUser.userType,
@@ -320,7 +320,7 @@ const Dashboard = () => {
             const res = await api.post(`/batch/createBatch`, formData);
             if (res.data) {
 
-                const couchdb = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addbatch', {
+                const couchdb = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addbatch`, {
                     batchId: (res.data?.batch?.batchId).toString(),
                     farmerRegNo: res.data?.batch?.farmerRegNo,
                     farmerName: res.data?.batch?.farmerName,
@@ -394,7 +394,7 @@ const Dashboard = () => {
             const res = await api.post(`/users/createuser`, userForm);
             if (res.data) {
 
-                const userdata = await axios.post('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addUser', {
+                const userdata = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addUser`, {
                     userId: res?.data?.user?._id,
                     userType: res?.data?.user?.userType,
                     userName: res?.data?.user?.name,
@@ -647,7 +647,7 @@ const Dashboard = () => {
             //     }
             // });
 
-            const response = await axios.get('https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batches/filter',
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter`,
                 {
                     params: {
                         page: currnetBatchPage,

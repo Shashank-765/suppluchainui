@@ -109,7 +109,7 @@ function App() {
 
           {isAuthenticated && userType === 'user' && (
             <>
-              <Route path="/userdashboard" element={<UserDashBoard />} />
+              <Route path={`/${userData?.role?.label}/userdashboard`} element={<UserDashBoard />} />
               <Route path="/product" element={<Product />} />
               <Route path="/form" element={<Form />} />
               <Route path="/invoice" element={<Invoice />} />
@@ -123,7 +123,6 @@ function App() {
               />
             </>
           )}
-
           {isAuthenticated &&
             userType !== 'user' &&
             userType !== 'admin' && (

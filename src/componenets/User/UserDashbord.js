@@ -320,7 +320,7 @@ function UserDashBoard() {
     setIsCircularLoader(true);
     const userrole = roleToFieldMap[user?.role?.label];
     try {
-      const response = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batches/filter?${userrole}=${user?._id}`,
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter?${userrole}=${user?._id}`,
         {
           params: {
             id: userdata?._id || user?._id,
@@ -591,8 +591,8 @@ function UserDashBoard() {
           const now = new Date().toISOString();
           if (user?.role?.label === 'Farm Inspection') {
             const url = toUpdate
-              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateInspector/${combinedId}`
-              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addInspector`;
+              ? `${process.env.REACT_APP_BACKEND2_URL}/updateInspector/${combinedId}`
+              : `${process.env.REACT_APP_BACKEND2_URL}/addInspector`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -614,8 +614,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Exporter') {
             const url = toUpdate
-              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateExporter/${combinedId}`
-              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addExporter`;
+              ? `${process.env.REACT_APP_BACKEND2_URL}/updateExporter/${combinedId}`
+              : `${process.env.REACT_APP_BACKEND2_URL}/addExporter`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -637,8 +637,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Harvester') {
             const url = toUpdate
-              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateHarvester/${combinedId}`
-              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addHarvester`;
+              ? `${process.env.REACT_APP_BACKEND2_URL}/updateHarvester/${combinedId}`
+              : `${process.env.REACT_APP_BACKEND2_URL}/addHarvester`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -657,8 +657,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Importer') {
             const url = toUpdate
-              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateImporter/${combinedId}`
-              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addImporter`;
+              ? `${process.env.REACT_APP_BACKEND2_URL}/updateImporter/${combinedId}`
+              : `${process.env.REACT_APP_BACKEND2_URL}/addImporter`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -680,8 +680,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Processor') {
             const url = toUpdate
-              ? `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/updateProcessor/${combinedId}`
-              : `https://1fvzwv7q-3000.inc1.devtunnels.ms/api/addProcessor`;
+              ? `${process.env.REACT_APP_BACKEND2_URL}/updateProcessor/${combinedId}`
+              : `${process.env.REACT_APP_BACKEND2_URL}/addProcessor`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {

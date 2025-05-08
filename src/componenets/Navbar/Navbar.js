@@ -139,12 +139,10 @@ function Navbar({ isAuthenticated }) {
                 :
                 data?.userType === 'user' ?
                   <li onClick={() => setNavState('navbarrightside')}>
-                    <Link to='/userdashboard'>Dashboard</Link>
+                    <Link to={`/${data?.role?.label}/userdashboard`}>Dashboard</Link>
                   </li> : ''}
             </>
           )}
-
-
           <li>
             <Link
               to='/product'

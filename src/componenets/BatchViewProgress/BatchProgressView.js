@@ -49,7 +49,7 @@ const BatchProgressView = () => {
 
   const fetchBatchById = async () => {
     try {
-      const response = await axios.get(`https://1fvzwv7q-3000.inc1.devtunnels.ms/api/batch/${batch?.batchId}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batch?.batchId}`);
       const data = response?.data;
 
       if (data) {

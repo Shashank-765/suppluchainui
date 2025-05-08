@@ -1,39 +1,45 @@
 .container {
-  max-width: 700px;
-  margin: 0 auto;
-  /* height: 100vh; */
-  padding: 2rem;
-  background-color: #fdfdfd;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2.5rem 2rem;
+  background-color: #d1e3d7;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
 }
 
 .heading {
   text-align: center;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-  color: #333;
+  margin-bottom: 2.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f2937;
+  letter-spacing: 0.5px;
 }
 
 .notificationList {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .notificationItem {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  background: #f1f5f9;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #51947a;
   border-radius: 10px;
-  cursor: pointer;
-  padding: 1rem;
+  padding: 1.2rem 1.5rem;
   margin-bottom: 1rem;
-  transition: background 0.3s;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
 }
 
 .notificationItem:hover {
-  background: #e2e8f0;
+  background: #f0f9ff;
+  transform: scale(1.01);
 }
 
 .notificationContent {
@@ -42,34 +48,41 @@
 }
 
 .message {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #222;
+  font-size: 1.05rem;
+  color: #111827;
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+}
+
+.message strong {
+  color: #51947a;
 }
 
 .date {
   font-size: 0.85rem;
-  color: #666;
+  color: #6b7280;
+  font-style: italic;
 }
 
 .deleteButton {
-  /* background: #ef4444; */
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s;
+  font-size: 0.85rem;
+  transition: background 0.3s ease;
 }
 
 .deleteButton:hover {
-  /* background: #dc2626;
-  color: white; */
+  background: #dc2626;
 }
 
 .noNotifications {
   text-align: center;
-  color: #999;
+  color: #9ca3af;
   font-style: italic;
+  font-size: 1rem;
+  padding: 2rem;
 }

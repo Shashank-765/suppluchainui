@@ -11,7 +11,6 @@ import axios from "axios";
 const BatchProgressView = () => {
   const location = useLocation();
   const { batch } = location.state || {};
-  // console.log(batch, 'this is batch data')
   const [allBatch, setAllBatch] = useState([]);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedQr, setSelectedQr] = useState(null);
@@ -25,11 +24,9 @@ const BatchProgressView = () => {
     setSelectedQr(null);
   };
 
- console.log('allBatch', allBatch)
-
   const [imageIndex, setImageIndex] = useState(0);
   const [inspectedIndex, setInspectedIndex] = useState(0);
-  const images = allBatch?.tracking?.images || [];
+  const images = allBatch?.processorId?.image || [];
   const nextImage = () => {
     setImageIndex((prev) => (prev + 1) % images.length);
   };
@@ -38,7 +35,7 @@ const BatchProgressView = () => {
   };
 
 
-  const inspectedImages = allBatch?.tracking?.inspectedImages || [];
+  const inspectedImages = allBatch?.farmInspectionId?.image || [];
   const nextInspected = () => {
     setInspectedIndex((prev) => (prev + 1) % inspectedImages.length);
   };
@@ -129,25 +126,25 @@ const BatchProgressView = () => {
           <div className={styles.box1}>
             <div className={styles.boxinnerside}>
               <h3>Farm Inspector</h3>
-              <p><span className={styles.batchesheading}>Farm Inspector Id:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.farmInspectionId}</span></p>
+              <p><span className={styles.batchesheading}>Farm Inspector Id:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.farmInspectionId || allBatch?.farmInspectionId?.id}</span></p>
               <p><span className={styles.batchesheading}>Certificate No:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.certificateNo}</span></p>
               <p><span className={styles.batchesheading}>Certificate From:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.certificateFrom}</span></p>
               <p><span className={styles.batchesheading}>Type of Fertilizer:</span><span className={styles.batchesdatavalue}> {allBatch?.farmInspectionId?.typeOfFertilizer}</span></p>
               <p><span className={styles.batchesheading}>Fertilizer Used:</span><span className={styles.batchesdatavalue}> {allBatch?.farmInspectionId?.fertilizerUsed}</span></p>
             </div>
             <div className={styles.imgecontainer}>
-              {allBatch?.tracking?.images?.length > 0 && (
+              {allBatch?.farmInspectionId?.image?.length > 0 && allBatch?.farmInspectionId?.image[0] !=='nil' ? (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
-                    <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} alt='images' /></button>
-                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={prevInspected}><img src={leftarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={nextInspected}><img src={rightarrow} alt='images' /></button>
                   </div>
                   <div className={styles.sliderContainer}>
-                    {allBatch.tracking.images.map((img, idx) => {
+                    {allBatch.farmInspectionId.image.map((img, idx) => {
                       let positionClass = styles.hidden;
-                      if (idx === imageIndex) positionClass = styles.current;
-                      else if (idx === imageIndex + 1) positionClass = styles.next;
-                      else if (idx === imageIndex - 1) positionClass = styles.prev;
+                      if (idx === inspectedIndex) positionClass = styles.current;
+                      else if (idx === inspectedIndex + 1) positionClass = styles.next;
+                      else if (idx === inspectedIndex - 1) positionClass = styles.prev;
 
                       return (
                         <img
@@ -160,7 +157,7 @@ const BatchProgressView = () => {
                     })}
                   </div>
                 </div>
-              )}
+              ):''}
             </div>
 
           </div>
@@ -176,7 +173,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Harvester</h3>
-            <p><span className={styles.batchesheading}>Harvester Id:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.harvestId}</span></p>
+            <p><span className={styles.batchesheading}>Harvester Id:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.harvestId || allBatch?.harvesterId?.id}</span></p>
             <p><span className={styles.batchesheading}>Crop Sampling:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.cropSampling}</span></p>
             <p><span className={styles.batchesheading}>Temperature Level:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.temperatureLevel}</span></p>
             <p><span className={styles.batchesheading}>Humidity:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.humidityLevel}</span></p>
@@ -195,7 +192,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Importer</h3>
-            <p><span className={styles.batchesheading}>Importer ID:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.importerId}</span></p>
+            <p><span className={styles.batchesheading}>Importer ID:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.importerId || allBatch?.importerId?.id}</span></p>
             <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.quantity}</span></p>
             <p><span className={styles.batchesheading}>Ship Storage:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.shipStorage}</span></p>
             <p><span className={styles.batchesheading}>Arrival Date:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.arrivalDate}</span></p>
@@ -215,7 +212,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Exporter</h3>
-            <p><span className={styles.batchesheading}>Exporter ID:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.exporterId}</span></p>
+            <p><span className={styles.batchesheading}>Exporter ID:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.exporterId || allBatch?.exporterId?.id}</span></p>
             <p><span className={styles.batchesheading}>Coordination Address:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterId?.coordinationAddress}</span></p>
             <p><span className={styles.batchesheading}>Ship Name:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.shipName}</span></p>
             <p><span className={styles.batchesheading}>Ship No:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterId?.shipNo}</span></p>
@@ -237,7 +234,7 @@ const BatchProgressView = () => {
           <div className={styles.box1}>
             <div>
               <h3>Processor</h3>
-              <p><span className={styles.batchesheading}>Processor ID:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processorId}</span></p>
+              <p><span className={styles.batchesheading}>Processor ID:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processorId || allBatch?.processorId?.id}</span></p>
               <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.quantity}</span></p>
               <p><span className={styles.batchesheading}>Processing Method:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processingMethod}</span></p>
               <p><span className={styles.batchesheading}>Packaging:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.packaging}</span></p>
@@ -247,18 +244,18 @@ const BatchProgressView = () => {
               <p><span className={styles.batchesheading}>Destination:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.destination}</span></p>
             </div>
             <div className={styles.imgecontainer}>
-              {allBatch?.tracking?.inspectedImages?.length > 0 && (
+              {allBatch?.processorId?.image?.length > 0  && allBatch?.processorId?.image[0]!=='nil' ? (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
-                    <button className={styles.navButton} onClick={prevInspected}><img src={leftarrow} alt='images' /></button>
-                    <button className={styles.navButton} onClick={nextInspected}><img src={rightarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} alt='images' /></button>
+                    <button className={styles.navButton} onClick={nextImage}><img src={rightarrow} alt='images' /></button>
                   </div>
                   <div className={styles.sliderContainer}>
-                    {allBatch.tracking.inspectedImages.map((img, idx) => {
+                    {allBatch?.processorId?.image.map((img, idx) => {
                       let positionClass = styles.hidden;
-                      if (idx === inspectedIndex) positionClass = styles.current;
-                      else if (idx === inspectedIndex + 1) positionClass = styles.next;
-                      else if (idx === inspectedIndex - 1) positionClass = styles.prev;
+                      if (idx === imageIndex) positionClass = styles.current;
+                      else if (idx === imageIndex + 1) positionClass = styles.next;
+                      else if (idx === imageIndex - 1) positionClass = styles.prev;
 
                       return (
                         <img
@@ -271,7 +268,7 @@ const BatchProgressView = () => {
                     })}
                   </div>
                 </div>
-              )}
+              ):''}
             </div>
 
           </div>

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../axios'
 import styles from './NotificationPage.module.css';
+import CircularLoader from '../CircularLoader/CircularLoader'
 import { useNavigate } from 'react-router-dom';
 
 const NotificationPage = () => {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
-    const [notifyToggle, setNotifyToggle] = useState(false)
+    const [notifyToggle, setNotifyToggle] = useState(false);
+    const [isCircularloader, setIsCircularLoader] = useState(false);
+
     const user = JSON.parse(localStorage.getItem('user'));
 
     function formatNotificationDate(createdAt) {
@@ -46,6 +49,7 @@ const NotificationPage = () => {
 
     const fetchNotifications = async () => {
         try {
+            setIsCircularLoader(true);
             const res = await api.get(
                 `/notify/getallnotifications`,
                 {
@@ -55,7 +59,10 @@ const NotificationPage = () => {
                 }
             );
             setNotifications(res.data);
+            setIsCircularLoader(false);
+
         } catch (err) {
+            setIsCircularLoader(false);
             console.error('Failed to fetch notifications:', err);
         }
     };
@@ -102,22 +109,24 @@ const NotificationPage = () => {
             <h2 className={styles.heading}>All Notifications</h2>
             <ul className={styles.notificationList}>
                 {notifications.length === 0 ? (
-                    <p className={styles.noNotifications}>No notifications found.</p>
+                    <p className={styles.noNotifications}> { isCircularloader ? <CircularLoader size={20}/> :'No notifications found.'}</p>
                 ) : (
                     notifications.map((note, index) => (
                         <li key={index} onClick={() => notificationHandler(note)} className={styles.notificationItem}>
                             <div className={styles.notificationContent}>
                                 <div className={styles.message}>
-                                    <strong>Batch ID:</strong> {note.batchId} <br />
+                                    <strong>A new batch has been successfully created for  {note?.coffeeType}.This batch has been assigned the unique identification number  {note.batchId}</strong>  <br />
+                                    You can now proceed to track, manage, or update its status as required.
+                                    <br />
                                     {note.message || 'New Notification'}
                                 </div>
                                 <div className={styles.date}>
                                     {formatNotificationDate(note.createdAt)}
                                 </div>
                             </div>
-                            <button className={styles.deleteButton} onClick={() => handleDelete(note._id)}>
+                            {/* <button className={styles.deleteButton} onClick={() => handleDelete(note._id)}>
                                 ❌
-                            </button>
+                            </button> */}
                         </li>
                     ))
                 )}

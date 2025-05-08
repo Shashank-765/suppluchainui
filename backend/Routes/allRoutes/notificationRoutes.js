@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../Models/userModel.js');
+const BatchModel = require('../../Models/BatchModel.js')
 const NotifyModel = require('../../Models/NotifictionModel.js')
 const { authorize } = require('../../Auth/Authenticate.js');
 
@@ -32,14 +33,26 @@ router.get('/notifications', authorize, async (req, res) => {
 router.get('/getallnotifications', authorize, async (req, res) => {
     try {
         const notifications = await NotifyModel.find({}).sort({ createdAt: -1 });
-        res.json(notifications);
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: error })
-    }
 
-})
-router.post('/deletenotification',authorize, async (req, res) => {
+        const enrichedNotifications = await Promise.all(
+            notifications.map(async (ele) => {
+                const batch = await BatchModel.findOne({ batchId: ele.batchId });
+
+                return {
+                    ...ele.toObject(),
+                    coffeeType: batch?.coffeeType || null, // attach coffeeType if found
+                };
+            })
+        );
+
+        res.json(enrichedNotifications);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+router.post('/deletenotification', authorize, async (req, res) => {
     try {
         const notificationId = req.query.id;
 

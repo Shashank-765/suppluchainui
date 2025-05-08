@@ -295,6 +295,7 @@
 
 .dropdown-menu li {
   padding: 8px 20px;
+  margin: 5px 9px;
 }
 
 .dropdown-menu li:hover {
@@ -305,6 +306,9 @@
   text-decoration: none;
   color: #333;
 }
+.dropdown-menu .notificationlino:hover{
+  background-color:#d1e3d7
+  }
 
 .dropdown {
   position: relative;
@@ -313,11 +317,9 @@
 
 .dropdown-toggle {
   cursor: pointer;
-
   >img {
     width: 20px;
   }
-
   >span {
     font-size: 18px;
     position: absolute;
@@ -334,8 +336,8 @@
   background-color: #FEF7F0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   padding: 10px 0;
-  min-width: 240px;
-  max-height: 250px;
+  min-width: 300px;
+  max-height: 300px;
   margin-top: 1rem;
   overflow-x: scroll;
   z-index: 1000;
@@ -359,25 +361,56 @@
 
 .dropdown-menu {
   z-index: 9999;
+  background-color: #d1e3d7;
 }
 
 .notificationli {
-  font-size: 13px;
-  font-weight: 100;
+  position: relative;
+  font-size: 14px;
+  font-weight: 400;
   text-align: start;
-  border-bottom: 1px solid green;
-  margin: -3px 5px;
+  border-bottom: 1px solid #d4d4d4;
+  background-color: #f9f9f9;
+  margin: 5px 0;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
 
-  .notification-date {
-    font-size: 10px;
-    font-weight: 50;
-    text-align: end;
-  }
+.notificationli:hover {
+  background-color: #e6f4ea;
+}
+
+.notificationli::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 16px;
+  width: 6px;
+  height: 6px;
+  background-color: green;
+  border-radius: 50%;
+}
+
+.notification-header {
+  font-weight: 500;
+  margin-bottom: 4px;
+  margin-left: 20px;
+  color: #333;
+}
+
+.notification-date {
+  font-size: 11px;
+  font-weight: 400;
+  text-align: right;
+  color: #888;
 }
 
 .notificationlino {
   font-size: 13px;
   font-weight: 100;
   text-align: center;
-  margin: -3px 5px;
+  margin: 6px 0;
+  color: #999;
+  cursor:auto;
 }

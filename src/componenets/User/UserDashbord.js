@@ -33,6 +33,7 @@ function UserDashBoard() {
   const inspectorFileInputRef = useRef(null);
   const [toUpdate, setToUpdate] = useState(null);
   const popupRef = useRef();
+  const [loadingBatchId, setLoadingBatchId] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -174,51 +175,48 @@ function UserDashBoard() {
 
     const selectedBatch = batchData.find(batch => String(batch.batchId) === String(id));
     if (selectedBatch) {
-      const inspectedImages = selectedBatch?.tracking?.inspectedImages || [];
-      const processingImages = selectedBatch?.tracking?.images || [];
-
-        if(user?.role?.label === 'Farm Inspection'){
-           if(selectedBatch?.farmInspectionId?.certificateNo){
-             setToUpdate(true)         
-           }else{
-            setToUpdate(false) 
-           }      
+      if (user?.role?.label === 'Farm Inspection') {
+        if (selectedBatch?.farmInspectionId?.certificateNo) {
+          setToUpdate(true)
+        } else {
+          setToUpdate(false)
         }
-        if(user?.role?.label === 'Harvester'){
-           if(selectedBatch?.harvesterId?.cropSampling){
-           console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.cropSampling)
-             setToUpdate(true)         
-           }else{
-            setToUpdate(false) 
-           }      
+      }
+      if (user?.role?.label === 'Harvester') {
+        if (selectedBatch?.harvesterId?.cropSampling) {
+          console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.cropSampling)
+          setToUpdate(true)
+        } else {
+          setToUpdate(false)
         }
-        if(user?.role?.label === 'Importer'){
-           if(selectedBatch?.importerId?.quantity){
-             setToUpdate(true)         
-           }else{
-            setToUpdate(false) 
-           }      
+      }
+      if (user?.role?.label === 'Importer') {
+        if (selectedBatch?.importerId?.quantity) {
+          setToUpdate(true)
+        } else {
+          setToUpdate(false)
         }
-        if(user?.role?.label === 'Exporter'){
-           if(selectedBatch?.exporterId?.coordinationAddress){
-             setToUpdate(true)         
-           }else{
-            setToUpdate(false) 
-           }      
+      }
+      if (user?.role?.label === 'Exporter') {
+        if (selectedBatch?.exporterId?.coordinationAddress) {
+          setToUpdate(true)
+        } else {
+          setToUpdate(false)
         }
-        if(user?.role?.label === 'Processor'){
-           if(selectedBatch?.processorId?.processingMethod){
-             setToUpdate(true)         
-           }else{
-            setToUpdate(false) 
-           }      
+      }
+      if (user?.role?.label === 'Processor') {
+        if (selectedBatch?.processorId?.processingMethod) {
+          setToUpdate(true)
+        } else {
+          setToUpdate(false)
         }
-           console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.coordinationAddress)
+      }
+      console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.coordinationAddress)
 
       setFormData(prevData => ({
         ...prevData,
-        batchId: selectedBatch?.batchId ,
-        farmInspectionId: selectedBatch?.farmInspectionId?.farmInspectionId || selectedBatch?.farmInspectionId?.id ,
+        batchId: selectedBatch?.batchId,
+        farmInspectionId: selectedBatch?.farmInspectionId?.farmInspectionId || selectedBatch?.farmInspectionId?.id,
         farmInspectionName: selectedBatch?.farmInspectionId?.farmInspectionName || 'Janiifer ojedja',
         productName: selectedBatch?.farmInspectionId?.productName || '',
         certificateNo: selectedBatch?.farmInspectionId?.certificateNo || '',
@@ -265,20 +263,20 @@ function UserDashBoard() {
         warehouseAddress: selectedBatch?.processorId?.warehouseLocation || '',
         destination: selectedBatch?.processorId?.destination || '',
         price: selectedBatch?.processorId?.price || '',
-        images: selectedBatch?.processorId?.images || [""],
+        images: selectedBatch?.processorId?.image || [""],
         processingStatus: selectedBatch?.processorId?.processorStatus || ''
       }));
       setImagePreviews(
-        processingImages.map(img =>
+        selectedBatch?.processorId?.image.map(img =>
           typeof img === 'string'
             ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
         )
       );
       setInspectedImagePreviews(
-        inspectedImages.map(img =>
+        selectedBatch?.farmInspectionId?.image.map(img =>
           typeof img === 'string'
-            ? `${process.env.REACT_APP_BACKEND_IMAGE_URv}${img.startsWith('/') ? '' : '/'}${img}`
+            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
         )
       );
@@ -287,7 +285,6 @@ function UserDashBoard() {
       console.error('Batch not found');
     }
   };
-
   const toggleFormClose = () => {
     setShowForm(false);
   }
@@ -537,7 +534,6 @@ function UserDashBoard() {
       setErrors(prev => ({ ...prev, [name]: error }));
     }
   };
-
   const handlePopupSubmit = async (e) => {
     e.preventDefault();
 
@@ -558,6 +554,7 @@ function UserDashBoard() {
   };
   const handleSubmit = async () => {
     setIsCircularLoader(true);
+    setLoadingBatchId(formData?.batchId);
     try {
       const payload = new FormData();
       const existingImages = formData.images.filter(img => typeof img === 'string');
@@ -705,6 +702,7 @@ function UserDashBoard() {
           }
 
           showSuccess('Submitted successfully');
+          setLoadingBatchId(null);
           setIsCircularLoader(false);
           toggleForm();
           setToggle(!toggle);
@@ -713,6 +711,7 @@ function UserDashBoard() {
 
         } catch (err) {
           setIsCircularLoader(false);
+          setLoadingBatchId(null);
           console.error(err);
           showError('Failed to update batch.');
         }
@@ -977,7 +976,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Farm Inspection' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                            Progress
+                            {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button
@@ -1026,7 +1025,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Harvester' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                            Progress
+                            {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button
@@ -1083,7 +1082,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Importer' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                            Progress
+                            {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button
@@ -1144,7 +1143,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Exporter' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                            Progress
+                            {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button
@@ -1208,7 +1207,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Processor' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                            Progress
+                          {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button

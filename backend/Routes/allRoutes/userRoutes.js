@@ -256,7 +256,8 @@ router.get('/fetchalluser', authorize, async (req, res) => {
       userType: 'user', // Only users with userType === "user"
       $or: [
         { name: { $regex: search, $options: 'i' } },
-        { walletAddress: { $regex: search, $options: 'i' } },
+        // { walletAddress: { $regex: search, $options: 'i' } },
+        { contact: { $regex: search, $options: 'i' } },
         { role: { $regex: search, $options: 'i' } },
       ],
     };

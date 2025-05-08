@@ -8,7 +8,7 @@ const BatchNotificationModel = new mongoose.Schema({
   exporter: { type: String, required: true },
   processor: { type: String, required: true },
   createdBy: { type: String, required: true }, 
-  message:{type:String,default:'Created'},
+  message:{type:String,default:'has been created'},
   readStatus: {
     type: Map,
     of: Boolean, 

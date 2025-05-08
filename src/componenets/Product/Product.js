@@ -1,29 +1,35 @@
-import React, { useEffect } from 'react'
+import React, { useEffect ,useState} from 'react'
 import './Product.css'
 import api from '../../axios'
 import image1 from '../../Imges/Image6.png'
 import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp'
+import CircularLoader from '../CircularLoader/CircularLoader'
 import { useNavigate } from 'react-router-dom';
 
 
 function Product() {
     const navigate = useNavigate();
+    const [isCircularloader, setIsCircularLoader] = useState(false);
     const handleClick = (ele) => {
         navigate('/viewpage', { state: { product: ele } });
     }
     const [data, setData] = React.useState([]);
     const fetchallproducts = async () => {
         try {
+            setIsCircularLoader(true);
             const response = await api.get(`/products/getproducttomarkiting`);
 
             if (response.data) {
                 setData(response.data.trackingDetails);
+                setIsCircularLoader(false);
             }
             else {
                 console.error('Error fetching products:', response.data.message);
+                setIsCircularLoader(false);
             }
         }
         catch (error) {
+            setIsCircularLoader(false);
             console.error('Error fetching products:', error);
         }
     }
@@ -36,13 +42,13 @@ function Product() {
         <>
             <div className='productsection'>
                 <div className='contactcoverimagecontianer'>
-                    <img src={coverImage} alt='images'/>
+                    <img src={coverImage} alt='images' />
                     <h1>Products</h1>
                 </div>
                 <div className='productmaincontainer'>
                     {
 
-                        data.length > 0 ? data?.map((ele, i) => {
+                        data.length > 0 ? isCircularloader ? <CircularLoader size={20}/> : data?.map((ele, i) => {
                             return (
                                 <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                     <div className='productimagecontianer'>
@@ -66,7 +72,7 @@ function Product() {
                         })
                             :
                             <div className='no-product-container'>
-                                <p>No Product Available </p>
+                                <p>{ isCircularloader ? <CircularLoader size={20}/> :'No Product Available'} </p>
                             </div>
                     }
 

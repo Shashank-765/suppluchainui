@@ -183,11 +183,11 @@ function Navbar({ isAuthenticated }) {
                 <ul className="dropdown-menu">
                   {notifications.length > 0 ? (
                     <>
-                      {notifications.slice(0, 5).map((note, index) => (
+                      {notifications.slice(0, 4).map((note, index) => (
                         <li key={index} className="notificationli">
                           <div className="notification-header" onClick={() => handleNotification(note)}>
                             {note.batchId && note.message
-                              ? `Batch Id ${note.batchId} ${note.message}`
+                              ? `Batch with Id ${note.batchId} ${note.message}`
                               : 'New Notification'}
                           </div>
                           <div className="notification-date">

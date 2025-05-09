@@ -184,7 +184,6 @@ function UserDashBoard() {
       }
       if (user?.role?.label === 'Harvester') {
         if (selectedBatch?.harvesterId?.cropSampling) {
-          console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.cropSampling)
           setToUpdate(true)
         } else {
           setToUpdate(false)
@@ -211,59 +210,68 @@ function UserDashBoard() {
           setToUpdate(false)
         }
       }
-      console.log('selectedBatch?.harvesterId?.coordinationAddress', selectedBatch?.harvesterId?.coordinationAddress)
 
       setFormData(prevData => ({
         ...prevData,
         batchId: selectedBatch?.batchId,
         farmInspectionId: selectedBatch?.farmInspectionId?.farmInspectionId || selectedBatch?.farmInspectionId?.id,
-        farmInspectionName: selectedBatch?.farmInspectionId?.farmInspectionName || 'Janiifer ojedja',
+        farmInspectionName: selectedBatch?.farmInspectionName || 'Janiifer ojedja',
         productName: selectedBatch?.farmInspectionId?.productName || '',
         certificateNo: selectedBatch?.farmInspectionId?.certificateNo || '',
         certificateFrom: selectedBatch?.farmInspectionId?.certificateFrom || '',
         typeOfFertilizer: selectedBatch?.farmInspectionId?.typeOfFertilizer || '',
         fertilizerUsed: selectedBatch?.farmInspectionId?.fertilizerUsed || '',
-        inspectedImages: selectedBatch?.farmInspectionId?.image || [""],
+        inspectedImages: selectedBatch?.farmInspectionId?.image || [],
         inspectionStatus: selectedBatch?.farmInspectionId?.farmInspectionStatus || '',
 
         harvesterId: selectedBatch?.harvesterId?.harvestId || selectedBatch?.harvesterId?.id,
-        harvesterName: selectedBatch?.harvesterId?.harvesterName || 'Janiifer ojedja',
+        harvesterName: selectedBatch?.harvesterName || 'Janiifer ojedja',
         cropSampling: selectedBatch?.harvesterId?.cropSampling || '',
         temperatureLevel: selectedBatch?.harvesterId?.temperatureLevel || '',
         humidity: selectedBatch?.harvesterId?.humidityLevel || '',
         harvestStatus: selectedBatch?.harvesterId?.harvestStatus || '',
 
         exporterId: selectedBatch?.exporterId?.exporterId || selectedBatch?.exporterId?.id,
-        exporterName: selectedBatch?.exporterId?.exporterName || 'Janiifer ojedja',
+        exporterName: selectedBatch?.exporterName || 'Janiifer ojedja',
         coordinationAddress: selectedBatch?.exporterId?.coordinationAddress || '',
         shipName: selectedBatch?.exporterId?.shipName || '',
         shipNo: selectedBatch?.exporterId?.shipNo || '',
-        departureDate: selectedBatch?.exporterId?.departureDate || '',
-        estimatedDate: selectedBatch?.exporterId?.estimatedDate || '',
+        departureDate: selectedBatch?.exporterId?.departureDate
+          ? new Date(selectedBatch.exporterId.departureDate).toISOString().split('T')[0]
+          : '',
+        estimatedDate: selectedBatch?.exporterId?.estimatedDate
+          ? new Date(selectedBatch.exporterId.estimatedDate).toISOString().split('T')[0]
+          : '',
         exportedTo: selectedBatch?.exporterId?.exportedTo || '',
         exportStatus: selectedBatch?.exporterId?.exporterStatus || '',
 
         importerId: selectedBatch?.importerId?.importerId || selectedBatch?.importerId?.id,
-        importerName: selectedBatch?.importerId?.importerName || 'Janiifer ojedja',
+        importerName: selectedBatch?.importerName || 'Janiifer ojedja',
         quantityImported: selectedBatch?.importerId?.quantity || '',
         shipStorage: selectedBatch?.importerId?.shipStorage || '',
-        arrivalDate: selectedBatch?.importerId?.arrivalDate || '',
+        arrivalDate: selectedBatch?.importerId?.arrivalDate
+          ? new Date(selectedBatch.importerId.arrivalDate).toISOString().split('T')[0]
+          : '',
         warehouseLocation: selectedBatch?.importerId?.warehouseLocation || '',
-        warehouseArrivalDate: selectedBatch?.importerId?.warehouseArrivalDate || '',
+        warehouseArrivalDate: selectedBatch?.importerId?.warehouseArrivalDate
+          ? new Date(selectedBatch.importerId.warehouseArrivalDate).toISOString().split('T')[0]
+          : '',
         importerAddress: selectedBatch?.importerId?.importerAddress || '',
         importStatus: selectedBatch?.importerId?.importerStatus || '',
 
         processorId: selectedBatch?.processorId?.processorId || selectedBatch?.processorId?.id,
-        processorName: selectedBatch?.processorId?.processorName || 'Janiifer ojedja',
+        processorName: selectedBatch?.processorName || 'random name',
         quantityProcessed: selectedBatch?.processorId?.quantity || '',
         processingMethod: selectedBatch?.processorId?.processingMethod || '',
         packaging: selectedBatch?.processorId?.packaging || '',
-        packagedDate: selectedBatch?.processorId?.packagedDate || '',
+        packagedDate: selectedBatch?.processorId?.packagedDate
+          ? new Date(selectedBatch.processorId.packagedDate).toISOString().split('T')[0]
+          : '',
         warehouse: selectedBatch?.processorId?.warehouse || '',
         warehouseAddress: selectedBatch?.processorId?.warehouseLocation || '',
         destination: selectedBatch?.processorId?.destination || '',
         price: selectedBatch?.processorId?.price || '',
-        images: selectedBatch?.processorId?.image || [""],
+        images: selectedBatch?.processorId?.image || [],
         processingStatus: selectedBatch?.processorId?.processorStatus || ''
       }));
       setImagePreviews(
@@ -274,7 +282,7 @@ function UserDashBoard() {
         )
       );
       setInspectedImagePreviews(
-        selectedBatch?.farmInspectionId?.image.map(img =>
+        selectedBatch?.farmInspectionId?.image?.map(img =>
           typeof img === 'string'
             ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
@@ -360,6 +368,9 @@ function UserDashBoard() {
     let error = '';
 
     if (name === 'images' || name === 'inspectedImages') {
+      if (!Array.isArray(value) || value.length === 0 || (value.length === 1 && value[0] === '')) {
+        error = 'At least one image is required';
+      }
       return error;
     }
     const currentRoleFields = getCurrentRoleFields(user?.role?.label);
@@ -539,9 +550,9 @@ function UserDashBoard() {
 
     const allTouched = {};
     Object.keys(formData).forEach(key => {
-      if (key !== 'images' && key !== 'inspectedImages') {
-        allTouched[key] = true;
-      }
+      // if (key !== 'images' && key !== 'inspectedImages') {
+      allTouched[key] = true;
+      // }
     });
     setTouched(allTouched);
 
@@ -553,9 +564,9 @@ function UserDashBoard() {
 
   };
   const handleSubmit = async () => {
-    setIsCircularLoader(true);
     setLoadingBatchId(formData?.batchId);
     try {
+      setIsCircularLoader(true);
       const payload = new FormData();
       const existingImages = formData.images.filter(img => typeof img === 'string');
       const newImages = formData.images.filter(img => typeof img !== 'string');
@@ -724,8 +735,6 @@ function UserDashBoard() {
     }
   }
 
-
-
   useEffect(() => {
     fetchbatchbyid();
   }, [searchBatchTerm, currnetBatchPage, toggle]);
@@ -808,9 +817,11 @@ function UserDashBoard() {
                         className={styles.custom_file_input}
                       />
                     </div>
-
+                    {errors.inspectedImages && touched.inspectedImages && (
+                      <div className={styles.errorMessage}>{errors.inspectedImages}</div>
+                    )}
                     <div className='preview-container'>
-                      {inspectedImagePreviews.map((src, idx) => (
+                      {inspectedImagePreviews?.map((src, idx) => (
                         <div key={idx} className='preview-item'>
                           <img src={src} alt={`fruit-${idx}`} className='preview-image' />
                           <span
@@ -822,6 +833,7 @@ function UserDashBoard() {
                         </div>
                       ))}
                     </div>
+
                   </>
                 )}
 
@@ -894,7 +906,9 @@ function UserDashBoard() {
                         className={styles.custom_file_input}
                       />
                     </div>
-
+                    {errors.images && touched.images && (
+                      <div className={styles.errorMessage}>{errors.images}</div>
+                    )}
                     <div className='preview-container'>
                       {imagePreviews.map((src, idx) => (
                         <div key={idx} className='preview-item'>
@@ -1207,7 +1221,7 @@ function UserDashBoard() {
                             onMouseEnter={() => user?.role?.label === 'Processor' && setHoveredBatchId(batch?.batchId)}
                             onMouseLeave={() => setHoveredBatchId(null)}
                           >
-                          {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
+                            {loadingBatchId === batch?.batchId ? <CircularLoader size={20} /> : 'Progress'}
                           </button>
                         ) : (
                           <button

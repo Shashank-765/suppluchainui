@@ -4,6 +4,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Farm Inspection fields
     farmInspectionId: { type: String },
     farmInspectionName: { type: String },
+    farmContact:{type:String},
     productName: { type: String },
     certificateNo: { type: String },
     certificateFrom: { type: String },
@@ -18,6 +19,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Harvester fields
     harvesterId: { type: String },
     harvesterName: { type: String },
+    harvesterContact:{type:String},
     cropSampling: { type: String },
     temperatureLevel: { type: String },
     humidity: { type: String },
@@ -28,6 +30,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Exporter fields
     exporterId: { type: String },
     exporterName: { type: String },
+    exporterContact:{type:String},
     coordinationAddress: { type: String },
     shipName: { type: String },
     shipNo: { type: String },
@@ -41,6 +44,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Importer fields
     importerId: { type: String },
     importerName: { type: String },
+    importerContact:{type:String},
     quantityImported: { type: String },
     shipStorage: { type: String },
     arrivalDate: { type: Date },
@@ -54,6 +58,7 @@ const trackingDetailsSchema = new mongoose.Schema({
     // Processor fields
     processorId: { type: String },
     processorName: { type: String },
+    processorContact:{type:String},
     quantityProcessed: { type: String },
     processingMethod: { type: String },
     packaging: { type: String },

@@ -15,7 +15,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
 function View() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { product } = location.state || {};
+  const { product, viewOnly } = location.state || {};
   const user = JSON.parse(localStorage.getItem('user')) || null;
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -198,11 +198,20 @@ function View() {
 
       const session = sessionRes.data;
       sessionStorage.setItem('invoiceData', JSON.stringify({
+        processorName: productData?.processorName,
+        farmddress: productData?.warehouseAddress,
+        farmId: productData?.farmInspectionId,
+        farmContact: productData?.farmContact || '9453495435',
         quantity,
         price,
         realprice,
         productname: productData?.productName,
         unit,
+        paymentDate: new Date().toLocaleDateString(),
+        recieverName: user?.name,
+        receiverId: user?._id,
+        receiverAddress: user?.address || 'noida sector - 4',
+        receiverContact: user?.contact
       }));
       const result = await stripe.redirectToCheckout({
         sessionId: session.id,
@@ -405,13 +414,14 @@ function View() {
           <div className="carousel-wrapper">
             <div className="leftviewdiv" ref={scrollRef} onScroll={handleScroll}>
               {
-                productData?.images?.length > 0 ? productData?.images?.map((img, index) => (
-                  <div className="imagecontainerview" key={index}>
-                    <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
-                  </div>
-                )) :
+                productData?.images?.length > 0 && Array.isArray(productData?.images) && productData.images.length === 1 && productData.images[0] !== ''
+                  ? productData?.images?.map((img, index) => (
+                    <div className="imagecontainerview" key={index}>
+                      <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
+                    </div>
+                  )) :
                   <div className="imagecontainerview">
-                    <img src={image1}  alt='images'/>
+                    <img src={image1} alt='images' />
                   </div>
               }
             </div>
@@ -440,11 +450,15 @@ function View() {
               </h2>
               <h2 className='nameofproductowner'>{productData?.productName}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.price}</span></h2>
-              <h2>Qty : <span className='priceproduct'>{productData?.quantityProcessed}  Qtl</span></h2>
+              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? product?.totalQuantityQuintal : productData?.quantityProcessed}  Qtl</span></h2>
               <div className='buynowbuttoncover'>
 
                 <div className='buynowbuttoncover'>
-                  <button onClick={BuyNowHandler} className='buynowbutton'>Buy Now</button>
+
+                  {
+                    viewOnly ? '' : <button onClick={BuyNowHandler} className='buynowbutton'>Buy Now</button>
+                  }
+
                 </div>
               </div>
             </div>
@@ -466,7 +480,7 @@ function View() {
                       {activeAccordion === index ? (
                         <img src={downarrow} alt='images' />
                       ) : (
-                        <img src={uparrow} alt='images'/>
+                        <img src={uparrow} alt='images' />
                       )}
                     </div>
                   </div>
@@ -547,7 +561,7 @@ function View() {
                   </tr>
                 </thead>
                 <tbody>
-                  { history?.length > 0 ? (
+                  {history?.length > 0 ? (
                     history.map((ele, i) => (
                       <tr key={i}>
                         <td>{ele?.transactionId}</td>
@@ -640,7 +654,7 @@ function View() {
                         {page}
                       </button>
                     ))} */}
-                  <div style={{ color: '#666', fontSize: '0.9em',display:'flex',alignItems:'center' }}>
+                  <div style={{ color: '#666', fontSize: '0.9em', display: 'flex', alignItems: 'center' }}>
                     Page {currentPage} of {pagination.totalPages}
                   </div>
 
@@ -730,7 +744,7 @@ function View() {
             </div>
 
             <div className="actions">
-             <button onClick={handleClosepopup} className="cancelButton">
+              <button onClick={handleClosepopup} className="cancelButton">
                 Cancel
               </button>
               <button
@@ -739,7 +753,7 @@ function View() {
               >
                 {isCircularloader ? <CircularLoader size={15} /> : 'confirm'}
               </button>
-             
+
             </div>
           </div>
         </div>

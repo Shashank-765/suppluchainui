@@ -89,9 +89,8 @@ router.get('/gettransactionhistory',authorize, async (req, res) => {
 const webhookHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.WEB_HOOK_SECRET;
-
+    console.log('api hitts');
     let event;
-
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err) {
@@ -130,6 +129,8 @@ const webhookHandler = async (req, res) => {
                 }
 
                 product.purchaseHistory = product.purchaseHistory || [];
+
+                const seller = sellerId?.split('_')[1];
                 product.purchaseHistory.push({
                     buyerId,
                     quantityBought: `${quantity} ${unit}`,
@@ -137,11 +138,9 @@ const webhookHandler = async (req, res) => {
                     sellerId,
                     purchaseDate: new Date(),
                 });
-
                 await product.save();
-
                 const isBuyerEmail = await User.findById(buyerId);
-                const isSellerEmail = await User.findById(sellerId);
+                const isSellerEmail = await User.findById(seller);
 
                 await TransactionModel.create({
                     batchId,

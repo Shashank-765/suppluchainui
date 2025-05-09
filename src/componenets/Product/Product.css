@@ -111,15 +111,12 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: start;
 
     >p {
         margin-bottom: 0;
+        width: 50%;
     }
-}
-
-.prices {
-    margin-left: 15px;
 }
 
 /* Responsive Grid Columns */

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from '../../axios'
+// import api from '../../axios'
 import certificqte from '../../Imges/certificqte.jpg'
 import check from '../../Imges/check.png'
 import No from '../../Imges/no.png'

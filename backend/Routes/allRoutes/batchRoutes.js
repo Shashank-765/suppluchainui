@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, 
+  limits: { fileSize: 10 * 1024 * 1024 },
 }).fields([
   { name: 'images', maxCount: 15 },
   { name: 'inspectedImages', maxCount: 15 }
@@ -196,7 +196,7 @@ router.get('/getBatch', authorize, async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching batches' });
   }
 });
-router.get('/getRoles',authorize, async (req, res) => {
+router.get('/getRoles', authorize, async (req, res) => {
   try {
     const roles = await Role.find({});
     const totalCount = await Role.countDocuments();
@@ -213,7 +213,7 @@ router.get('/getRoles',authorize, async (req, res) => {
     });
   }
 });
-router.get('/getBatchById',authorize, async (req, res) => {
+router.get('/getBatchById', authorize, async (req, res) => {
   try {
     const { id } = req.query;
 
@@ -366,7 +366,7 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
       return res.status(400).json({ message: 'Batch ID is required' });
     }
 
-    const existing = await TrackingModel.findOne({ batchId });
+    // const existing = await TrackingModel.findOne({ batchId });
 
     const updatedFields = {};
 
@@ -379,12 +379,15 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
       if (req.files?.inspectedImages) {
         inspectedPaths.push(...req.files.inspectedImages.map(file => `/uploads/${file.filename}`));
       }
+      const isId = farmInspectionId?.split("_")[1];
+      const farm = await User.findOne({ _id: isId })
 
       updatedFields.certificateNo = certificateNo;
       updatedFields.certificateFrom = certificateFrom;
       updatedFields.productName = productName;
       updatedFields.farmInspectionId = farmInspectionId;
       updatedFields.farmInspectionName = farmInspectionName;
+      updatedFields.farmContact = farm?.contact;
       updatedFields.typeOfFertilizer = typeOfFertilizer;
       updatedFields.fertilizerUsed = fertilizerUsed;
       updatedFields.isInspexted = inspectionStatus === 'Completed';
@@ -394,8 +397,11 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
     }
 
     if (harvesterId && harvesterName && cropSampling && temperatureLevel && humidity && harvestStatus) {
+      const isId = harvesterId?.split("_")[1];
+      const harvest = await User.findOne({ _id: isId })
       updatedFields.harvesterId = harvesterId;
       updatedFields.harvesterName = harvesterName;
+      updatedFields.harvesterContact = harvest?.contact;
       updatedFields.cropSampling = cropSampling;
       updatedFields.temperatureLevel = temperatureLevel;
       updatedFields.humidity = humidity;
@@ -405,8 +411,12 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
     }
 
     if (exporterId && coordinationAddress && shipName && shipNo && departureDate && estimatedDate && exportedTo && exportStatus) {
+      const isId = exporterId?.split("_")[1];
+
+      const exporter = await User?.findOne({ _id: isId })
       updatedFields.exporterId = exporterId;
       updatedFields.exporterName = exporterName;
+      updatedFields.exporterContact = exporter?.contact;
       updatedFields.coordinationAddress = coordinationAddress;
       updatedFields.shipName = shipName;
       updatedFields.shipNo = shipNo;
@@ -419,8 +429,13 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
     }
 
     if (importerId && quantityImported && shipStorage && arrivalDate && warehouseLocation && warehouseArrivalDate && importerAddress && importStatus) {
+      const isId = importerId?.split("_")[1];
+
+      const imported = await User?.findOne({ _id: isId });
+
       updatedFields.importerId = importerId;
       updatedFields.importerName = importerName;
+      updatedFields.importerContact = imported?.contact;
       updatedFields.quantityImported = quantityImported;
       updatedFields.shipStorage = shipStorage;
       updatedFields.arrivalDate = arrivalDate;
@@ -438,10 +453,12 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
       if (req.files?.images) {
         processedPaths.push(...req.files.images.map(file => `/uploads/${file.filename}`));
       }
-
+      const isId = processorId?.split("_")[1];
+      const process = await User?.findOne({ _id: isId })
       updatedFields.price = price;
       updatedFields.processorId = processorId;
       updatedFields.processorName = processorName;
+      updatedFields.processorContact = process?.contact;
       updatedFields.quantityProcessed = quantityProcessed;
       updatedFields.processingMethod = processingMethod;
       updatedFields.packaging = packaging;

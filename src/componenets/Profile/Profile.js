@@ -34,7 +34,8 @@ function Profile({ setIsAuthenticated, setUser }) {
     const navigate = useNavigate();
 
     const handleClick = (product) => {
-        navigate('/viewpage', { state: { product } });
+    const viewOnly = 'viewOnly'
+        navigate('/viewpage', { state: { product,viewOnly } });
     };
 
     useEffect(() => {
@@ -65,9 +66,11 @@ function Profile({ setIsAuthenticated, setUser }) {
     }, [navigate]);
 
     const fetchProducts = async () => {
-        try {
+        try {   
+          setIsCircularLoader(true);
             const response = await api.get(`/products/getmyproducts?id=${user._id}`);
             if (response.data) {
+            setIsCircularLoader(false);
                 const updatedProducts = response.data.products.map((product) => {
                     let totalQuantityQuintal = 0;
 
@@ -98,9 +101,11 @@ function Profile({ setIsAuthenticated, setUser }) {
                 setProducts(updatedProducts);
             }
             else {
+            setIsCircularLoader(false);
                 showError('Failed to fetch products');
             }
         } catch (error) {
+        setIsCircularLoader(false);
             console.log(error)
             showError('Error fetching products');
         }
@@ -256,8 +261,8 @@ function Profile({ setIsAuthenticated, setUser }) {
                                                     </div>
                                                     <div className="productdetailscontainer">
                                                         <div className="productdetailscontainerdetails">
-                                                            <p>{product?.fruitName}</p>
-                                                            <p>QTY: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
+                                                            <p>{product?.productName}</p>
+                                                            <p>Stock: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
                                                         </div>
                                                         <p className="prices">
                                                             Price: <span className="pricevalueproduct">{product?.price}</span>
@@ -267,7 +272,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                                             ))
                                         ) : (
                                             <div className="no-product-container-profile">
-                                                <p>No Product Available</p>
+                                                <p>{isCircularloader ? <CircularLoader size={20}/> :'No Product Available'}</p>
                                             </div>
                                         )}
                                     </div>

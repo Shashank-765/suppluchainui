@@ -86,7 +86,7 @@ router.get('/getmyproducts',authorize, async (req, res) => {
       },
       {
         $project: {
-          fruitName: 1,
+          productName: 1,
           images: 1,
           price: 1,
           quantityProcessed: 1,

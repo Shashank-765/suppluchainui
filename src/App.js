@@ -7,7 +7,6 @@ import Home from './componenets/Home/Home';
 import Contact from './componenets/contact/Contact';
 import Faqs from './componenets/Faqs/Faqs';
 import View from './componenets/View/View';
-import Form from './componenets/Form/Form';
 import Invoice from './componenets/Invoice/Invoice';
 import SignupLogin from './componenets/signup/Signup';
 import NotFound from './componenets/Not-Found';
@@ -66,8 +65,6 @@ function App() {
   //   return () => clearInterval(interval);
   // }, []);
 
-
-
   const userType = userData?.userType;
 
   return (
@@ -95,7 +92,6 @@ function App() {
             <>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/product" element={<Product />} />
-              <Route path="/form" element={<Form />} />
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/userdashboard" element={<UserDashBoard />} />
               <Route path="/batchprogress" element={<BatchProgressView />} />
@@ -111,12 +107,10 @@ function App() {
             <>
               <Route path={`/${userData?.role?.label}/userdashboard`} element={<UserDashBoard />} />
               <Route path="/product" element={<Product />} />
-              <Route path="/form" element={<Form />} />
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/batchprogress" element={<BatchProgressView />} />
               <Route path="/screening" element={<ScreeningPage />} />
               <Route path="/notifications" element={<NotificationPage />} />
-
               <Route
                 path="/profile"
                 element={<Profile setIsAuthenticated={setIsAuthenticated} />}

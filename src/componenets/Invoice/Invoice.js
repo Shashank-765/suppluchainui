@@ -65,24 +65,24 @@ function Invoice() {
               <div className="party-icon"><i className="fas fa-user-tie"></i></div>
               <h4>
                 From<br />
-                Ramesh Kumar
+                {invoiceData?.processorName}
               </h4>
             </div>
-            <p>Farm ID: FARM-102</p>
-            <p>Location: Nashik, Naharashtra</p>
-            <p>Phone: +91-XXXXX-XXXX</p>
+            <p>Farm ID: {invoiceData?.farmId}</p>
+            <p>Location: {invoiceData?.farmddress}</p>
+            <p>Phone: +91-{invoiceData?.farmContact}</p>
           </div>
           <div className="party to">
             <div className="party-header">
               <div className="party-icon"><i className="fas fa-building"></i></div>
               <h4>
                 To<br />
-                AgriFresh Ltd.
+                {invoiceData?.recieverName}
               </h4>
             </div>
-            <p>Company ID: COMP-507</p>
-            <p>Bengaluru, Karnataka, Indaia</p>
-            <p>Phone: +91-YYYYY-YYYYY</p>
+            <p>Company ID: {invoiceData?.receiverId}</p>
+            <p>{invoiceData?.receiverAddress}</p>
+            <p>Phone: +91-{invoiceData?.receiverContact}</p>
           </div>
         </div>
 

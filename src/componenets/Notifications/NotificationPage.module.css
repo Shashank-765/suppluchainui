@@ -86,3 +86,18 @@
   font-size: 1rem;
   padding: 2rem;
 }
+.loadMoreButton {
+    margin: 20px auto;
+    padding: 10px 20px;
+    display: block;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.loadMoreButton:hover {
+    background-color: #179635;
+}

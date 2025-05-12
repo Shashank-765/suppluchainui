@@ -1,0 +1,56 @@
+.aboutContainer {
+    max-width: 80%;
+    margin-block: 5% !important;
+    margin: auto;
+    padding: 2rem;
+    background-color: #d1e3d7;
+    color: #2e2e2e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.heading {
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #0e4d2d;
+    font-family: IBM Plex Mono;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 41px;
+    line-height: 120%;
+    letter-spacing: 0%;
+}
+
+.intro {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.section {
+    margin-bottom: 2rem;
+}
+
+.section h2 {
+    color: #0e4d2d;
+    margin-bottom: 0.5rem;
+    font-family: IBM Plex Mono;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 27px;
+    line-height: 120%;
+    letter-spacing: 0%;
+}
+
+.section p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+a {
+    color: #1d6f42;
+    text-decoration: none;
+    font-weight: 500;
+}

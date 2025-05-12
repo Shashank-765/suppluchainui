@@ -9,6 +9,10 @@ const NotificationPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [notifyToggle, setNotifyToggle] = useState(false);
     const [isCircularloader, setIsCircularLoader] = useState(false);
+    const [skip, setSkip] = useState(0);
+    const limit = 5;
+    const [hasMore, setHasMore] = useState(true);
+
 
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -47,20 +51,52 @@ const NotificationPage = () => {
         return createdDate.toLocaleDateString();
     }
 
-    const fetchNotifications = async () => {
+    // const fetchNotifications = async () => {
+    //     try {
+    //         setIsCircularLoader(true);
+    //         const res = await api.get(
+    //             `/notify/getallnotifications`,
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${user?.token}`,
+    //                 },
+    //             }
+    //         );
+    //         setNotifications(res.data);
+    //         setIsCircularLoader(false);
+
+    //     } catch (err) {
+    //         setIsCircularLoader(false);
+    //         console.error('Failed to fetch notifications:', err);
+    //     }
+    // };
+
+
+    const fetchNotifications = async (isLoadMore = false) => {
         try {
             setIsCircularLoader(true);
-            const res = await api.get(
-                `/notify/getallnotifications`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                }
-            );
-            setNotifications(res.data);
-            setIsCircularLoader(false);
+            const res = await api.get(`/notify/getallnotifications`, {
+                params: {
+                    skip: isLoadMore ? skip : 0,
+                    limit,
+                },
+                headers: {
+                    Authorization: `Bearer ${user?.token}`,
+                },
+            });
 
+            const fetched = res.data;
+
+            if (fetched.length < limit) {
+                setHasMore(false); // No more data
+            }
+
+            setNotifications(prev =>
+                isLoadMore ? [...prev, ...fetched] : fetched
+            );
+
+            setSkip(prev => isLoadMore ? prev + limit : limit);
+            setIsCircularLoader(false);
         } catch (err) {
             setIsCircularLoader(false);
             console.error('Failed to fetch notifications:', err);
@@ -81,7 +117,7 @@ const NotificationPage = () => {
     };
 
     useEffect(() => {
-        fetchNotifications();
+        fetchNotifications(false);
     }, [notifyToggle]);
 
     const notificationHandler = (batch) => {
@@ -89,27 +125,27 @@ const NotificationPage = () => {
         navigate('/batchprogress', { state: { batch } })
     }
 
-    const handleDelete = async (id) => {
-        try {
-            const deletednoti = await api.post(`/notify/deletenotification?id=${id}`, {}, {
-                headers: {
-                    Authorization: `Bearer ${user?.token}`,
-                },
-            });
-            if (deletednoti) {
-                setNotifyToggle(!notifyToggle)
-            }
-        } catch (err) {
-            console.error('Failed to delete notification:', err);
-        }
-    };
+    // const handleDelete = async (id) => {
+    //     try {
+    //         const deletednoti = await api.post(`/notify/deletenotification?id=${id}`, {}, {
+    //             headers: {
+    //                 Authorization: `Bearer ${user?.token}`,
+    //             },
+    //         });
+    //         if (deletednoti) {
+    //             setNotifyToggle(!notifyToggle)
+    //         }
+    //     } catch (err) {
+    //         console.error('Failed to delete notification:', err);
+    //     }
+    // };
 
     return (
         <div className={styles.container}>
             <h2 className={styles.heading}>All Notifications</h2>
             <ul className={styles.notificationList}>
                 {notifications.length === 0 ? (
-                    <p className={styles.noNotifications}> { isCircularloader ? <CircularLoader size={20}/> :'No notifications found.'}</p>
+                    <p className={styles.noNotifications}> {isCircularloader ? <CircularLoader size={20} /> : 'No notifications found.'}</p>
                 ) : (
                     notifications.map((note, index) => (
                         <li key={index} onClick={() => notificationHandler(note)} className={styles.notificationItem}>
@@ -130,6 +166,12 @@ const NotificationPage = () => {
                         </li>
                     ))
                 )}
+                {hasMore && notifications.length > 0 && (
+                    <button className={styles.loadMoreButton} onClick={() => fetchNotifications(true)}>
+                        {isCircularloader ? <CircularLoader size={20} /> : 'See More'}
+                    </button>
+                )}
+
             </ul>
         </div>
     );

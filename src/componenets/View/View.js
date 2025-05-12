@@ -245,6 +245,18 @@ function View() {
     fetchProducts();
   }, [])
 
+  useEffect(() => {
+    if (showPopup) {
+      document.body.style.overflow = 'hidden'; 
+    } else {
+      document.body.style.overflow = 'auto'; 
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showPopup]);
+
+
   const [activeAccordion, setActiveAccordion] = useState(null);
 
   const handleAccordion = (index) => {
@@ -414,7 +426,7 @@ function View() {
           <div className="carousel-wrapper">
             <div className="leftviewdiv" ref={scrollRef} onScroll={handleScroll}>
               {
-                productData?.images?.length > 0 && Array.isArray(productData?.images) && productData.images.length === 1 && productData.images[0] !== ''
+                productData?.images?.length > 0 && productData.images[0] !== ''
                   ? productData?.images?.map((img, index) => (
                     <div className="imagecontainerview" key={index}>
                       <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
@@ -558,6 +570,7 @@ function View() {
                     <th>To</th>
                     <th>Price</th>
                     <th>Quantity</th>
+                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -569,19 +582,18 @@ function View() {
                         <td>{ele?.buyer}</td>
                         <td>₹ {ele?.price}</td>
                         <td>{ele?.quantity}</td>
+                        <td>{new Date(ele?.createdAt).toLocaleDateString('en-GB')}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
+                      <td colSpan="7" style={{ textAlign: 'center', fontSize: '15px', padding: '1rem' }}>
                         No history available
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
-
-
             </div>
             {history?.length > 0 && (
               <div className="pagination-container" style={{

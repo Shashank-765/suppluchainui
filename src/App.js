@@ -25,6 +25,8 @@ import {
   Route,
   useLocation
 } from 'react-router-dom';
+import PrivacyPolicy from './componenets/privacyPolicy/PrivacyPolicy';
+import About from './componenets/About/About';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -80,6 +82,9 @@ function App() {
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/product" element={<Product />} />
           <Route path="/viewpage" element={<View />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+
 
           {!isAuthenticated && (
             <Route

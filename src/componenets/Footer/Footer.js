@@ -21,16 +21,16 @@ function Footer() {
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Quick Links</p>
                     <p className='footerlink'><Link to='/'>Home</Link></p>
-                    <p className='footerlink'>About</p>
+                    <p className='footerlink'><Link to='/about'>About</Link></p>
                     <p className='footerlink'><Link to='/product'>Explore</Link></p>
                     <p className='footerlink'><Link to='/contact'>Contact</Link></p>
                 </div>
                 <div className='footerrightsections'>
                     <p className='footerlinksheading'>Exolore More</p>
                     <p className='footerlink'><Link to='/faqs'>Faq</Link></p>
-                    <p className='footerlink'>Privacy Policy</p>
-                    <p className='footerlink'>Term of service</p>
-                    <p className='footerlink'>Carrer Apportunities</p>
+                    <p className='footerlink'><Link to='/privacypolicy'>Privacy Policy</Link></p>
+                    {/* <p className='footerlink'>Term of service</p>
+                    <p className='footerlink'>Carrer Apportunities</p> */}
 
                 </div>
                 <div className='footerrightsections'>

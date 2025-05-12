@@ -138,7 +138,6 @@ const Dashboard = () => {
         });
         setEditTouched(allTouched);
 
-
         if (!validateEditForm()) {
             setIsCircularLoader(false);
             return;
@@ -148,12 +147,12 @@ const Dashboard = () => {
 
             if (response?.data) {
                 const updatedUser = response.data.user;
-
                 const updateRes = await axios.put(
                     `${process.env.REACT_APP_BACKEND2_URL}/updateUser/${updatedUser.id}`,
                     {
                         userId: updatedUser.id,
                         userType: updatedUser.userType,
+                        userRole: 'random',
                         userName: updatedUser.name,
                         userEmail: updatedUser.email,
                         userPhone: updatedUser.contact,
@@ -225,7 +224,6 @@ const Dashboard = () => {
             error = 'This field is required';
             return error;
         }
-
 
         switch (name) {
             case 'farmerRegNo':

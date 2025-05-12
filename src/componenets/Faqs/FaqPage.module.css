@@ -1,13 +1,15 @@
-.faqs-conatainer{
- height: 100vh;
+.faqs-conatainer {
+  height: 100%;
 }
-.maincontainer{
- height: 100vh;
+
+.maincontainer {
+  height: 100%;
 }
+
 .container {
-  max-width: 800px;
+  max-width: 70%;
   margin: 40px auto;
-  padding: 20px;
+  padding: 5%;
   background: #d1e3d7;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
   border-radius: 12px;
@@ -28,10 +30,11 @@
 }
 
 .faqItem {
+  margin-top: 4%;
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #51947a;
   border-radius: 8px;
-  padding: 16px 20px;
+  padding: 30px 25px;
   cursor: pointer;
   transition: all 0.3s ease;
 }

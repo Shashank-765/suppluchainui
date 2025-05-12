@@ -30,17 +30,23 @@ router.get('/notifications', authorize, async (req, res) => {
     }
 
 })
+
 router.get('/getallnotifications', authorize, async (req, res) => {
     try {
-        const notifications = await NotifyModel.find({}).sort({ createdAt: -1 });
+        const skip = parseInt(req.query.skip) || 0;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const notifications = await NotifyModel.find({})
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
         const enrichedNotifications = await Promise.all(
             notifications.map(async (ele) => {
                 const batch = await BatchModel.findOne({ batchId: ele.batchId });
-
                 return {
                     ...ele.toObject(),
-                    coffeeType: batch?.coffeeType || null, // attach coffeeType if found
+                    coffeeType: batch?.coffeeType || null,
                 };
             })
         );
@@ -73,6 +79,7 @@ router.post('/deletenotification', authorize, async (req, res) => {
         return res.status(500).json({ message: 'Server error while deleting notification' });
     }
 });
+
 router.post('/notified', authorize, async (req, res) => {
     try {
         const { notificationId } = req.query;

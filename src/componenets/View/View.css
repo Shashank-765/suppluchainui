@@ -53,7 +53,6 @@
 /* Keep accordion cards clickable */
 .description-container {
   border-radius: 10px;
-  cursor: pointer;
 }
 
 /* Main scrollable container */
@@ -241,6 +240,7 @@
   font-family: 'Lexend', sans-serif;
   font-size: 20px;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 .iconvegtble {
@@ -329,8 +329,8 @@
 
   table td,
   table th {
-    padding: 20px 11px;
-    text-align: left;
+    padding: 20px 3px;
+    text-align: center;
     font-size: 12px;
     overflow: hidden;
   }
@@ -459,11 +459,11 @@
 
 @media screen and (max-width:1275px) {
   .rightsidedescriptionimage {
-
+     height: 75%;
     table td,
     table th {
       padding: 18px 11px;
-      text-align: left;
+      text-align: center;
       font-size: 8px;
       overflow: hidden;
     }
@@ -684,4 +684,14 @@
 .quantity_box {
   display: flex;
   justify-content: space-between;
+}
+.rightsidehistorydetials {
+  height: 75%;
+  overflow-x: scroll;
+  /* scrollbar-width: none; 
+  -ms-overflow-style: none; */
+}
+
+.rightsidehistorydetials::-webkit-scrollbar {
+  display: none; 
 }

@@ -8,21 +8,30 @@ const { authorize } = require('../../Auth/Authenticate.js')
 const TrackingModel = require('../../Models/BatchProductModel.js');
 
 
-router.get('/getproducttomarkiting',authorize, async (req, res) => {
+router.get('/getproducttomarkiting', authorize, async (req, res) => {
   try {
-    const trackingDetails = await TrackingModel.find({ isProcessed: true })
-    if (!trackingDetails) {
-      return res.status(404).json({ message: 'Tracking details not found' });
-    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 4;
+    const skip = (page - 1) * limit;
 
-    return res.status(200).json({ trackingDetails, message: 'Tracking details fetched successfully' });
+    const totalCount = await TrackingModel.countDocuments({ isProcessed: true });
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const trackingDetails = await TrackingModel.find({ isProcessed: true })
+      .sort({ createdAt: -1 }) // ✅ Ensure consistent ordering
+      .skip(skip)
+      .limit(limit);
+
+    return res.status(200).json({
+      trackingDetails,
+      totalPages,
+      message: 'Tracking details fetched successfully',
+    });
   } catch (error) {
     console.error('Error fetching tracking details:', error);
     return res.status(500).json({ message: 'Server error while fetching tracking details' });
   }
-}
-);
-
+});
 
 router.post('/buyProduct',authorize, async (req, res) => {
   try {

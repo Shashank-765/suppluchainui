@@ -139,7 +139,7 @@ function UserDashBoard() {
       ...prev,
       inspectedImages: updatedImages
     }));
-    setInspectedImagePreviews(prev => [...prev, ...newPreviews]);
+    setInspectedImagePreviews((prev=[]) => [...prev, ...newPreviews]);
 
     inspectorFileInputRef.current.value = '';
   };

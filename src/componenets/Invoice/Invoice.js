@@ -143,9 +143,9 @@ function Invoice() {
                 <div className="document-icon"><i className="fas fa-file-invoice"></i></div>
                 <div className="details-content">
                   <p>Invoice No.<br /> INV-AGRI-20250409-001</p><br />
-                  <p>Invoice Date: April 9, 2025</p>
-                  <p>Payment Due: April 16, 2025</p>
-                  <p>Payment Status: Pending</p>
+                  <p>Invoice Date: {invoiceData?.paymentDate}</p>
+                  <p>Payment Due: {invoiceData?.paymentDate}</p>
+                  <p>Payment Status: {invoiceData?.status || 'Success'}</p>
                 </div>
               </div>
             </div>

@@ -52,24 +52,24 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
-router.get('/gettransactionhistory',authorize, async (req, res) => {
+router.get('/gettransactionhistory', authorize, async (req, res) => {
     try {
         const { productId, page = 1, limit = 10 } = req.query;
         const skip = (page - 1) * limit;
-        
+
         const total = await TransactionModel.countDocuments({ productId });
-        
+
         const Data = await TransactionModel.find({ productId })
             .skip(skip)
             .limit(parseInt(limit))
             .sort({ createdAt: -1 });
-            
+
         if (!Data) {
             return res.status(400).json({ message: 'invalid product id' })
         }
-        
-        return res.status(200).json({ 
-            Data, 
+
+        return res.status(200).json({
+            Data,
             pagination: {
                 total,
                 currentPage: parseInt(page),
@@ -78,7 +78,7 @@ router.get('/gettransactionhistory',authorize, async (req, res) => {
                 hasNextPage: (page * limit) < total,
                 hasPrevPage: page > 1
             },
-            message: 'transaction fetched successfully' 
+            message: 'transaction fetched successfully'
         });
     } catch (error) {
         console.log(error)
@@ -151,6 +151,29 @@ const webhookHandler = async (req, res) => {
                     price,
                     quantity: `${quantity} ${unit}`,
                 });
+
+                if (event.type === 'charge.refunded') {
+                    const charge = event.data.object;
+                    const paymentIntentId = charge.payment_intent;
+
+                    try {
+                        await TransactionModel.findOneAndUpdate(
+                            { transactionId: paymentIntentId },
+                            {
+                                $set: {
+                                    isRefunded: true,
+                                    refundId: charge.refunds.data[0]?.id
+                                }
+                            }
+                        );
+                        console.log('Transaction marked as refunded:', paymentIntentId);
+                    } catch (err) {
+                        console.error('Error updating refund status:', err);
+                        return res.status(500).json({ message: 'Failed to update refund status' });
+                    }
+                }
+
+
             } catch (err) {
                 console.error('Error processing webhook event:', err);
                 return res.status(500).json({ message: 'Internal server error' });
@@ -160,6 +183,34 @@ const webhookHandler = async (req, res) => {
 
     res.json({ received: true });
 };
+
+
+router.post('/refund', async (req, res) => {
+    const { transactionId, reason } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: 'Transaction ID is required' });
+    }
+
+    try {
+        const refund = await stripe.refunds.create({
+            payment_intent: transactionId,
+            reason: reason || 'requested_by_customer', // optional: 'duplicate' | 'fraudulent' | 'requested_by_customer'
+        });
+
+        // Optionally update your DB record
+        await TransactionModel.findOneAndUpdate(
+            { transactionId },
+            { $set: { isRefunded: true, refundId: refund.id } }
+        );
+          console.log('this apis ihitts')
+        res.status(200).json({ message: 'Refund successful', refund });
+    } catch (error) {
+        console.error('Refund failed:', error);
+        res.status(500).json({ message: 'Failed to process refund' });
+    }
+});
+
 
 module.exports = {
     router,

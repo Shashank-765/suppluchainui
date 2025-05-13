@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     role: { type: Object },
     address :{type:String},
     userType: { type: String, enum: ['admin', 'user','seller','buyer','retailer'], default: 'user' },
-});
+},{timestamps:true});
 
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();

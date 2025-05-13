@@ -247,9 +247,9 @@ function View() {
 
   useEffect(() => {
     if (showPopup) {
-      document.body.style.overflow = 'hidden'; 
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'auto'; 
+      document.body.style.overflow = 'auto';
     }
     return () => {
       document.body.style.overflow = 'auto';
@@ -577,7 +577,7 @@ function View() {
                   {history?.length > 0 ? (
                     history.map((ele, i) => (
                       <tr key={i}>
-                        <td>{ele?.transactionId}</td>
+                        <td>{ele?.transactionId ? `${ele.transactionId.slice(0, 3)}...${ele.transactionId.slice(-3)}`: ''}</td>
                         <td>{ele?.seller}</td>
                         <td>{ele?.buyer}</td>
                         <td>₹ {ele?.price}</td>

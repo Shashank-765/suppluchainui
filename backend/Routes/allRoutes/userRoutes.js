@@ -190,17 +190,9 @@ router.post('/updateprofile', authorize, async (req, res) => {
     isExist.userType = userType;
 
     await isExist.save();
-
     return res.status(200).json({
       message: 'Profile updated successfully',
-      user: {
-        id: isExist?._id,
-        email: isExist.email,
-        name: isExist.name,
-        contact: isExist.contact,
-        address: isExist.address,
-        userType: isExist.userType
-      }
+      user: isExist
     });
   } catch (error) {
     console.log(error);
@@ -251,12 +243,12 @@ router.post('/login', async (req, res) => {
 router.get('/fetchalluser', authorize, async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
+    console.log('req.body', req.body);
 
     const query = {
-      userType: 'user', // Only users with userType === "user"
+      userType: 'user',
       $or: [
         { name: { $regex: search, $options: 'i' } },
-        // { walletAddress: { $regex: search, $options: 'i' } },
         { contact: { $regex: search, $options: 'i' } },
         { role: { $regex: search, $options: 'i' } },
       ],
@@ -268,23 +260,74 @@ router.get('/fetchalluser', authorize, async (req, res) => {
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
 
-    const totalUsers = await User.countDocuments(query);
-    const totalPages = Math.ceil(totalUsers / limit);
+    const totalUsers = await User.countDocuments({ userType: { $ne: 'admin' } });
+    const excludedUserCount = await User.countDocuments({ userType: { $in: ['buyer', 'retailer'] } });
+    const validUserCount = totalUsers - excludedUserCount;
+    const totalPages = Math.ceil(validUserCount / limit);
 
-    const allUserwihtoutPagination = await User.find({});
+    const allUserwihtoutPagination = await User.find({ userType: 'user' });
+
+    const otherUserTypeCount = await User.countDocuments({
+      userType: { $nin: ['user', 'admin'] }
+    });
+
+    const roles = ['Farm Inspection', 'Harvester', 'Importer', 'Exporter', 'Processor'];
+    const roleCounts = {};
+
+    for (const roleLabel of roles) {
+      const count = await User.countDocuments({ 'role.label': roleLabel });
+      roleCounts[roleLabel] = count;
+    }
 
     res.status(200).json({
       allUsers,
       allUserwihtoutPagination,
       totalUsers,
       totalPages,
-      currentPage: parseInt(page)
+      currentPage: parseInt(page),
+      otherUserTypeCount,
+      roleCounts
     });
+
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ message: 'Server error while fetching users' });
   }
 });
+
+router.get('/getallsimpleusers', async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = '' } = req.query;
+
+    const query = {
+      userType: { $nin: ['user', 'admin'] },
+      name: { $regex: search, $options: 'i' }
+    };
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const users = await User.find(query)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    const total = await User.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    return res.status(200).json({
+      users,
+      totalUsers: total,
+      totalPages,
+      currentPage: parseInt(page),
+      message: 'Data fetched successfully'
+    });
+
+  } catch (error) {
+    console.log('Error fetching simple users:', error);
+    return res.status(500).json({ message: 'Server error while fetching users' });
+  }
+});
+
 router.post('/blockUser', authorize, async (req, res) => {
   try {
     const { id } = req.query;
@@ -392,7 +435,6 @@ router.get('/getimages', authorize, async (req, res) => {
   }
 });
 
-
 function getRandomImages(arr, maxCount) {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -401,25 +443,6 @@ function getRandomImages(arr, maxCount) {
   }
   return shuffled.slice(0, maxCount);
 }
-
-
-// router.post('/renewtoken', async (req, res) => {
-//   try {
-//     const userId = req?.query?.userId;
-//     const newToken = generateToken(userId);
-
-//     const user = await User.findById(userId);
-//     if (!user) return res.status(404).json({ message: 'User not found' });
-
-//     user.token = newToken;
-//     await user.save();
-
-//     return res.json({ token: newToken });
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ message: 'Token renewal failed' });
-//   }
-// });
 
 
 module.exports = router;

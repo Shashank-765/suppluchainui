@@ -164,14 +164,13 @@ router.get('/getBatch', authorize, async (req, res) => {
     const totalPages = Math.ceil(totalBatches / perPage);
     const skip = (currentPage - 1) * perPage;
 
-    const batches = await BatchModel.find(query)
-      .sort({ createdAt: -1 })
+    const batches = await BatchModel.find(query).sort({ createdAt: -1 })
       .skip(skip)
       .limit(perPage);
 
     const batchIds = batches.map(batch => batch.batchId);
 
-    const trackBatches = await TrackingModel.find({ batchId: { $in: batchIds } });
+    const trackBatches = await TrackingModel.find({ batchId: { $in: batchIds } }).sort({ createdAt: -1 });
 
     const trackingMap = {};
     trackBatches.forEach(track => {
@@ -196,7 +195,7 @@ router.get('/getBatch', authorize, async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching batches' });
   }
 });
-router.get('/getRoles', authorize, async (req, res) => {
+router.get('/getRoles',authorize, async (req, res) => {
   try {
     const roles = await Role.find({});
     const totalCount = await Role.countDocuments();

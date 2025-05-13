@@ -116,10 +116,10 @@
     >p {
         margin-bottom: 0;
         width: 50%;
+        text-align: start;
     }
 }
 
-/* Responsive Grid Columns */
 @media screen and (max-width: 1200px) {
     .productmaincontainer {
         grid-template-columns: repeat(3, 1fr);

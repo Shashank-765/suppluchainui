@@ -29,8 +29,27 @@
     text-align: center;
 }
 
+.card2 {
+    background: #fff;
+    border-radius: 12px;
+    /* padding: 1.5rem; */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    text-align: center;
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(3, 1fr);
+
+}
+
 .counter {
     font-size: 1.8rem;
+    font-weight: bold;
+    color: #175B42;
+}
+
+.counter1 {
+    font-size: 1rem;
     font-weight: bold;
     color: #175B42;
 }
@@ -120,7 +139,7 @@
 
 .table th,
 .table td {
-    padding: 0.35rem;
+    padding: 0.45rem;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
@@ -160,6 +179,7 @@
     display: none;
     /* Chrome, Safari, and Opera */
 }
+
 .modal h2 {
     margin-bottom: 1rem;
 }
@@ -525,4 +545,56 @@
     display: flex;
     justify-content: end;
     align-items: center;
+}
+
+.simpleUserWrapper {
+  padding: 1rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.simpleusersearchInput {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.simpleUserTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.simpleUserTable th,
+.simpleUserTable td {
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.simpleuserpagination {
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+  >button{
+   cursor: pointer;
+  }
+}
+
+.simpleuser button {
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #175b42;
+  color: white;
+  cursor: pointer;
+}
+
+.simpleuser button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

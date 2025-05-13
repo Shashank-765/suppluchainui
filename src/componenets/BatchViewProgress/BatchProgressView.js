@@ -126,7 +126,7 @@ const BatchProgressView = () => {
           <div className={styles.box1}>
             <div className={styles.boxinnerside}>
               <h3>Farm Inspector</h3>
-              <p><span className={styles.batchesheading}>Farm Inspector Id:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.farmInspectionId || allBatch?.farmInspectionId?.id}</span></p>
+              <p><span className={styles.batchesheading}>Farm Inspector Id:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.farmInspectionId?.split('_')[1] || allBatch?.farmInspectionId?.id?.split('_')[1]}</span></p>
               <p><span className={styles.batchesheading}>Certificate No:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.certificateNo}</span></p>
               <p><span className={styles.batchesheading}>Certificate From:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.certificateFrom}</span></p>
               <p><span className={styles.batchesheading}>Type of Fertilizer:</span><span className={styles.batchesdatavalue}> {allBatch?.farmInspectionId?.typeOfFertilizer}</span></p>
@@ -173,7 +173,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Harvester</h3>
-            <p><span className={styles.batchesheading}>Harvester Id:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.harvestId || allBatch?.harvesterId?.id}</span></p>
+            <p><span className={styles.batchesheading}>Harvester Id:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.harvestId?.split('_')[1] || allBatch?.harvesterId?.id?.split('_')[1]}</span></p>
             <p><span className={styles.batchesheading}>Crop Sampling:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.cropSampling}</span></p>
             <p><span className={styles.batchesheading}>Temperature Level:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.temperatureLevel}</span></p>
             <p><span className={styles.batchesheading}>Humidity:</span><span className={styles.batchesdatavalue}>{allBatch?.harvesterId?.humidityLevel}</span></p>
@@ -192,7 +192,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Importer</h3>
-            <p><span className={styles.batchesheading}>Importer ID:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.importerId || allBatch?.importerId?.id}</span></p>
+            <p><span className={styles.batchesheading}>Importer ID:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.importerId?.split('_')[1] || allBatch?.importerId?.id?.split('_')[1]}</span></p>
             <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.quantity}</span></p>
             <p><span className={styles.batchesheading}>Ship Storage:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.shipStorage}</span></p>
             <p><span className={styles.batchesheading}>Arrival Date:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.arrivalDate}</span></p>
@@ -212,7 +212,7 @@ const BatchProgressView = () => {
           </div>
           <div className={styles.box}>
             <h3>Exporter</h3>
-            <p><span className={styles.batchesheading}>Exporter ID:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.exporterId || allBatch?.exporterId?.id}</span></p>
+            <p><span className={styles.batchesheading}>Exporter ID:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.exporterId?.split('_')[1] || allBatch?.exporterId?.id?.split('_')[1]}</span></p>
             <p><span className={styles.batchesheading}>Coordination Address:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterId?.coordinationAddress}</span></p>
             <p><span className={styles.batchesheading}>Ship Name:</span><span className={styles.batchesdatavalue}>{allBatch?.exporterId?.shipName}</span></p>
             <p><span className={styles.batchesheading}>Ship No:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterId?.shipNo}</span></p>
@@ -234,7 +234,7 @@ const BatchProgressView = () => {
           <div className={styles.box1}>
             <div>
               <h3>Processor</h3>
-              <p><span className={styles.batchesheading}>Processor ID:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processorId || allBatch?.processorId?.id}</span></p>
+              <p><span className={styles.batchesheading}>Processor ID:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processorId?.split('_')[1] || allBatch?.processorId?.id?.split('_')[1]}</span></p>
               <p><span className={styles.batchesheading}>Quantity:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.quantity}</span></p>
               <p><span className={styles.batchesheading}>Processing Method:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processingMethod}</span></p>
               <p><span className={styles.batchesheading}>Packaging:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.packaging}</span></p>

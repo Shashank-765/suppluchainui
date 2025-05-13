@@ -5,32 +5,42 @@ const BatchModel = require('../../Models/BatchModel.js')
 const NotifyModel = require('../../Models/NotifictionModel.js')
 const { authorize } = require('../../Auth/Authenticate.js');
 
-
+// authorize
 router.get('/notifications', authorize, async (req, res) => {
     try {
         const userId = req.query.id;
+        console.log('userId', userId);
+
         const notifications = await NotifyModel.find({
-            $or: [
-                { farmInspection: userId },
-                { harvester: userId },
-                { importer: userId },
-                { exporter: userId },
-                { processor: userId }
-            ],
-            $or: [
-                { [`readStatus.${userId}`]: { $ne: true } },
-                { [`readStatus.${userId}`]: { $exists: false } }
-            ],
-            createdBy: { $ne: userId }
+            $and: [
+                {
+                    $or: [
+                        { farmInspection: userId },
+                        { harvester: userId },
+                        { importer: userId },
+                        { exporter: userId },
+                        { processor: userId }
+                    ]
+                },
+                {
+                    $or: [
+                        { [`readStatus.${userId}`]: { $ne: true } },
+                        { [`readStatus.${userId}`]: { $exists: false } }
+                    ]
+                },
+                {
+                    createdBy: { $ne: userId }
+                }
+            ]
         }).sort({ createdAt: -1 });
+
         res.json(notifications);
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: error })
+        console.error(error);
+        res.status(500).json({ message: error.message || 'Server error' });
     }
-
-})
-
+});
+// authorize
 router.get('/getallnotifications', authorize, async (req, res) => {
     try {
         const skip = parseInt(req.query.skip) || 0;

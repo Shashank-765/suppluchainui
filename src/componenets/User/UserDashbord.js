@@ -125,7 +125,7 @@ function UserDashBoard() {
       ...prev,
       images: updatedImages
     }));
-    setImagePreviews(prev => [...prev, ...newPreviews]);
+    setImagePreviews((prev=[] )=> [...prev, ...newPreviews]);
 
     processorFileInputRef.current.value = '';
   };
@@ -139,7 +139,7 @@ function UserDashBoard() {
       ...prev,
       inspectedImages: updatedImages
     }));
-    setInspectedImagePreviews((prev=[]) => [...prev, ...newPreviews]);
+    setInspectedImagePreviews((prev = []) => [...prev, ...newPreviews]);
 
     inspectorFileInputRef.current.value = '';
   };
@@ -275,7 +275,7 @@ function UserDashBoard() {
         processingStatus: selectedBatch?.processorId?.processorStatus || ''
       }));
       setImagePreviews(
-        selectedBatch?.processorId?.image.map(img =>
+        selectedBatch?.processorId?.image?.map(img =>
           typeof img === 'string'
             ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
@@ -820,12 +820,12 @@ function UserDashBoard() {
                     {errors.inspectedImages && touched.inspectedImages && (
                       <div className={styles.errorMessage}>{errors.inspectedImages}</div>
                     )}
-                    <div className='preview-container'>
+                    <div className={styles.previewcontainer}>
                       {inspectedImagePreviews?.map((src, idx) => (
-                        <div key={idx} className='preview-item'>
-                          <img src={src} alt={`fruit-${idx}`} className='preview-image' />
+                        <div key={idx} className={styles.previewitem}>
+                          <img src={src} alt={`fruit-${idx}`} className={styles.previewimage} />
                           <span
-                            className='remove-icon'
+                            className={styles.removeicon}
                             onClick={() => handleRemoveInspectedImage(idx)}
                           >
                             &times;
@@ -909,12 +909,12 @@ function UserDashBoard() {
                     {errors.images && touched.images && (
                       <div className={styles.errorMessage}>{errors.images}</div>
                     )}
-                    <div className='preview-container'>
-                      {imagePreviews.map((src, idx) => (
-                        <div key={idx} className='preview-item'>
-                          <img src={src} alt={`fruit-${idx}`} className='preview-image' />
+                    <div className={styles.previewcontainer}>
+                      {imagePreviews?.map((src, idx) => (
+                        <div key={idx} className={styles.previewitem}>
+                          <img src={src} alt={`fruit-${idx}`} className={styles.previewimage} />
                           <span
-                            className='remove-icon'
+                            className={styles.removeicon}
                             onClick={() => handleRemoveImage(idx)}
                           >
                             &times;

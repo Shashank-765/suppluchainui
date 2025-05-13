@@ -159,8 +159,6 @@ function Navbar({ isAuthenticated }) {
           <li onClick={() => setNavState('navbarrightside')}>
             <Link to='/contact'>Contact</Link>
           </li>
-
-          {/* Show Login/Signup or Logout */}
           {!isAuthenticated ? (
             <li onClick={() => setNavState('navbarrightside')}>
               <Link to='/auth'>Signup</Link>
@@ -172,7 +170,7 @@ function Navbar({ isAuthenticated }) {
 
           )}
 
-          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
+          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && data?.userType !=='admin' && (
             <li className="dropdown notification-bell" ref={dropdownRef}>
               <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
                 <img src={notificationimage} alt='images' />
@@ -209,8 +207,6 @@ function Navbar({ isAuthenticated }) {
                   )}
                 </ul>
               )}
-
-
             </li>
           )}
         </ul>

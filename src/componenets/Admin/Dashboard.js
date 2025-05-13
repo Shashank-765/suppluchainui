@@ -23,10 +23,11 @@ const Dashboard = () => {
     const [searchBatchTerm, setSearchBatchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [toatalUser, setTotalUser] = useState(0);
+    const [roleCounts, setRoleCounts] = useState({});
     const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
-    const [usersPerPage] = useState(8);
+    const [usersPerPage] = useState(6);
     const [totalPages, setTotalPages] = useState(0);
     const [totalBatchPage, setTotalBatchPage] = useState(0);
     const [allBatch, setAllBatch] = useState([]);
@@ -41,6 +42,38 @@ const Dashboard = () => {
     const [popupAction, setPopupAction] = useState('');
     const [pendingFunction, setPendingFunction] = useState(null);
     const [pendingArgs, setPendingArgs] = useState([]);
+    const [simpleUsers, setSimpleUsers] = useState([]);
+    const [simpleUserPage, setSimpleUserPage] = useState(1);
+    const [simpleUserTotalPages, setSimpleUserTotalPages] = useState(1);
+    const [simpleUserSearch, setSimpleUserSearch] = useState('');
+    const [simpleUserLoading, setSimpleUserLoading] = useState(false);
+
+
+    const fetchSimpleUsers = async () => {
+        try {
+            setSimpleUserLoading(true);
+            const res = await api.get(`${process.env.REACT_APP_BACKEND_URL}/users/getallsimpleusers`, {
+                params: {
+                    page: simpleUserPage,
+                    limit: 5,
+                    search: simpleUserSearch
+                }
+            });
+
+            setSimpleUsers(res.data.users);
+            setSimpleUserTotalPages(res.data.totalPages);
+        } catch (error) {
+            console.error('Failed to fetch simple users:', error);
+        } finally {
+            setSimpleUserLoading(false);
+        }
+    };
+      const UserNavigateHandler =(userdata)=>{
+       navigate('/profile', { state: { userdata } });
+      }
+    useEffect(() => {
+        fetchSimpleUsers();
+    }, [simpleUserPage, simpleUserSearch, toggle]);
 
     useEffect(() => {
         if (showBatchModal || showUserModal || isEditing)
@@ -148,7 +181,7 @@ const Dashboard = () => {
             if (response?.data) {
                 const updatedUser = response.data.user;
                 const updateRes = await axios.put(
-                    `${process.env.REACT_APP_BACKEND2_URL}/updateUser/${updatedUser.id}`,
+                    `${process.env.REACT_APP_BACKEND2_URL}/updateUser/${updatedUser._id}`,
                     {
                         userId: updatedUser.id,
                         userType: updatedUser.userType,
@@ -156,6 +189,7 @@ const Dashboard = () => {
                         userName: updatedUser.name,
                         userEmail: updatedUser.email,
                         userPhone: updatedUser.contact,
+                        userPassword: updatedUser?.password,
                         userAddress: updatedUser.address,
                         userStatus: updatedUser.isBlocked || "True",
                         userCreatedAt: updatedUser.userCreatedAt || 'null',
@@ -369,6 +403,10 @@ const Dashboard = () => {
 
     const handleUserPopupSubmit = async (e) => {
         e.preventDefault();
+        if (!validateUserForm()) {
+            setIsCircularLoader(false);
+            return;
+        }
         showPopup('create user', handleUserSubmit, [e]);
     };
 
@@ -382,10 +420,7 @@ const Dashboard = () => {
         setUserTouched(allTouched);
 
 
-        if (!validateUserForm()) {
-            setIsCircularLoader(false);
-            return;
-        }
+
 
 
         try {
@@ -396,7 +431,9 @@ const Dashboard = () => {
                     userId: res?.data?.user?._id,
                     userType: res?.data?.user?.userType,
                     userName: res?.data?.user?.name,
+                    userRole: res?.data?.user?.role?.label || 'harvester',
                     userEmail: res?.data?.user?.email,
+                    userPassword: res?.data?.user?.password,
                     userPhone: res?.data?.user?.contact,
                     userAddress: res?.data?.user?.walletAddress,
                     userStatus: res?.data?.user?.isBlocked || "True",
@@ -599,6 +636,9 @@ const Dashboard = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
+    const handlesimpleuserSearchChange = (e) => {
+        setSimpleUserSearch(e.target.value)
+    }
     const handleSearchBatchChange = (e) => {
         setSearchBatchTerm(e.target.value);
         setCurrentBatchPage(1);
@@ -615,8 +655,9 @@ const Dashboard = () => {
             });
             setAllUser(response.data.allUsers);
             setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
-            setTotalPages(response.data.totalPages);
-            setTotalUser(response.data.totalUsers);
+            setTotalPages(response?.data?.totalPages);
+            setTotalUser(response?.data?.otherUserTypeCount);
+            setRoleCounts(response?.data?.roleCounts);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -748,11 +789,12 @@ const Dashboard = () => {
     };
     const deleteBatch = async (id) => {
         try {
-            const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
-            if (response?.data) {
-                setToggle(!toggle);
-                showSuccess("Batch deleted succefully")
-            }
+            // const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
+            // if (response?.data) {
+            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${id}`)
+            setToggle(!toggle);
+            showSuccess("Batch deleted succefully")
+            // }
         } catch (error) {
             console.log(error)
             showError("failed to delte batch")
@@ -790,10 +832,39 @@ const Dashboard = () => {
             </div>
 
             <div className={styles.cards}>
-                <div className={styles.card}>
-                    <h3>Users</h3>
-                    <p className={styles.counter}>{toatalUser}</p>
+                <div className={styles.card2}>
+                    <div className={styles.roleBlock}>
+                        <h4>Users</h4>
+                        <p className={styles.counter1}>{toatalUser}</p>
+                    </div>
+
+                    <div className={styles.roleBlock}>
+                        <h4>Inspector</h4>
+                        <p className={styles.counter1}>{roleCounts['Farm Inspection'] || 0}</p>
+                    </div>
+
+                    <div className={styles.roleBlock}>
+                        <h4>Harvester</h4>
+                        <p className={styles.counter1}>{roleCounts['Harvester'] || 0}</p>
+                    </div>
+
+                    <div className={styles.roleBlock}>
+                        <h4>Importer</h4>
+                        <p className={styles.counter1}>{roleCounts['Importer'] || 0}</p>
+                    </div>
+
+                    <div className={styles.roleBlock}>
+                        <h4>Exporter</h4>
+                        <p className={styles.counter1}>{roleCounts['Exporter'] || 0}</p>
+                    </div>
+
+                    <div className={styles.roleBlock}>
+                        <h4>Processor</h4>
+                        <p className={styles.counter1}>{roleCounts['Processor'] || 0}</p>
+                    </div>
                 </div>
+
+
                 <div className={styles.card}>
                     <h3>Total Roles</h3>
                     <p className={styles.counter}>{totalRoles}</p>
@@ -955,7 +1026,7 @@ const Dashboard = () => {
                                                 <img src={view} alt='images' />
                                             </button>
                                             {
-                                                batch?.farmInspectionId	?.farmInspectionStatus==='Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
+                                                batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
                                                     <img src={deleteimage} alt='images' />
                                                 </button>
                                             }
@@ -1127,6 +1198,81 @@ const Dashboard = () => {
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+
+            <div className={styles.simpleUserWrapper}>
+                <h3>Other Users</h3>
+                <input
+                    type="text"
+                    placeholder="Search by name"
+                    value={simpleUserSearch}
+                    onChange={handlesimpleuserSearchChange}
+                    className={styles.simpleusersearchInput}
+                />
+                <table className={styles.simpleUserTable}>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Role</th>
+                            <th>Address</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {simpleUsers.length === 0 ? (
+                            <tr>
+                                <td colSpan="3">No users found</td>
+                            </tr>
+                        ) : (
+                            simpleUsers.map((user) => (
+                                <tr key={user._id}>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.contact}</td>
+                                    <td>{user.userType || '---'}</td>
+                                    <td>{user.address}</td>
+                                    <td>{new Date(user?.createdAt).toLocaleDateString('en-GB')}</td>
+                                    <td>
+                                        {
+                                            !user?.isBlocked ? (
+                                                <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
+                                            ) : (
+                                                <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
+                                            )}
+                                        <button onClick={()=>UserNavigateHandler(user)} className={styles.editButton}><img src={view} alt='images' /></button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+
+
+                <div className={styles.simpleuserpagination}>
+                    <button
+                        onClick={() => setSimpleUserPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={simpleUserPage === 1}
+                    >
+                        ◀
+                    </button>
+                    <span>
+                        Page {simpleUserPage} of {simpleUserTotalPages}
+                    </span>
+                    <button
+                        onClick={() =>
+                            setSimpleUserPage((prev) =>
+                                prev < simpleUserTotalPages ? prev + 1 : prev
+                            )
+                        }
+                        disabled={simpleUserPage === simpleUserTotalPages}
+                    >
+                        ▶
+                    </button>
                 </div>
             </div>
 

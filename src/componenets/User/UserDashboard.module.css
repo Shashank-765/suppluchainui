@@ -387,3 +387,28 @@ select {
     z-index: 2;
     /* Text is above the overlay */
 }
+
+.previewimage {
+    width: 80px;
+    height: 90px;
+}
+
+.removeicon {
+    position: absolute;
+    margin-top: -8px;
+    margin-left: -11px;
+    font-size: 16px;
+    color: white;
+    background: red;
+    width: 20px;
+    height: 23px;
+    font-weight: 700;
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+}
+.previewcontainer {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+}

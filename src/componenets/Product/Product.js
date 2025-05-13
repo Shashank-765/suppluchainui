@@ -21,7 +21,7 @@ function Product() {
     const fetchAllProducts = async (pageToFetch) => {
         try {
             setIsCircularLoader(true);
-            const response = await api.get(`/products/getproducttomarkiting?page=${pageToFetch}&limit=12`);
+            const response = await api.get(`/products/getproducttomarkiting?page=${pageToFetch}&limit=3`);
             if (response.data) {
                 const newData = response.data.trackingDetails;
 

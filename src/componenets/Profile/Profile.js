@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import image1 from '../../Imges/Image6.png'
 import profileImage from '../../Imges/portrait-322470_1280.jpg';
@@ -12,13 +12,13 @@ import './Profile.css';
 
 function Profile({ setIsAuthenticated, setUser }) {
     const popupRef = useRef(null);
+    const location = useLocation();
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({ name: '', email: '', userType: '', address: '', contact: '' });
     const [isCircularloader, setIsCircularLoader] = useState(false);
-
-
+    const { userdata } = location.state || {};
     useEffect(() => {
         if (isEditing)
 
@@ -34,8 +34,9 @@ function Profile({ setIsAuthenticated, setUser }) {
     const navigate = useNavigate();
 
     const handleClick = (product) => {
-    const viewOnly = 'viewOnly'
-        navigate('/viewpage', { state: { product,viewOnly } });
+    //    if(userdata) return;
+        const viewOnly = 'viewOnly'
+        navigate('/viewpage', { state: { product, viewOnly } });
     };
 
     useEffect(() => {
@@ -66,11 +67,11 @@ function Profile({ setIsAuthenticated, setUser }) {
     }, [navigate]);
 
     const fetchProducts = async () => {
-        try {   
-          setIsCircularLoader(true);
-            const response = await api.get(`/products/getmyproducts?id=${user._id}`);
+        try {
+            setIsCircularLoader(true);
+            const response = await api.get(`/products/getmyproducts?id=${userdata ? userdata?._id : user._id}`);
             if (response.data) {
-            setIsCircularLoader(false);
+                setIsCircularLoader(false);
                 const updatedProducts = response.data.products.map((product) => {
                     let totalQuantityQuintal = 0;
 
@@ -101,13 +102,12 @@ function Profile({ setIsAuthenticated, setUser }) {
                 setProducts(updatedProducts);
             }
             else {
-            setIsCircularLoader(false);
+                setIsCircularLoader(false);
                 showError('Failed to fetch products');
             }
         } catch (error) {
-        setIsCircularLoader(false);
+            setIsCircularLoader(false);
             console.log(error)
-            showError('Error fetching products');
         }
     };
 
@@ -199,14 +199,14 @@ function Profile({ setIsAuthenticated, setUser }) {
                         <div className="profile-card">
                             <div className="profile-banner">
                                 <img src={profilecover} alt='images' />
-                                <h1>Welcome, {userData.name}</h1>
+                                <h1>Welcome, {userdata ? userdata?.name : userData.name}</h1>
                             </div>
                             <div className="profile-content">
                                 <img className="profile-image" src={profileImage} alt="Profile" />
                                 <div className="profile-details">
                                     <div className="contact-info">
                                         <p>Contact No</p>
-                                        <span className="contact-information">{user?.contact}</span>
+                                        <span className="contact-information">{userdata ? userdata?.contact : user?.contact}</span>
                                     </div>
 
                                     {
@@ -222,61 +222,71 @@ function Profile({ setIsAuthenticated, setUser }) {
 
                                     <div className="settings">
                                         <p>{user?.role?.label} Email</p>
-                                        <span className="edit-btn">{user?.email}</span>
+                                        <span className="edit-btn">{userdata ? userdata?.email : user?.email}</span>
                                     </div>
                                     <div className="settings">
                                         <p>Wallet Address</p>
                                         <span className="edit-btn">
-                                            {user?.walletAddress
-                                                ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
-                                                : ''}
+                                            {userdata?.walletAddress
+                                                ? `${userdata.walletAddress.slice(0, 4)}......${userdata.walletAddress.slice(-4)}`
+                                                : user?.walletAddress
+                                                    ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
+                                                    : ''}
                                         </span>
+
                                     </div>
                                 </div>
-                                <button onClick={handleEditToggle} className="profile-edit-btn">Edit Profile</button>
-                                <button onClick={handleLogout} className="profile-logout-btn">Logout</button>
+
+                                {
+
+                                    userdata ? '' :
+                                        <>
+                                            <button onClick={handleEditToggle} className="profile-edit-btn">Edit Profile</button>
+                                            <button onClick={handleLogout} className="profile-logout-btn">Logout</button>
+                                        </>
+                                }
+
                             </div>
                         </div>
 
 
                         {
-
                             // user?.userType === 'user' || user?.userType === 'admin' ? '' :
-                                <div className="my-product-continer">
-                                    <h2 className="my-products-only">My Products</h2>
-                                    <div className="productmaincontainer">
-                                        {products.length > 0 ? (
-                                            products.map((product, i) => (
-                                                <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
-                                                    <div className="productimagecontianer">
-                                                        {product?.images?.length > 0 ?(
-                                                            <img
-                                                                src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.images[0]}`}
-                                                                alt={`product-${i}`}
-                                                                className="product-image"
-                                                            />
-                                                        ):
-                                                          <img src={image1} alt='images' />
-                                                        }
-                                                    </div>
-                                                    <div className="productdetailscontainer">
-                                                        <div className="productdetailscontainerdetails">
-                                                            <p>{product?.productName}</p>
-                                                            <p>Stock: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
-                                                        </div>
-                                                        <p className="prices">
-                                                            Price: <span className="pricevalueproduct">{product?.price}</span>
-                                                        </p>
-                                                    </div>
+                            <div className="my-product-continer">
+                                <h2 className="my-products-only">My Products</h2>
+                                <div className="productmaincontainer">
+                                    {products.length > 0 ? (
+                                        products.map((product, i) => (
+                                            <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
+                                                <div className="productimagecontianer">
+                                                    {product?.images?.length > 0 ? (
+                                                        <img
+                                                            src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.images[0]}`}
+                                                            alt={`product-${i}`}
+                                                            className="product-image"
+                                                        />
+                                                    ) :
+                                                        <img src={image1} alt='images' />
+                                                    }
                                                 </div>
-                                            ))
-                                        ) : (
-                                            <div className="no-product-container-profile">
-                                                <p>{isCircularloader ? <CircularLoader size={20}/> :'No Product Available'}</p>
+                                                <div className="productdetailscontainer">
+                                                    <div className="productdetailscontainerdetails">
+                                                        <p>{product?.productName}</p>
+                                                        <p>Stock: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
+                                                    </div>
+                                                    <p className="prices">
+                                                        Price: <span className="pricevalueproduct">{product?.price}</span>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
+                                        ))
+                                    ) : (
+                                        <div className="no-product-container-profile">
+                                            <p>{isCircularloader ? <CircularLoader size={20} /> : 'No Product Available'}</p>
+                                        </div>
+                                    )}
                                 </div>
+                            </div>
                         }
                     </>
 

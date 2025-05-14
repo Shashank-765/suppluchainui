@@ -20,7 +20,6 @@ const FarmerRecordSchema = new mongoose.Schema({
   importerId: { type: String, },
 }, { timestamps: true });
 
-// auto-increment logic
 FarmerRecordSchema.pre('save', async function (next) {
   if (this.isNew) {
     try {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../Models/userModel.js');
 const TrackingModel = require('../../Models/BatchProductModel.js');
+const Role = require('../../Models/RolesModel.js')
 const nodemailer = require("nodemailer")
 const { authorize } = require('../../Auth/Authenticate.js')
 const bcrypt = require('bcryptjs');
@@ -228,7 +229,7 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({ user, message: 'User logged in successfully' });
@@ -345,6 +346,7 @@ router.post('/blockUser', authorize, async (req, res) => {
   }
 }
 );
+
 router.post('/unblockUser', authorize, async (req, res) => {
   try {
     const { id } = req.query;
@@ -364,47 +366,48 @@ router.post('/unblockUser', authorize, async (req, res) => {
 }
 );
 
-// router.post('/insertRoles', async (req, res) => {
-//   const roleMap = {
-//     FARM_INSPECTION: {
-//       name: 'Farm Inspection',
-//       className: 'label info',
-//     },
-//     HARVESTER: {
-//       name: 'Harvester',
-//       className: 'label success',
-//     },
-//     EXPORTER: {
-//       name: 'Exporter',
-//       className: 'label warning',
-//     },
-//     IMPORTER: {
-//       name: 'Importer',
-//       className: 'label danger',
-//     },
-//     PROCESSOR: {
-//       name: 'Processor',
-//       className: 'label primary',
-//     },
-//   };
+router.post('/insertRoles', async (req, res) => {
+  const roleMap = {
+    FARM_INSPECTION: {
+      name: 'Farm Inspection',
+      className: 'label info',
+    },
+    HARVESTER: {
+      name: 'Harvester',
+      className: 'label success',
+    },
+    EXPORTER: {
+      name: 'Exporter',
+      className: 'label warning',
+    },
+    IMPORTER: {
+      name: 'Importer',
+      className: 'label danger',
+    },
+    PROCESSOR: {
+      name: 'Processor',
+      className: 'label primary',
+    },
+  };
 
-//   const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
-//     key,
-//     name: value.name,
-//     className: value.className,
-//   }));
+  const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
+    key,
+    name: value.name,
+    className: value.className,
+  }));
 
-//   try {
-//     await Role.insertMany(roleDocs, { ordered: false });
-//     res.status(201).json({ message: 'Roles inserted successfully.' });
-//   } catch (err) {
-//     if (err.code === 11000) {
-//       res.status(409).json({ message: 'Some roles already exist.', error: err });
-//     } else {
-//       res.status(500).json({ message: 'Error inserting roles.', error: err });
-//     }
-//   }
-// });
+  try {
+    await Role.insertMany(roleDocs, { ordered: false });
+    res.status(201).json({ message: 'Roles inserted successfully.' });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(409).json({ message: 'Some roles already exist.', error: err });
+    } else {
+    console.log('err', err)
+      res.status(500).json({ message: 'Error inserting roles.', error: err });
+    }
+  }
+});
 
 router.get('/getimages', authorize, async (req, res) => {
   try {
@@ -443,6 +446,5 @@ function getRandomImages(arr, maxCount) {
   }
   return shuffled.slice(0, maxCount);
 }
-
 
 module.exports = router;

@@ -104,6 +104,12 @@ const webhookHandler = async (req, res) => {
         if (session.payment_status === 'paid') {
             const { batchId, quantity, price, buyerId, sellerId, unit, productId } = session.metadata;
 
+            res.clearCookie('paymentIntentId', {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+            });
+
             try {
                 const product = await TrackingModel.findOne({ batchId });
                 if (!product) {
@@ -151,6 +157,13 @@ const webhookHandler = async (req, res) => {
                     price,
                     quantity: `${quantity} ${unit}`,
                 });
+                res.cookie("paymentIntentId", session.payment_intent, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "None",
+                    maxAge: 24 * 60 * 60 * 1000,
+                });
+                console.log(session.payment_intent, 'this is payment id');
 
                 if (event.type === 'charge.refunded') {
                     const charge = event.data.object;
@@ -184,6 +197,26 @@ const webhookHandler = async (req, res) => {
     res.json({ received: true });
 };
 
+router.get('/transaction/:sessionId', async (req, res) => {
+    const sessionId = req.params.sessionId;
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const transaction = await TransactionModel.findOne({
+            transactionId: session.payment_intent
+        });
+
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+
+        res.json(transaction);
+    } catch (err) {
+        console.error('Error fetching transaction:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 router.post('/refund', async (req, res) => {
     const { transactionId, reason } = req.body;
@@ -198,19 +231,17 @@ router.post('/refund', async (req, res) => {
             reason: reason || 'requested_by_customer', // optional: 'duplicate' | 'fraudulent' | 'requested_by_customer'
         });
 
-        // Optionally update your DB record
         await TransactionModel.findOneAndUpdate(
             { transactionId },
             { $set: { isRefunded: true, refundId: refund.id } }
         );
-          console.log('this apis ihitts')
+        console.log('this apis ihitts')
         res.status(200).json({ message: 'Refund successful', refund });
     } catch (error) {
         console.error('Refund failed:', error);
         res.status(500).json({ message: 'Failed to process refund' });
     }
 });
-
 
 module.exports = {
     router,

@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './Screening.module.css';
 
 function ScreeningPage() {
-  // Example data structure for tracking (you can replace it with real data)
   const trackingSteps = [
     { title: 'Batch Received', status: 'Completed', date: '2025-04-10' },
     { title: 'Initial Screening', status: 'Completed', date: '2025-04-12' },

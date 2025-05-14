@@ -70,7 +70,6 @@ function Home() {
           </div>
           <div className='imagesectionblock'>
             <h1>🔐 Why Hyperledger Fabric?</h1>
-            {/* <p>At the heart of our platform lies a decentralized infrastructure built on Hyperledger Fabric. This cutting-edge technology enables seamless collaboration, transparency, and traceability across the entire supply chain</p> */}
             <ul>
               <li>Permissioned Blockchain Network</li>
               <p>Only authorized participants can join and interact, ensuring security and trust among all stakeholders.</p>
@@ -81,10 +80,6 @@ function Home() {
               <li>Immutable Ledger for End-to-End Traceability</li>
               <p>Every action is recorded on a tamper-proof ledger, enabling full traceability of crops at every stage.</p>
             </ul>
-            {/* <div className='getstartedbuttoncontainer'>
-              <Link classNa
-              me='getstartedbutton' to="/product">Get Started</Link>
-            </div> */}
 
           </div>
         </div>

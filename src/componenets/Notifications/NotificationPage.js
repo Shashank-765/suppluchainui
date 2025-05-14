@@ -51,27 +51,6 @@ const NotificationPage = () => {
         return createdDate.toLocaleDateString();
     }
 
-    // const fetchNotifications = async () => {
-    //     try {
-    //         setIsCircularLoader(true);
-    //         const res = await api.get(
-    //             `/notify/getallnotifications`,
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${user?.token}`,
-    //                 },
-    //             }
-    //         );
-    //         setNotifications(res.data);
-    //         setIsCircularLoader(false);
-
-    //     } catch (err) {
-    //         setIsCircularLoader(false);
-    //         console.error('Failed to fetch notifications:', err);
-    //     }
-    // };
-
-
     const fetchNotifications = async (isLoadMore = false) => {
         try {
             setIsCircularLoader(true);
@@ -84,17 +63,13 @@ const NotificationPage = () => {
                     Authorization: `Bearer ${user?.token}`,
                 },
             });
-
             const fetched = res.data;
-
             if (fetched.length < limit) {
-                setHasMore(false); // No more data
+                setHasMore(false);
             }
-
             setNotifications(prev =>
                 isLoadMore ? [...prev, ...fetched] : fetched
             );
-
             setSkip(prev => isLoadMore ? prev + limit : limit);
             setIsCircularLoader(false);
         } catch (err) {

@@ -1,10 +1,8 @@
 .profile-container {
-  /* max-width: 600px; */
   border-radius: 12px;
   background-color: #FEF7F0;
   text-align: center;
   padding: 10px 10px
-    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 .profile-edit-form {
@@ -115,7 +113,6 @@
 
 .no-product-container-profile {
   width: 95vw;
-  /* border: 1px solid red; */
   text-align: center;
   height: 30vh;
 }
@@ -125,8 +122,6 @@
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  /* max-width: 500px; */
-  /* margin: 2rem; */
 }
 
 .profile-banner {
@@ -171,10 +166,8 @@
   padding: 1rem;
   text-align: center;
   margin-top: -4rem;
-  /* Pulls profile content up into banner */
   position: relative;
   z-index: 3;
-  /* Ensure it's above banner background */
 }
 
 .profile-image {
@@ -183,11 +176,9 @@
   border-radius: 100%;
   object-fit: cover;
   margin-top: 0px;
-  /* This pulls it up to overlap the banner */
   border: 5px solid #fff;
   z-index: 5;
   background-color: white;
-  /* Optional: fallback in case image doesn't load */
 }
 
 
@@ -264,10 +255,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 60px;
-  height: 25px;
-  border-radius: 6px;
-  border: 1px solid red; */
 }
 .contacteditnumber::-webkit-outer-spin-button,
 .contacteditnumber::-webkit-inner-spin-button {

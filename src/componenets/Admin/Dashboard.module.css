@@ -32,7 +32,6 @@
 .card2 {
     background: #fff;
     border-radius: 12px;
-    /* padding: 1.5rem; */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     flex: 1;
     text-align: center;
@@ -100,7 +99,6 @@
 
     .table {
         min-width: 900px;
-        /* Set this based on your actual table's column width */
     }
 }
 
@@ -177,7 +175,6 @@
 
 .modal::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, and Opera */
 }
 
 .modal h2 {
@@ -220,7 +217,6 @@
     color: #fff;
 }
 
-/* Existing styles remain unchanged */
 
 .usersGrid {
     display: flex;
@@ -342,13 +338,11 @@
     background: transparent;
     border: none;
     color: green;
-    /* border: 1px solid red; */
 
     >img {
         width: 20px;
         color: green;
         cursor: pointer;
-        /* font-size: 10px; */
     }
 }
 
@@ -356,14 +350,12 @@
     background: transparent;
     border: none;
     color: green;
-    /* border: 1px solid red; */
 
     >img {
         width: 18px;
         color: green;
         cursor: pointer;
         margin-left: 5px;
-        /* font-size: 10px; */
     }
 }
 
@@ -447,7 +439,6 @@
     background-color: #45a049;
 }
 
-/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -477,33 +468,24 @@
     border: none;
     padding: 5px 10px;
     border-radius: 20px;
-    /* cursor: pointer; */
     font-size: 16px;
 }
 
-/* .completeBtn:hover {
-    background-color: #0056b3;
-} */
 .pendingBtn {
     background-color: #ff2b07;
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 20px;
-    /* cursor: pointer; */
     font-size: 16px;
 }
 
-/* .pendingBtn:hover {
-    background-color: #e0a800;
-} */
 .progressBtn {
     background-color: #ff9800;
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 20px;
-    /* cursor: pointer; */
     font-size: 16px;
 }
 
@@ -597,4 +579,11 @@
 .simpleuser button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+.simpleusertablecontainer{
+  overflow-x: scroll;
+}
+.simpleusertablecontainer::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, and Opera */
 }

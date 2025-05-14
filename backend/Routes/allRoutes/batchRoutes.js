@@ -119,6 +119,7 @@ router.post('/createBatch', authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while creating batch' });
   }
 });
+
 router.delete('/deletebatch', authorize, async (req, res) => {
   try {
     const { batchId } = req.query;
@@ -140,6 +141,7 @@ router.delete('/deletebatch', authorize, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 router.get('/getBatch', authorize, async (req, res) => {
   try {
     const { page = 1, limit = 5, search = '' } = req.query;
@@ -149,11 +151,6 @@ router.get('/getBatch', authorize, async (req, res) => {
       query = {
         $or: [
           { batchId: !isNaN(search) ? Number(search) : -1 },
-          // { farmInspectionName: { $regex: search, $options: 'i' } },
-          // { harvesterName: { $regex: search, $options: 'i' } },
-          // { processorName: { $regex: search, $options: 'i' } },
-          // { exporterName: { $regex: search, $options: 'i' } },
-          // { importerName: { $regex: search, $options: 'i' } }
         ]
       };
     }
@@ -195,6 +192,7 @@ router.get('/getBatch', authorize, async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching batches' });
   }
 });
+
 router.get('/getRoles',authorize, async (req, res) => {
   try {
     const roles = await Role.find({});
@@ -212,6 +210,7 @@ router.get('/getRoles',authorize, async (req, res) => {
     });
   }
 });
+
 router.get('/getBatchById', authorize, async (req, res) => {
   try {
     const { id } = req.query;
@@ -235,6 +234,7 @@ router.get('/getBatchById', authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batch' });
   }
 });
+
 router.get('/getBatchByUserId', authorize, async (req, res) => {
   try {
     const { id, search = '', page = 1, limit = 5 } = req.query;
@@ -257,11 +257,7 @@ router.get('/getBatchByUserId', authorize, async (req, res) => {
       const searchQuery = {
         $or: [
           { batchId: !isNaN(search) ? Number(search) : -1 },
-          // { farmInspectionName: { $regex: search, $options: 'i' } },
-          // { harvesterName: { $regex: search, $options: 'i' } },
-          // { processorName: { $regex: search, $options: 'i' } },
-          // { exporterName: { $regex: search, $options: 'i' } },
-          // { importerName: { $regex: search, $options: 'i' } }
+
         ]
       };
       finalMatch = { $and: [userMatch, searchQuery] };
@@ -305,6 +301,7 @@ router.get('/getBatchByUserId', authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching batches.' });
   }
 });
+
 router.post('/updateBatch', authorize, upload, async (req, res) => {
   try {
     const {
@@ -365,7 +362,6 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
       return res.status(400).json({ message: 'Batch ID is required' });
     }
 
-    // const existing = await TrackingModel.findOne({ batchId });
 
     const updatedFields = {};
 

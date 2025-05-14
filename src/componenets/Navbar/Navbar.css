@@ -6,13 +6,11 @@
   align-items: center;
   background: #FEF7F0;
   border-bottom: 3px solid #51947a;
-  /* border: 1px solid red; */
 }
 
 .logocontainercompany {
   width: 30%;
   height: 60px;
-  /* border: 1px solid red; */
   margin-left: 10%;
   min-width: 150px;
   max-width: 150px;
@@ -28,7 +26,6 @@
   width: 20%;
   z-index: 2;
 
-  /* border: 1px solid red; */
   >img {
     margin-left: 10%;
   }
@@ -36,7 +33,6 @@
 
 .navbarrightside {
   width: 50%;
-  /* border: 1px solid red; */
   display: flex;
   justify-content: end;
   align-items: center;
@@ -120,7 +116,6 @@
       align-items: start;
 
       >li {
-        /* margin-left: 30px; */
         list-style: none;
         cursor: pointer;
         font-family: Bold;
@@ -140,7 +135,6 @@
 
   .navbarrightside {
     display: none;
-    /* border: 1px solid red; */
   }
 
   .menubutton {
@@ -155,7 +149,6 @@
   }
 
   .navbarleftlog {
-    /* border: 1px solid red; */
     margin-left: 0;
 
     >img {
@@ -181,7 +174,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* background: rgba(0, 0, 0,.8); */
     z-index: 1000;
 
     background: #FEF7F0;
@@ -194,7 +186,6 @@
     z-index: 999;
     border-bottom: 3px solid #51947a;
     margin-top: 40%;
-    /* background: rgba(0, 0, 0,.8); */
     background: #FEF7F0;
     flex-direction: column;
     justify-content: center;
@@ -202,14 +193,12 @@
     color: black;
 
     >ul {
-      /* margin-right: 7%; */
       display: flex;
       flex-direction: column;
       justify-content: start;
       align-items: start;
 
       >li {
-        /* margin-left: 30px; */
         list-style: none;
         cursor: pointer;
         font-family: Bold;
@@ -229,7 +218,6 @@
 
   .navbarrightside {
     display: none;
-    /* border: 1px solid red; */
   }
 
   .menubutton {
@@ -244,7 +232,6 @@
   }
 
   .navbarleftlog {
-    /* border: 1px solid red; */
     margin-left: 0;
 
     >img {
@@ -356,7 +343,6 @@
 
 .dropdown-menu::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari, and Opera */
 }
 
 .dropdown-menu {

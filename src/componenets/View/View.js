@@ -10,6 +10,7 @@ import CircularLoader from '../CircularLoader/CircularLoader'
 import informat from '../../Imges/information.png';
 import locationImage from '../../Imges/location.png';
 import { showError } from '../ToastMessage/ToastMessage';
+import axios from 'axios';
 const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
 
 function View() {
@@ -46,40 +47,6 @@ function View() {
       setCurrentPage(newPage);
     }
   };
-
-  // const handleLimitChange = (newLimit) => {
-  //   const limitValue = Number(newLimit);
-  //   setPagination(prev => ({
-  //     ...prev,
-  //     limit: limitValue
-  //   }));
-  //   // No need to setCurrentPage(1) here as the useEffect will trigger
-  // };
-
-  // const getPageNumbers = () => {
-  //   const pages = [];
-  //   const maxVisiblePages = 5;
-
-  //   if (pagination.totalPages <= maxVisiblePages) {
-  //     for (let i = 1; i <= pagination.totalPages; i++) {
-  //       pages.push(i);
-  //     }
-  //   } else {
-  //     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  //     let endPage = startPage + maxVisiblePages - 1;
-
-  //     if (endPage > pagination.totalPages) {
-  //       endPage = pagination.totalPages;
-  //       startPage = endPage - maxVisiblePages + 1;
-  //     }
-
-  //     for (let i = startPage; i <= endPage; i++) {
-  //       pages.push(i);
-  //     }
-  //   }
-
-  //   return pages;
-  // };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -169,7 +136,6 @@ function View() {
       behavior: 'smooth',
     });
   };
-
   const handlebuynow = async (quantity, price, realprice) => {
     setQuantityError('');
     setPriceError('');
@@ -217,6 +183,29 @@ function View() {
         sessionId: session.id,
       });
       setIsCircularLoader(false);
+      try {
+
+        const cookies = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('paymentIntentId='));
+        const paymentIntentId = cookies?.split('=')[1];
+        console.log('Payment Intent ID:', paymentIntentId);
+
+          await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/buy`, {
+          transactionId: paymentIntentId,
+          buyerId: user?._id,
+          batchId: productData?.batchId,
+          sellerId: productData?.processorId,
+          quantity,
+          price,
+          buyStatus: 'completed',
+          buyCreated: new Date().toISOString(),
+          buyUpdatednew: new Date().toISOString()
+        })
+      } catch (error) {
+        console.log(error)
+      }
+
       if (result.error) {
         console.log(result.error.message);
         setIsCircularLoader(false);
@@ -358,15 +347,17 @@ function View() {
       heading: "Processor",
       processorId: productData?.processorId,
       processorName: productData?.processorName,
-      processedDate: productData?.processedDate,
+      processedDate: productData?.processedDate
+        ? new Date(productData?.processedDate).toLocaleDateString('en-GB') : '',
       processorAddress: productData?.warehouseAddress,
       quantityProcessed: productData?.quantityProcessed,
       processingMethod: productData?.processingMethod,
       packaging: productData?.packaging,
-      packagedDate: productData?.packagedDate,
+      packagedDate: productData?.packagedDate
+        ? new Date(productData?.packagedDate).toLocaleDateString('en-GB') : '',
       warehouse: productData?.warehouse,
       destination: productData?.destination,
-      processedDate: productData?.processedDate,
+
     },
     {
       id: '2',
@@ -376,10 +367,13 @@ function View() {
       coordinationAddress: productData?.coordinationAddress,
       shipName: productData?.shipName,
       shipNo: productData?.shipNo,
-      departureDate: productData?.departureDate,
-      estimatedDate: productData?.estimatedDate,
+      departureDate: productData?.departureDate
+        ? new Date(productData?.departureDate).toLocaleDateString('en-GB') : '',
+      estimatedDate: productData?.estimatedDate
+        ? new Date(productData?.estimatedDate).toLocaleDateString('en-GB') : '',
       exportedTo: productData?.exportedTo,
-      exportDate: productData?.exportDate,
+      exportDate: productData?.exportDate
+        ? new Date(productData?.exportDate).toLocaleDateString('en-GB') : '',
     },
     {
       id: '3',
@@ -388,12 +382,14 @@ function View() {
       importerName: productData?.importerName,
       quantityImported: productData?.quantityImported,
       shipStorage: productData?.shipStorage,
-      arrivalDate: productData?.arrivalDate,
+      arrivalDate: productData?.arrivalDate
+        ? new Date(productData?.arrivalDate).toLocaleDateString('en-GB') : '',
       warehouseLocation: productData?.warehouseLocation,
-      warehouseArrivalDate: productData?.warehouseArrivalDate,
+      warehouseArrivalDate: productData?.warehouseArrivalDate
+        ? new Date(productData?.warehouseArrivalDate).toLocaleDateString('en-GB') : '',
       importerAddress: productData?.importerAddress,
-      importDate: productData?.importDate,
-
+      importDate: productData?.importDate
+        ? new Date(productData?.importDate).toLocaleDateString('en-GB') : '',
     },
     {
       id: '4',
@@ -404,6 +400,7 @@ function View() {
       temperatureLevel: productData?.temperatureLevel,
       humidity: productData?.humidity,
       harvestDate: productData?.harvestDate
+        ? new Date(productData?.harvestDate).toLocaleDateString('en-GB') : ''
     },
     {
       id: '5',
@@ -415,7 +412,8 @@ function View() {
       certificateFrom: productData?.certificateFrom,
       typeOfFertilizer: productData?.typeOfFertilizer,
       fertilizerUsed: productData?.fertilizerUsed,
-      inspectionDate: productData?.inspectionDate,
+      inspectionDate: productData?.inspectionDate
+        ? new Date(productData?.inspectionDate).toLocaleDateString('en-GB') : '',
     }
 
   ];
@@ -504,7 +502,7 @@ function View() {
                     <div className='descriptionmanagaersection'>
                       <p className='tesxtjustify'>
                         <div className='tesxtjustify'>
-                          {/* {item?.processorId && <p><span>Id </span><span>{item.processorId}</span></p>} */}
+
                           {item?.processorName && <p><span>Name </span><span>{item.processorName}</span></p>}
                           {item?.processedDate && <p><span>Processed Date </span><span>{item.processedDate}</span></p>}
                           {item?.processorAddress && <p><span>Address </span><span>{item.processorAddress}</span></p>}
@@ -515,7 +513,7 @@ function View() {
                           {item?.warehouse && <p><span>Warehouse </span><span>{item.warehouse}</span></p>}
                           {item?.destination && <p><span>Destination </span><span>{item.destination}</span></p>}
 
-                          {/* {item?.exporterId && <p><span>Id </span><span>{item.exporterId}</span></p>} */}
+
                           {item?.exporterName && <p><span>Name </span><span>{item.exporterName}</span></p>}
                           {item?.coordinationAddress && <p><span>Coordination Address </span><span>{item.coordinationAddress}</span></p>}
                           {item?.shipName && <p><span>Ship Name </span><span>{item.shipName}</span></p>}
@@ -525,7 +523,7 @@ function View() {
                           {item?.exportedTo && <p><span>Exported To </span><span>{item.exportedTo}</span></p>}
                           {item?.exportDate && <p><span>Export Date </span><span>{item.exportDate}</span></p>}
 
-                          {/* {item?.importerId && <p><span>Id </span><span>{item.importerId}</span></p>} */}
+
                           {item?.importerName && <p><span>Name </span><span>{item.importerName}</span></p>}
                           {item?.quantityImported && <p><span>Quantity Imported </span><span>{item.quantityImported}</span></p>}
                           {item?.shipStorage && <p><span>Ship Storage </span><span>{item.shipStorage}</span></p>}
@@ -535,14 +533,14 @@ function View() {
                           {item?.importerAddress && <p><span>Importer Address </span><span>{item.importerAddress}</span></p>}
                           {item?.importDate && <p><span>Import Date </span><span>{item.importDate}</span></p>}
 
-                          {/* {item?.harvesterId && <p><span>Id </span><span>{item.harvesterId}</span></p>} */}
+
                           {item?.harvesterName && <p><span>Name </span><span>{item.harvesterName}</span></p>}
                           {item?.cropSampling && <p><span>Crop Sampling </span><span>{item.cropSampling}</span></p>}
                           {item?.temperatureLevel && <p><span>Temperature Level </span><span>{item.temperatureLevel}</span></p>}
                           {item?.humidity && <p><span>Humidity </span><span>{item.humidity}</span></p>}
                           {item?.harvestDate && <p><span>Harvest Date </span><span>{item.harvestDate}</span></p>}
 
-                          {/* {item?.farmInspectionId && <p><span>Id </span><span>{item.farmInspectionId}</span></p>} */}
+
                           {item?.farmInspectionName && <p><span>Name </span><span>{item.farmInspectionName}</span></p>}
                           {item?.productName && <p><span>Product Name </span><span>{item.productName}</span></p>}
                           {item?.certificateNo && <p><span>Certificate No </span><span>{item.certificateNo}</span></p>}
@@ -577,7 +575,7 @@ function View() {
                   {history?.length > 0 ? (
                     history.map((ele, i) => (
                       <tr key={i}>
-                        <td>{ele?.transactionId ? `${ele.transactionId.slice(0, 3)}...${ele.transactionId.slice(-3)}`: ''}</td>
+                        <td>{ele?.transactionId ? `${ele.transactionId.slice(0, 3)}...${ele.transactionId.slice(-3)}` : ''}</td>
                         <td>{ele?.seller}</td>
                         <td>{ele?.buyer}</td>
                         <td>₹ {ele?.price}</td>
@@ -604,20 +602,6 @@ function View() {
                 flexWrap: 'wrap',
                 gap: '10px'
               }}>
-                {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={{ marginRight: '10px' }}>Items per page:</span>
-                    <select
-                      value={pagination.limit}
-                      onChange={(e) => handleLimitChange(e.target.value)}
-                      style={{ padding: '5px', borderRadius: '4px' }}
-                      disabled={loading}
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={15}>15</option>
-                      <option value={20}>20</option>
-                    </select>
-                  </div> */}
 
                 <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                   <button
@@ -648,24 +632,6 @@ function View() {
                     ◀
                   </button>
 
-                  {/* {getPageNumbers().map(page => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        disabled={loading}
-                        style={{
-                          padding: '5px 10px',
-                          border: '1px solid #ddd',
-                          background: currentPage === page ? '#007bff' : '#fff',
-                          color: currentPage === page ? '#fff' : '#000',
-                          cursor: 'pointer',
-                          borderRadius: '4px',
-                          minWidth: '36px'
-                        }}
-                      >
-                        {page}
-                      </button>
-                    ))} */}
                   <div style={{ color: '#666', fontSize: '0.9em', display: 'flex', alignItems: 'center' }}>
                     Page {currentPage} of {pagination.totalPages}
                   </div>

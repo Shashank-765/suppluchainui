@@ -15,26 +15,12 @@
   width: 100%;
 }
 
-/* .leftviewdiv {
-  width: 100%;
-  height: auto;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  gap: 10px;
-
-} */
 
 .imagecontainerview {
   width: 100%;
   height: 64%;
   flex-shrink: 0;
 
-  /* border: 1px solid brown; */
   >img {
     width: 100%;
     height: 100%;
@@ -50,16 +36,13 @@
   justify-content: space-around;
 }
 
-/* Keep accordion cards clickable */
 .description-container {
   border-radius: 10px;
 }
 
-/* Main scrollable container */
 .descriptiop-containeriew {
   width: 40%;
   height: 450px;
-  /* border: 1px solid #235f48; */
   border-radius: 20px;
   box-shadow: 0 0 10px #7cb4a4;
   display: flex;
@@ -67,7 +50,6 @@
   align-items: stretch;
   text-align: left;
   overflow-y: auto;
-  /* scroll only when content exceeds height */
   padding: 1rem;
   gap: 1rem;
 
@@ -77,14 +59,12 @@
   }
 }
 
-/* Each accordion block */
 .imagedescription {
   width: 100%;
   height: auto;
   border-radius: 5px;
 }
 
-/* Header section of each accordion */
 .about-vegitable {
   display: flex;
   justify-content: space-between;
@@ -94,7 +74,6 @@
   border-radius: 5px;
 }
 
-/* Icon and heading */
 .iconvegtble {
   display: flex;
   align-items: center;
@@ -105,13 +84,11 @@
   font-weight: bold;
 }
 
-/* Right-side arrow icon */
 .righticon img {
   width: 20px;
   height: 20px;
 }
 
-/* Accordion content */
 .about-vegitabledescription {
   display: flex;
   flex-direction: column;
@@ -122,7 +99,6 @@
   border-radius: 5px;
 }
 
-/* Inner content layout */
 .descriptionmanagaersection p {
   margin: 0.25rem 0;
   display: flex;
@@ -143,11 +119,9 @@
 
 .descriptiop-containeriew::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari, and Opera */
 }
 
 .rightviewdiv {
-  /* border: 1px solid red; */
   border-radius: 20px;
   padding: 2rem;
   width: 40%;
@@ -189,7 +163,6 @@
 
 .buynowbuttoncover {
   width: 100%;
-  /* border: 1px solid red; */
   text-align: center;
   margin-top: 5rem;
 }
@@ -289,7 +262,6 @@
 }
 
 .tesxtjustify {
-  /* border: 1px solid red; */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -309,7 +281,6 @@
 
     >span {
       width: 45%;
-      /* border: 1px solid red; */
       text-align: start;
       font-size: 18px;
     }
@@ -319,13 +290,11 @@
 .rightsidedescriptionimage {
   width: 45%;
   height: 450px;
-  /* border: 1px solid #235f48; */
   box-shadow: 0 0 10px #7cb4a4;
   border-radius: 20px;
   text-align: center;
   padding: 1rem;
   overflow: hidden;
-  /* margin: 10px; */
 
   table td,
   table th {
@@ -403,7 +372,6 @@
   border-radius: 20px;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  /* background: #e7f4f0; */
 }
 
 .leftviewdiv {
@@ -439,8 +407,6 @@
 .dot-indicators {
   display: flex;
   justify-content: center;
-  /* margin-top: 6px; */
-  /* padding-block: 10px */
 }
 
 .dot {
@@ -661,7 +627,6 @@
   transition: background-color 0.3s;
 }
 
-/* Animation */
 @keyframes fadeScale {
   from {
     opacity: 0;
@@ -688,8 +653,6 @@
 .rightsidehistorydetials {
   height: 75%;
   overflow-x: scroll;
-  /* scrollbar-width: none; 
-  -ms-overflow-style: none; */
 }
 
 .rightsidehistorydetials::-webkit-scrollbar {

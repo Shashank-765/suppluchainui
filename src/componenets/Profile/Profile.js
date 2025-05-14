@@ -34,7 +34,6 @@ function Profile({ setIsAuthenticated, setUser }) {
     const navigate = useNavigate();
 
     const handleClick = (product) => {
-    //    if(userdata) return;
         const viewOnly = 'viewOnly'
         navigate('/viewpage', { state: { product, viewOnly } });
     };
@@ -117,10 +116,18 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
+        document.cookie.split(";").forEach(cookie => {
+            const name = cookie.trim().split("=")[0];
+            document.cookie = `${name}=; Max-Age=0; path=/;`;
+            document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
+        });
+
         setIsAuthenticated(false);
         navigate('/auth');
         showSuccess('Logout successful!');
     };
+
+
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
@@ -199,7 +206,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                         <div className="profile-card">
                             <div className="profile-banner">
                                 <img src={profilecover} alt='images' />
-                                <h1>Welcome, {userdata ? userdata?.name : userData.name}</h1>
+                                <h1>{userdata ? '' : 'Welcome,'} {userdata ? `${userdata?.name} Profiles` : userData.name}</h1>
                             </div>
                             <div className="profile-content">
                                 <img className="profile-image" src={profileImage} alt="Profile" />
@@ -208,16 +215,13 @@ function Profile({ setIsAuthenticated, setUser }) {
                                         <p>Contact No</p>
                                         <span className="contact-information">{userdata ? userdata?.contact : user?.contact}</span>
                                     </div>
-
                                     {
-
                                         user?.userType === 'user' ? <div className="role-info">
                                             <p>Role</p>
                                             <span className={user?.role?.className}>
                                                 {user?.role?.slug}
                                             </span>
                                         </div> : ''
-
                                     }
 
                                     <div className="settings">
@@ -248,12 +252,9 @@ function Profile({ setIsAuthenticated, setUser }) {
 
                             </div>
                         </div>
-
-
-                        {
-                            // user?.userType === 'user' || user?.userType === 'admin' ? '' :
+                       {
                             <div className="my-product-continer">
-                                <h2 className="my-products-only">My Products</h2>
+                                <h2 className="my-products-only">{userdata ? 'Products' : 'My Products'}</h2>
                                 <div className="productmaincontainer">
                                     {products.length > 0 ? (
                                         products.map((product, i) => (

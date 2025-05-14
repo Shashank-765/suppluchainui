@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, #e3f2fd, #ffffff);
+  background: #d1e3d7;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -22,7 +22,7 @@
 .notfound-box h1 {
   font-size: 120px;
   margin: 0;
-  color: #ff6b6b;
+  color: #1d6f42;
   font-weight: bold;
 }
 
@@ -36,15 +36,11 @@
   display: inline-block;
   padding: 12px 28px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #1d6f42;
   color: white;
   text-decoration: none;
   border-radius: 6px;
   transition: background-color 0.3s ease;
-}
-
-.back-home-btn:hover {
-  background-color: #0056b3;
 }
 
 @media (max-width: 600px) {

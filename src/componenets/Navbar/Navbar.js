@@ -182,8 +182,8 @@ function Navbar({ isAuthenticated }) {
                   {notifications.length > 0 ? (
                     <>
                       {notifications.slice(0, 4).map((note, index) => (
-                        <li key={index} className="notificationli">
-                          <div className="notification-header" onClick={() => handleNotification(note)}>
+                        <li key={index} className="notificationli" onClick={() => handleNotification(note)}>
+                          <div className="notification-header" >
                             {note.batchId && note.message
                               ? `Batch with Id ${note.batchId} ${note.message}`
                               : 'New Notification'}

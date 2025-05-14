@@ -46,12 +46,10 @@ const Dashboard = () => {
     const [simpleUserPage, setSimpleUserPage] = useState(1);
     const [simpleUserTotalPages, setSimpleUserTotalPages] = useState(1);
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
-    const [simpleUserLoading, setSimpleUserLoading] = useState(false);
 
 
     const fetchSimpleUsers = async () => {
         try {
-            setSimpleUserLoading(true);
             const res = await api.get(`${process.env.REACT_APP_BACKEND_URL}/users/getallsimpleusers`, {
                 params: {
                     page: simpleUserPage,
@@ -59,18 +57,15 @@ const Dashboard = () => {
                     search: simpleUserSearch
                 }
             });
-
             setSimpleUsers(res.data.users);
             setSimpleUserTotalPages(res.data.totalPages);
         } catch (error) {
             console.error('Failed to fetch simple users:', error);
-        } finally {
-            setSimpleUserLoading(false);
         }
     };
-      const UserNavigateHandler =(userdata)=>{
-       navigate('/profile', { state: { userdata } });
-      }
+    const UserNavigateHandler = (userdata) => {
+        navigate('/profile', { state: { userdata } });
+    }
     useEffect(() => {
         fetchSimpleUsers();
     }, [simpleUserPage, simpleUserSearch, toggle]);
@@ -192,11 +187,11 @@ const Dashboard = () => {
                         userPassword: updatedUser?.password,
                         userAddress: updatedUser.address,
                         userStatus: updatedUser.isBlocked || "True",
-                        userCreatedAt: updatedUser.userCreatedAt || 'null',
-                        userUpdatedAt: updatedUser.userUpdatedAt || 'null',
-                        userDeletedAt: updatedUser.userDeletedAt || 'null',
-                        userCreatedBy: updatedUser.userCreatedBy || 'null',
-                        userUpdatedBy: updatedUser.userUpdatedBy || 'null',
+                        userCreatedAt: updatedUser.userCreatedAt || new Date().toISOString(),
+                        userUpdatedAt: updatedUser.userUpdatedAt || new Date().toISOString(),
+                        userDeletedAt: updatedUser.userDeletedAt || '00/00/0000',
+                        userCreatedBy: updatedUser.userCreatedBy || user?._id,
+                        userUpdatedBy: updatedUser.userUpdatedBy || user?._id,
                         userDeletedBy: updatedUser.userDeletedBy || 'null'
                     }
                 );
@@ -353,22 +348,30 @@ const Dashboard = () => {
             if (res.data) {
 
                 const couchdb = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addbatch`, {
-                    batchId: (res.data?.batch?.batchId).toString(),
-                    farmerRegNo: res.data?.batch?.farmerRegNo,
-                    farmerName: res.data?.batch?.farmerName,
-                    farmerAddress: res.data?.batch?.farmerAddress,
-                    farmInspectionName: res.data?.batch?.farmInspectionName,
-                    harvesterName: res.data?.batch?.harvesterName,
-                    processorName: res.data?.batch?.processorName,
-                    exporterName: res.data?.batch?.exporterName,
-                    importerName: res.data?.batch?.importerName,
-                    coffeeType: res.data?.batch?.coffeeType,
-                    qrCode: res.data?.batch?.qrCode,
-                    farmInspectionId: res.data?.batch?.farmInspectionId,
-                    harvesterId: res.data?.batch?.harvesterId,
-                    processorId: res.data?.batch?.processorId,
-                    exporterId: res.data?.batch?.exporterId,
-                    importerId: res.data?.batch?.importerId
+                    batchId: (res?.data?.batch?.batchId)?.toString(),
+                    farmerRegNo:res?.data?.batch?.farmerRegNo,
+                    farmerName:res?.data?.batch?.farmerName,
+                    farmerAddress:res?.data?.batch?.farmerAddress,
+                    farmInspectionName:res?.data?.batch?.farmInspectionName,
+                    harvesterName:res?.data?.batch?.harvesterName,
+                    processorName:res?.data?.batch?.processorName,
+                    exporterName:res?.data?.batch?.exporterName,
+                    importerName:res?.data?.batch?.importerName,
+                    coffeeType:res?.data?.batch?.coffeeType,
+                    qrCode:res?.data?.batch?.qrCode,
+                    farmInspectionId:res?.data?.batch?.farmInspectionId,
+                    harvesterId:res?.data?.batch?.harvesterId,
+                    processorId:res?.data?.batch?.processorId,
+                    exporterId:res?.data?.batch?.exporterId,
+                    importerId:res?.data?.batch?.importerId,
+                    batchStatus:res?.data?.batch?.batchStatus || 'progress',
+                    batchIsDeleted:res?.data?.batch?.batchIsDeleted || "00/00/0000",
+                    batchCreatedAt:res?.data?.batch?.batchCreatedAt || new Date().toISOString(),
+                    batchUpdatedAt:res?.data?.batch?.batchUpdatedAt || new Date().toISOString(),
+                    batchDeletedAt:res?.data?.batch?.batchDeletedAt || '00/00/0000',
+                    batchCreatedBy:res?.data?.batch?.batchCreatedBy || user?._id,
+                    batchUpdatedBy:res?.data?.batch?.batchUpdatedBy || user?._id,
+                    batchDeletedBy:res?.data?.batch?.batchDeletedBy || user?._id
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -430,21 +433,23 @@ const Dashboard = () => {
                 const userdata = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addUser`, {
                     userId: res?.data?.user?._id,
                     userType: res?.data?.user?.userType,
+                    userRole: res?.data?.user?.role?.label,
                     userName: res?.data?.user?.name,
-                    userRole: res?.data?.user?.role?.label || 'harvester',
                     userEmail: res?.data?.user?.email,
-                    userPassword: res?.data?.user?.password,
                     userPhone: res?.data?.user?.contact,
-                    userAddress: res?.data?.user?.walletAddress,
+                    userAddress: res?.data?.user?.address || 'noida',
+                    userPassword: res?.data?.user?.password,
                     userStatus: res?.data?.user?.isBlocked || "True",
-                    userCreatedAt: res?.data?.user?.userCreatedAt || 'null',
-                    userUpdatedAt: res?.data?.user?.userUpdatedAt || 'null',
-                    userDeletedAt: res?.data?.user?.userDeletedAt || 'null',
-                    userCreatedBy: res?.data?.user?.userCreatedBy || 'null',
-                    userUpdatedBy: res?.data?.user?.userUpdatedBy || 'null',
-                    userDeletedBy: res?.data?.user?.userDeletedBy || 'null'
+                    userCreatedAt: res?.data?.user?.userCreatedAt || new Date().toISOString(),
+                    userUpdatedAt: res?.data?.user?.userUpdatedAt || '00/00/0000',
+                    userDeletedAt: res?.data?.user?.userDeletedAt || '00/00/0000',
+                    userCreatedBy: res?.data?.user?.userCreatedBy || user?._id,
+                    userUpdatedBy: res?.data?.user?.userUpdatedBy || user?._id ,
+                    userDeletedBy: res?.data?.user?.userDeletedBy || user?._id,
+                    userWalletAddress: res?.data?.user?.walletAddress,
+                    userBuyProducts: [],
+                    userIsDeleted: 'False'
                 })
-                console.log(userdata, 'user created successfully');
                 showSuccess("User Created succefully")
                 setIsCircularLoader(false);
                 setToggle(!toggle);
@@ -588,7 +593,6 @@ const Dashboard = () => {
         try {
             const response = await api.post(`/users/blockUser?id=${user._id}`);
             if (response.data) {
-                // console.log('User blocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User Blocked Succefully')
                 setToggle(!toggle);
             } else {
@@ -605,7 +609,6 @@ const Dashboard = () => {
         try {
             const response = await api.post(`/users/unblockUser?id=${user?._id}`,);
             if (response.data) {
-                // console.log('User unblocked successfully!',response?.data?.user?.isBlocked);
                 showSuccess('User unblocked successfully!');
                 setToggle(!toggle);
             } else {
@@ -678,14 +681,6 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            // const response = await api.get("/batch/getBatch", {
-            //     params: {
-            //         page: currnetBatchPage,
-            //         limit: usersPerPage,
-            //         search: searchBatchTerm,
-            //     }
-            // });
-
             const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter`,
                 {
                     params: {
@@ -1043,7 +1038,6 @@ const Dashboard = () => {
                             )}
                         </tbody>
 
-                        {/* QR Modal */}
                         {qrModalOpen && (
                             <div className={styles.qrModalOverlay} onClick={closeQrModal}>
                                 <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
@@ -1211,48 +1205,48 @@ const Dashboard = () => {
                     onChange={handlesimpleuserSearchChange}
                     className={styles.simpleusersearchInput}
                 />
-                <table className={styles.simpleUserTable}>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Contact</th>
-                            <th>Role</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {simpleUsers.length === 0 ? (
+                <div className={styles.simpleusertablecontainer}>
+                    <table className={styles.simpleUserTable}>
+                        <thead>
                             <tr>
-                                <td colSpan="3">No users found</td>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Contact</th>
+                                <th>Role</th>
+                                <th>Address</th>
+                                <th>Date</th>
+                                <th>Action</th>
                             </tr>
-                        ) : (
-                            simpleUsers.map((user) => (
-                                <tr key={user._id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.contact}</td>
-                                    <td>{user.userType || '---'}</td>
-                                    <td>{user.address}</td>
-                                    <td>{new Date(user?.createdAt).toLocaleDateString('en-GB')}</td>
-                                    <td>
-                                        {
-                                            !user?.isBlocked ? (
-                                                <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
-                                            ) : (
-                                                <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
-                                            )}
-                                        <button onClick={()=>UserNavigateHandler(user)} className={styles.editButton}><img src={view} alt='images' /></button>
-                                    </td>
+                        </thead>
+                        <tbody>
+                            {simpleUsers.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">No users found</td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-
-
+                            ) : (
+                                simpleUsers.map((user) => (
+                                    <tr key={user._id}>
+                                        <td>{user.name}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.contact}</td>
+                                        <td>{user.userType || '---'}</td>
+                                        <td>{user.address}</td>
+                                        <td>{new Date(user?.createdAt).toLocaleDateString('en-GB')}</td>
+                                        <td>
+                                            {
+                                                !user?.isBlocked ? (
+                                                    <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
+                                                ) : (
+                                                    <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
+                                                )}
+                                            <button onClick={() => UserNavigateHandler(user)} className={styles.editButton}><img src={view} alt='images' /></button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
                 <div className={styles.simpleuserpagination}>
                     <button
                         onClick={() => setSimpleUserPage((prev) => Math.max(prev - 1, 1))}
@@ -1558,20 +1552,6 @@ const Dashboard = () => {
                                 />
                                 {userErrors.email && <span className={styles.errorText}>{userErrors.email}</span>}
                             </div>
-
-                            {/* <div className={styles.formGroup}>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    value={userForm.password}
-                                    onChange={handleUserChange}
-                                    onBlur={handleUserBlur}
-                                    className={styles.inputtextclasses}
-                                />
-                                {userErrors.password && <span className={styles.errorText}>{userErrors.password}</span>}
-                            </div> */}
-
                             <div className={styles.formGroup}>
                                 <input
                                     type="text"

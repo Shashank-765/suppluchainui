@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../Models/userModel.js');
 const mongoose = require('mongoose');
 const { authorize } = require('../../Auth/Authenticate.js')
 
@@ -18,7 +17,7 @@ router.get('/getproducttomarkiting', authorize, async (req, res) => {
     const totalPages = Math.ceil(totalCount / limit);
 
     const trackingDetails = await TrackingModel.find({ isProcessed: true })
-      .sort({ createdAt: -1 }) // ✅ Ensure consistent ordering
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -121,7 +120,6 @@ router.get('/getmyproducts',authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while fetching products' });
   }
 });
-
 
 router.get('/getProductById',authorize, async (req, res) => {
   try {

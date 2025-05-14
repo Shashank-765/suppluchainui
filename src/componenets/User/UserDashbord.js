@@ -11,7 +11,6 @@ import axios from 'axios';
 
 function UserDashBoard() {
   const user = JSON.parse(localStorage.getItem('user')) || null;
-  // console.log(user?.role?.label,'user role')
   const [showForm, setShowForm] = useState(false);
   const [batchData, setBatchData] = useState([]);
   const [usersPerPage] = useState(6);
@@ -334,19 +333,6 @@ function UserDashBoard() {
             search: searchBatchTerm,
           },
         }
-        // const response = await api.get(
-        // `/batch/getBatchByUserId`,
-        // {
-        //   params: {
-        //     id: userdata?._id || user?._id,
-        //     page: currnetBatchPage,
-        //     limit: usersPerPage,
-        //     search: searchBatchTerm,
-        //   },
-        //   headers: {
-        //     Authorization: `Bearer ${user?.token}`,
-        //   },
-        // }
       );
 
       if (response.data) {
@@ -514,11 +500,9 @@ function UserDashBoard() {
     const newErrors = {};
 
     currentRoleFields.forEach(key => {
-      // if (key !== 'images' && key !== 'inspectedImages') {
       const error = validateField(key, formData[key]);
       console.log(error, 'this is the error')
       if (error) newErrors[key] = error;
-      // }
     });
 
     setErrors(newErrors);
@@ -550,9 +534,7 @@ function UserDashBoard() {
 
     const allTouched = {};
     Object.keys(formData).forEach(key => {
-      // if (key !== 'images' && key !== 'inspectedImages') {
       allTouched[key] = true;
-      // }
     });
     setTouched(allTouched);
 

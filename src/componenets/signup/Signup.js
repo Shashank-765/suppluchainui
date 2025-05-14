@@ -34,17 +34,17 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
             case 'email':
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Enter a valid email';
                 break;
-            // case 'password':
-            //     if (value.length < 6) {
-            //         error = 'Password must be at least 6 characters';
-            //     } else if (!/[A-Za-z]/.test(value)) {
-            //         error = 'Password must include at least one letter';
-            //     } else if (!/\d/.test(value)) {
-            //         error = 'Password must include at least one number';
-            //     } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-            //         error = 'Password must include at least one special character';
-            //     }
-            //     break;
+            case 'password':
+                if (value.length < 6) {
+                    error = 'Password must be at least 6 characters';
+                } else if (!/[A-Za-z]/.test(value)) {
+                    error = 'Password must include at least one letter';
+                } else if (!/\d/.test(value)) {
+                    error = 'Password must include at least one number';
+                } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+                    error = 'Password must include at least one special character';
+                }
+                break;
 
             case 'address':
                 if (!value.trim()) error = 'Address is required';

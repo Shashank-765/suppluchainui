@@ -87,7 +87,7 @@ function Product() {
                         {!isCircularloader && page < totalPages && (
                             <div className='productcontainer see-more-card' onClick={handleSeeMore}>
                                 <div className='productimagecontianer'>
-                                    {/* <img src={image1} alt='see more' className='see-more-image' /> */}
+                                
                                 </div>
                                 <div className='productdetailscontainer'>
                                     <div className='productdetailscontainerdetails'>

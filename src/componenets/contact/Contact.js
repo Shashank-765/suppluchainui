@@ -11,7 +11,6 @@ function Contact() {
     </div>
      
 
-      {/* Full-width Map */}
       <div className="map-fullwidth">
         <iframe
           title="Google Map"

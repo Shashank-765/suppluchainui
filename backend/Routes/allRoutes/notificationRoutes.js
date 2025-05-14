@@ -5,7 +5,7 @@ const BatchModel = require('../../Models/BatchModel.js')
 const NotifyModel = require('../../Models/NotifictionModel.js')
 const { authorize } = require('../../Auth/Authenticate.js');
 
-// authorize
+
 router.get('/notifications', authorize, async (req, res) => {
     try {
         const userId = req.query.id;
@@ -40,7 +40,7 @@ router.get('/notifications', authorize, async (req, res) => {
         res.status(500).json({ message: error.message || 'Server error' });
     }
 });
-// authorize
+
 router.get('/getallnotifications', authorize, async (req, res) => {
     try {
         const skip = parseInt(req.query.skip) || 0;

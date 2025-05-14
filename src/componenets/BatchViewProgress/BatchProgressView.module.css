@@ -236,11 +236,6 @@
   z-index: 1;
 }
 
-/* .current {
-  display: block;
-  transform: translateX(0);
-  opacity: 1;
-} */
 
 .next {
   display: block;
@@ -253,7 +248,7 @@
 }
 
 
-/* Currently focused image */
+
 .current {
   left: 5%;
   z-index: 3;
@@ -261,7 +256,6 @@
   opacity: 1;
 }
 
-/* Peek left */
 .prev {
   left: -25%;
   z-index: 2;
@@ -269,22 +263,6 @@
   opacity: 0.6;
 }
 
-/* Peek right */
-/* .next {
-  left: 55%;
-  z-index: 2;
-  transform: scale(0.9);
-  opacity: 0.6;
-} */
-
-/* Hidden images */
-/* .hidden {
-  opacity: 0;
-  transform: scale(0.9);
-  pointer-events: none;
-} */
-
-/* Arrows */
 .arrowContainer {
   position: absolute;
   top: 50%;

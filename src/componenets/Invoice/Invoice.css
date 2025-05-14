@@ -6,19 +6,6 @@
     --spacing-unit: 1rem;
 }
 
-/* * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: #f5f5f5;
-    padding: 2rem;
-} */
 
 .invoice-container {
     margin-block: 3rem !important;
@@ -30,14 +17,12 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Header Styles */
 .invoice-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 2rem;
     padding-bottom: 2rem;
-    /* border-bottom: 2px solid var(--border-color); */
 }
 
 .brand h1 {
@@ -73,11 +58,9 @@ body {
     margin-bottom: 0.25rem;
 }
 
-/* Parties Container */
 .parties-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    /* grid-template-columns: 1fr; */
     gap: 2rem;
     margin-bottom: 2rem;
     position: relative;
@@ -124,7 +107,6 @@ body {
     color: var(--text-color);
 }
 
-/* Table Styles */
 .invoice-table {
     width: 100%;
     border-collapse: collapse;
@@ -148,7 +130,6 @@ body {
     background-color: #f9f9f9;
 }
 
-/* Summary Section */
 .invoice-summary {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -157,7 +138,6 @@ body {
 
 div.calculations {
     padding: 1.5rem;
-    /* background-color: var(--secondary-color); */
     border: 1px solid #ddd;
     border-radius: 8px;
 }
@@ -215,11 +195,9 @@ i.fas.fa-building {
     font-size: 40px;
 }
 
-/* Footer Styles */
 .invoice-footer {
     margin-top: 2rem;
     padding-top: 2rem;
-    /* border-top: 2px solid var(--border-color); */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
@@ -282,7 +260,6 @@ i.fas.fa-building {
     margin: 2rem 0;
 }
 
-/* Responsive Design */
 @media screen and (max-width: 768px) {
     .invoice-container {
         padding: 1rem;

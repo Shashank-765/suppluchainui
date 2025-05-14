@@ -39,6 +39,11 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("user");
+        document.cookie.split(";").forEach(cookie => {
+          const name = cookie.trim().split("=")[0];
+          document.cookie = `${name}=; Max-Age=0; path=/;`;
+          document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
+        });
         window.location.href = "/auth";
         return Promise.reject(refreshError);
       }

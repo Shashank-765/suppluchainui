@@ -142,7 +142,32 @@ function Profile({ setIsAuthenticated, setUser }) {
         try {
             setIsCircularLoader(true);
             const response = await api.post(`/users/updateprofile`, formData)
+            console.log(response?.data)
             if (response?.data) {
+                try {
+                    const updatedb = await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateUser/${response.data?.user?._id}`,
+                        {
+                            userId: response.data?.user?._id,
+                            userType: response.data.user?.userType,
+                            userRole: response.data.user?.userType,
+                            userName: response.data.user?.name,
+                            userEmail: response.data.user?.email,
+                            userPhone: response.data.user?.contact,
+                            userPassword: response.data.user?.password,
+                            userAddress: response.data.user?.address || 'noida sector 12',
+                            userStatus: response.data.user?.isBlocked || "True",
+                            userCreatedAt: response.data.user?.createdAt || new Date().toISOString(),
+                            userUpdatedAt: response.data.user?.updatedAt || new Date().toISOString(),
+                            userDeletedAt: response.data.user?.deletedAt || '00/00/0000',
+                            userCreatedBy: response.data.user?.createdBy || user?._id,
+                            userUpdatedBy: response.data.user?.updatedBy || user?._id,
+                            userDeletedBy: response.data.user?.deletedBy || 'null'
+                        })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+
                 setIsEditing(false);
                 setIsCircularLoader(false);
                 showSuccess('Profile updated!');
@@ -252,7 +277,7 @@ function Profile({ setIsAuthenticated, setUser }) {
 
                             </div>
                         </div>
-                       {
+                        {
                             <div className="my-product-continer">
                                 <h2 className="my-products-only">{userdata ? 'Products' : 'My Products'}</h2>
                                 <div className="productmaincontainer">

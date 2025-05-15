@@ -107,6 +107,32 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
                     },
                 });
                 if (registeredUser && registeredUser.data) {
+
+                     try {
+                        const user = await api.post(`${process.env.REACT_APP_BACKEND2_URL}/adduser`,{
+                            userId: registeredUser?.data?.user?._id,
+                            userType: registeredUser?.data?.user?.userType,
+                            userRole: registeredUser?.data?.user?.userType,
+                            userName: registeredUser?.data?.user?.name,
+                            userEmail: registeredUser?.data?.user?.email,
+                            userPhone: registeredUser?.data?.user?.contact,
+                            userAddress: registeredUser?.data?.user?.address || 'noida',
+                            userPassword: registeredUser?.data?.user?.password,
+                            userStatus: registeredUser?.data?.user?.isBlocked || "True",
+                            userCreatedAt: registeredUser?.data?.user?.createdAt || new Date().toISOString(),
+                            userUpdatedAt: registeredUser?.data?.user?.updatedAt || '00/00/0000',
+                            userDeletedAt: registeredUser?.data?.user?.deletedAt || '00/00/0000',
+                            userCreatedBy: registeredUser?.data?.user?._id,
+                            userUpdatedBy: registeredUser?.data?.user?._id ,
+                            userDeletedBy: registeredUser?.data?.user?._id,
+                            userWalletAddress: registeredUser?.data?.user?.walletAddress,
+                            userBuyProducts: [],
+                            userIsDeleted: 'False'
+                        })
+                       
+                     } catch (error) {
+                          console.log(error)
+                     }
                     setIsCircularLoader(false);
                     setFormData({
                         name: '',

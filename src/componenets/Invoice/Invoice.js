@@ -1,5 +1,6 @@
 import React from 'react'
 import './Invoice.css'
+import axios from 'axios';
 import { useEffect, useState } from 'react'
 import CircularLoader from '../CircularLoader/CircularLoader'
 import qrcode from '../../Imges/qrcode.jpg'
@@ -8,10 +9,8 @@ import { usePDF } from 'react-to-pdf';
 function Invoice() {
 
   const [invoiceData, setInvoiceData] = useState(null);
+  const [processordata, setProcessordata] = useState(null);
   const [isCircularloader, setIsCircularLoader] = useState(false);
-
-  const { toPDF, targetRef } = usePDF({ filename: 'invoice.pdf' });
-  const navigate = useNavigate();
   useEffect(() => {
     const storedData = sessionStorage.getItem('invoiceData');
     if (storedData) {
@@ -19,7 +18,101 @@ function Invoice() {
     } else {
       navigate('/');
     }
-  }, [navigate]);
+  }, []);
+
+  useEffect(() => {
+    if (!invoiceData) return;
+
+    const fetchprocessordetails = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/processor/${invoiceData.batchId + '_' + invoiceData.sellerId}`);
+        console.log(response.data, 'this is data of processor');
+        setProcessordata(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchprocessordetails();
+  }, [invoiceData]);
+
+  useEffect(() => {
+    if (!invoiceData || !processordata) return;
+
+    const fetchSession = async () => {
+      const sessionId = new URLSearchParams(window.location.search).get('session_id');
+      if (!sessionId) return;
+
+      try {
+        const session = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/stripe/getsession/${sessionId}`, {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`,
+          },
+        }).then(res => res.data);
+
+        // 1. Log buy transaction
+        try {
+          const data = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/buy`, {
+            transactionId: session.payment_intent,
+            buyerId: invoiceData.buyerId,
+            batchId: invoiceData.batchId,
+            sellerId: invoiceData.sellerId,
+            quantity: invoiceData.quantity,
+            price: invoiceData.price,
+            buyStatus: 'completed',
+            buyCreated: new Date().toISOString(),
+            buyUpdated: new Date().toISOString()
+          });
+          console.log(data, 'buy data');
+        } catch (error) {
+          console.log('Buy API error:', error);
+        }
+
+        // 2. Update processor
+        let purchaseQuantity = parseFloat(invoiceData.quantity);
+        if (invoiceData.unit === 'kg') {
+          purchaseQuantity = purchaseQuantity / 100;
+        }
+        const storeQuantity = processordata.quantity - purchaseQuantity;
+
+        try {
+          const processorquantity = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updateProcessor/${invoiceData.batchId}_${invoiceData.sellerId}`, {
+            batchId: invoiceData.batchId,
+            processorId: invoiceData.sellerId,
+            processorName: processordata.processorName,
+            price: invoiceData.realprice,
+            quantity: storeQuantity.toString(),
+            processingMethod: processordata.processingMethod,
+            packaging: processordata.packaging,
+            packagedDate: processordata.packagedDate,
+            warehouse: processordata.warehouse,
+            warehouseLocation: processordata.warehouseLocation,
+            destination: processordata.destination,
+            processorStatus: processordata.processorStatus,
+            processorCreated: processordata.processorCreated,
+            processorUpdated: processordata.processorUpdated,
+            processorDeleted: processordata.processorDeleted,
+            image: processordata.image || []
+          });
+          console.log(processorquantity, 'processor updated');
+        } catch (error) {
+          console.log('Update Processor API error:', error);
+        }
+
+      } catch (err) {
+        console.error('Failed to fetch session:', err);
+      }
+    };
+
+    fetchSession();
+  }, [invoiceData, processordata]);
+
+
+
+
+  const { toPDF, targetRef } = usePDF({ filename: 'invoice.pdf' });
+  const navigate = useNavigate();
+
 
   if (!invoiceData) {
     return <div>Loading...</div>;

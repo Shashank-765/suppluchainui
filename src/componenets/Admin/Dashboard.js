@@ -27,7 +27,7 @@ const Dashboard = () => {
     const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
-    const [usersPerPage] = useState(6);
+    const [usersPerPage] = useState(8);
     const [totalPages, setTotalPages] = useState(0);
     const [totalBatchPage, setTotalBatchPage] = useState(0);
     const [allBatch, setAllBatch] = useState([]);
@@ -365,7 +365,7 @@ const Dashboard = () => {
                     exporterId:res?.data?.batch?.exporterId,
                     importerId:res?.data?.batch?.importerId,
                     batchStatus:res?.data?.batch?.batchStatus || 'progress',
-                    batchIsDeleted:res?.data?.batch?.batchIsDeleted || "00/00/0000",
+                    batchIsDeleted:res?.data?.batch?.batchIsDeleted || "False",
                     batchCreatedAt:res?.data?.batch?.batchCreatedAt || new Date().toISOString(),
                     batchUpdatedAt:res?.data?.batch?.batchUpdatedAt || new Date().toISOString(),
                     batchDeletedAt:res?.data?.batch?.batchDeletedAt || '00/00/0000',
@@ -576,12 +576,13 @@ const Dashboard = () => {
     const [edituserdata, setedituserdata] = useState({ name: '', email: '', userType: '', address: '', contact: '' })
 
     const edithandler = (edituser) => {
+        console.log(edituser)
         setedituserdata({
-            name: edituser?.name,
-            email: edituser?.email,
+            name: edituser?.userName,
+            email: edituser?.userEmail,
             userType: edituser?.userType,
-            address: edituser?.address,
-            contact: edituser?.contact
+            address: edituser?.userAddress,
+            contact: edituser?.userPhone
         })
         setIsEditing(!isEditing);
     }
@@ -649,17 +650,17 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await api.get(`/users/fetchalluser`, {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users`, {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
                     search: searchTerm,
                 },
             });
-            setAllUser(response.data.allUsers);
-            setwithoutPaginaitonalluser(response?.data?.allUserwihtoutPagination)
+            setAllUser(response.data.data);
+            setwithoutPaginaitonalluser(response.data.data)
             setTotalPages(response?.data?.totalPages);
-            setTotalUser(response?.data?.otherUserTypeCount);
+            setTotalUser(response?.data?.totalUsers);
             setRoleCounts(response?.data?.roleCounts);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -782,11 +783,37 @@ const Dashboard = () => {
         setEditErrors(newErrors);
         return isValid;
     };
-    const deleteBatch = async (id) => {
+    const deleteBatch = async (batch) => {
         try {
+            console.log(batch)
             // const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
             // if (response?.data) {
-            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${id}`)
+            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`,{
+                batchId: batch?.batchId,
+                farmerRegNo:batch?.farmerRegNo,
+                farmerName:batch?.farmerName,
+                farmerAddress:batch?.farmerAddress,
+                farmInspectionName:batch?.farmInspectionName,
+                harvesterName:batch?.harvesterName,
+                processorName:batch?.processorName,
+                exporterName:batch?.exporterName,
+                importerName:batch?.importerName,
+                coffeeType:batch?.coffeeType,
+                qrCode:batch?.qrCode,
+                farmInspectionId:batch?.farmInspectionId?.id?.split("_")[1],
+                harvesterId:batch?.harvesterId?.id?.split("_")[1],
+                processorId:batch?.processorId?.id?.split("_")[1],
+                exporterId:batch?.exporterId?.id?.split("_")[1],
+                importerId:batch?.importerId?.id?.split("_")[1],
+                batchStatus:'deleted',
+                batchIsDeleted:'true',
+                batchCreatedAt:batch?.batchCreatedAt || new Date().toISOString(),
+                batchUpdatedAt:batch?.batchUpdatedAt || new Date().toISOString(),
+                batchDeletedAt:new Date().toISOString(),
+                batchCreatedBy:batch?.batchCreatedBy || user?._id,
+                batchUpdatedBy:batch?.batchUpdatedBy || user?._id,
+                batchDeletedBy:batch?.batchDeletedBy || user?._id
+            })
             setToggle(!toggle);
             showSuccess("Batch deleted succefully")
             // }
@@ -835,34 +862,34 @@ const Dashboard = () => {
 
                     <div className={styles.roleBlock}>
                         <h4>Inspector</h4>
-                        <p className={styles.counter1}>{roleCounts['Farm Inspection'] || 0}</p>
+                        {/* <p className={styles.counter1}>{roleCounts['Farm Inspection'] || 0}</p> */}
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Harvester</h4>
-                        <p className={styles.counter1}>{roleCounts['Harvester'] || 0}</p>
+                        {/* <p className={styles.counter1}>{roleCounts['Harvester'] || 0}</p> */}
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Importer</h4>
-                        <p className={styles.counter1}>{roleCounts['Importer'] || 0}</p>
+                        {/* <p className={styles.counter1}>{roleCounts['Importer'] || 0}</p> */}
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Exporter</h4>
-                        <p className={styles.counter1}>{roleCounts['Exporter'] || 0}</p>
+                        {/* <p className={styles.counter1}>{roleCounts['Exporter'] || 0}</p> */}
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Processor</h4>
-                        <p className={styles.counter1}>{roleCounts['Processor'] || 0}</p>
+                        {/* <p className={styles.counter1}>{roleCounts['Processor'] || 0}</p> */}
                     </div>
                 </div>
 
 
                 <div className={styles.card}>
                     <h3>Total Roles</h3>
-                    <p className={styles.counter}>{totalRoles}</p>
+                    {/* <p className={styles.counter}>{totalRoles}</p> */}
                 </div>
                 <div className={styles.card}>
                     <h3>Total Batches</h3>
@@ -1021,7 +1048,7 @@ const Dashboard = () => {
                                                 <img src={view} alt='images' />
                                             </button>
                                             {
-                                                batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch?.batchId])} className={styles.deleteButton}>
+                                                batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch])} className={styles.deleteButton}>
                                                     <img src={deleteimage} alt='images' />
                                                 </button>
                                             }
@@ -1138,25 +1165,26 @@ const Dashboard = () => {
                                 <tbody>
                                     {allUser?.length > 0 ? (
                                         allUser.map((user, index) => (
+                                            user?.userRole !== 'SimpleUser' && user?.userRole !== 'admin' &&
                                             <tr key={index}>
                                                 <td>
-                                                    {user.walletAddress
-                                                        ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
+                                                    {user.userWalletAddress
+                                                        ? `${user.userWalletAddress.slice(0, 4)}......${user.userWalletAddress.slice(-4)}`
                                                         : ''}
                                                 </td>
-                                                <td>{user.name}</td>
-                                                <td>{user.contact}</td>
+                                                <td>{user.userName}</td>
+                                                <td>{user.userPhone}</td>
                                                 <td>
-                                                    {user.role ? (
+                                                    {user.userType ? (
                                                         <span
-                                                            className={
-                                                                user.role.className
-                                                                    .split(' ')
-                                                                    .map(cn => styles[cn])
-                                                                    .join(' ')
-                                                            }
+                                                            // className={
+                                                            //     user.userType.className
+                                                            //         .split(' ')
+                                                            //         .map(cn => styles[cn])
+                                                            //         .join(' ')
+                                                            // }
                                                         >
-                                                            {user.role.label}
+                                                            {user.userRole}
                                                         </span>
                                                     ) : ' -----'}
                                                 </td>
@@ -1219,18 +1247,19 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {simpleUsers.length === 0 ? (
+                            {allUser.length === 0 ? (
                                 <tr>
                                     <td colSpan="3">No users found</td>
                                 </tr>
                             ) : (
-                                simpleUsers.map((user) => (
-                                    <tr key={user._id}>
-                                        <td>{user.name}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.contact}</td>
-                                        <td>{user.userType || '---'}</td>
-                                        <td>{user.address}</td>
+                                allUser.map((user) => (
+                                    user?.userRole === 'SimpleUser' &&
+                                    <tr key={user.userId}>
+                                        <td>{user.userName}</td>
+                                        <td>{user.userEmail}</td>
+                                        <td>{user.userPhone}</td>
+                                        <td>{user.userRole || '---'}</td>
+                                        <td>{user.userAddress}</td>
                                         <td>{new Date(user?.createdAt).toLocaleDateString('en-GB')}</td>
                                         <td>
                                             {
@@ -1336,10 +1365,10 @@ const Dashboard = () => {
                                     style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a farmInspection Name</option>
-                                    {withoutPaginaitonalluser.map((user) => (
-                                        user?.role?.label === 'Farm Inspection' && (
-                                            <option key={user._id} value={user.name} style={{ color: "black" }}>
-                                                {user?.name}
+                                    {allUser.map((user) => (
+                                        user?.userRole === 'Farm Inspection' && (
+                                            <option key={user.userId} value={user.userName} style={{ color: "black" }}>
+                                                {user?.userName}
                                             </option>
                                         )
                                     ))}
@@ -1358,10 +1387,10 @@ const Dashboard = () => {
                                     style={{ color: formData.harvesterName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a harvesterName Name</option>
-                                    {withoutPaginaitonalluser.map((user) => (
-                                        user?.role?.label === 'Harvester' && (
-                                            <option key={user._id} value={user.name} style={{ color: "black" }}>
-                                                {user?.name}
+                                    {allUser.map((user) => (
+                                        user?.userRole === 'Harvester' && (
+                                            <option key={user.userId} value={user.userName} style={{ color: "black" }}>
+                                                {user?.userName}
                                             </option>
                                         )
                                     ))}
@@ -1378,9 +1407,9 @@ const Dashboard = () => {
                                     style={{ color: formData.processorName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a processorName Name</option>
-                                    {withoutPaginaitonalluser.map((user) => (
-                                        (user?.role?.label === 'Processor' && <option key={user._id} style={{ color: "black" }}>
-                                            {user?.role?.label === 'Processor' && user?.name}
+                                    {allUser.map((user) => (
+                                        (user?.userRole === 'Processor' && <option key={user.userId} style={{ color: "black" }}>
+                                            {user?.userRole === 'Processor' && user?.userName}
                                         </option>)
                                     ))}
                                 </select>
@@ -1396,9 +1425,9 @@ const Dashboard = () => {
                                     style={{ color: formData.exporterName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a exporterName Name</option>
-                                    {withoutPaginaitonalluser.map((user) => (
-                                        (user?.role?.label === 'Exporter' && <option key={user._id} style={{ color: "black" }}>
-                                            {user?.role?.label === 'Exporter' && user?.name}
+                                    {allUser.map((user) => (
+                                        (user?.userRole === 'Exporter' && <option key={user.userId} style={{ color: "black" }}>
+                                            {user?.userRole === 'Exporter' && user?.userName}
                                         </option>)
                                     ))}
                                 </select>
@@ -1414,9 +1443,9 @@ const Dashboard = () => {
                                     style={{ color: formData.importerName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a importerName Name</option>
-                                    {withoutPaginaitonalluser.map((user) => (
-                                        (user?.role?.label === 'Importer' && <option key={user._id} style={{ color: "black" }}>
-                                            {user?.role?.label === 'Importer' && user?.name}
+                                    {allUser.map((user) => (
+                                        (user?.userRole === 'Importer' && <option key={user.userId} style={{ color: "black" }}>
+                                            {user?.userRole === 'Importer' && user?.userName}
                                         </option>)
                                     ))}
                                 </select>
@@ -1440,13 +1469,13 @@ const Dashboard = () => {
                                 <input
                                     type="text"
                                     name="name"
-                                    value={edituserdata.name}
+                                    value={edituserdata.userName}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
-                                    className={editErrors.name ? styles.errorInput : ''}
+                                    className={editErrors.userName ? styles.errorInput : ''}
                                 />
                             </label>
-                            {editErrors.name && <span className={styles.errorText}>{editErrors.name}</span>}
+                            {editErrors.userName && <span className={styles.errorText}>{editErrors.userName}</span>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -1455,7 +1484,7 @@ const Dashboard = () => {
                                 <input
                                     type="email"
                                     name="email"
-                                    value={edituserdata.email}
+                                    value={edituserdata.userEmail}
                                     onChange={handleeditChange}
                                     disabled
                                 />
@@ -1469,12 +1498,12 @@ const Dashboard = () => {
                                     type="number"
                                     className={`${styles.contactnumber} ${editErrors.contact ? styles.errorInput : ''}`}
                                     name="contact"
-                                    value={edituserdata.contact}
+                                    value={edituserdata.userPhone}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
                                 />
                             </label>
-                            {editErrors.contact && <span className={styles.errorText}>{editErrors.contact}</span>}
+                            {editErrors.userPhone && <span className={styles.errorText}>{editErrors.userPhone}</span>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -1483,13 +1512,13 @@ const Dashboard = () => {
                                 <input
                                     type="text"
                                     name="address"
-                                    value={edituserdata.address}
+                                    value={edituserdata.userAddress}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
-                                    className={editErrors.address ? styles.errorInput : ''}
+                                    className={editErrors.userAddress ? styles.errorInput : ''}
                                 />
                             </label>
-                            {editErrors.address && <span className={styles.errorText}>{editErrors.address}</span>}
+                            {editErrors.userAddress && <span className={styles.errorText}>{editErrors.userAddress}</span>}
                         </div>
 
                         {(edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin') ? (

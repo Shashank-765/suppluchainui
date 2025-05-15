@@ -88,7 +88,7 @@ function View() {
         setHistory(resp?.data?.Data);
         setPagination({
           ...resp?.data?.pagination,
-          limit: pagination.limit // Keep our local limit setting
+          limit: pagination.limit 
         });
       }
     } catch (error) {
@@ -105,7 +105,7 @@ function View() {
     const newUnit = e.target.value;
     setUnit(newUnit);
 
-    const basePricePerQuintal = parseFloat(productData?.price || 0);
+    const basePricePerQuintal = parseFloat(productData?.processorId?.price || 0);
     const unitPrice = newUnit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
     if (lastChanged === 'quantity') {
@@ -157,21 +157,23 @@ function View() {
         quantity,
         price,
         buyerId: user?._id,
-        sellerId: productData?.processorId,
-        productId: product?._id,
+        sellerId: productData?.processorId?.processorId.split("_")[1],
         unit,
       });
-
+     console.log(sessionRes, 'this is sessionRes');
       const session = sessionRes.data;
       sessionStorage.setItem('invoiceData', JSON.stringify({
         processorName: productData?.processorName,
         farmddress: productData?.warehouseAddress,
-        farmId: productData?.farmInspectionId,
+        farmId: productData?.farmInspectionId?.farmInspectionId.split("_")[1],
         farmContact: productData?.farmContact || '9453495435',
         quantity,
         price,
         realprice,
-        productname: productData?.productName,
+        buyerId: user?._id,
+        batchId: productData?.batchId,
+        sellerId: productData?.processorId?.processorId.split("_")[1],
+        productname: productData?.coffeeType,
         unit,
         paymentDate: new Date().toLocaleDateString(),
         recieverName: user?.name,
@@ -183,28 +185,6 @@ function View() {
         sessionId: session.id,
       });
       setIsCircularLoader(false);
-      try {
-
-        const cookies = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('paymentIntentId='));
-        const paymentIntentId = cookies?.split('=')[1];
-        console.log('Payment Intent ID:', paymentIntentId);
-
-          await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/buy`, {
-          transactionId: paymentIntentId,
-          buyerId: user?._id,
-          batchId: productData?.batchId,
-          sellerId: productData?.processorId,
-          quantity,
-          price,
-          buyStatus: 'completed',
-          buyCreated: new Date().toISOString(),
-          buyUpdatednew: new Date().toISOString()
-        })
-      } catch (error) {
-        console.log(error)
-      }
 
       if (result.error) {
         console.log(result.error.message);
@@ -220,9 +200,10 @@ function View() {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get(`/products/getProductById?id=${product?._id}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${product?.batchId}`);
       if (response.data) {
-        setProductsData(response.data.product);
+        console.log(response.data, 'this is data of batch');
+        setProductsData(response.data);
       } else {
         console.error('Error fetching products:', response.data.message);
       }
@@ -260,8 +241,8 @@ function View() {
     if (!/^\d*\.?\d*$/.test(value)) return;
     if (parseFloat(value) < 0) return;
 
-    const basePricePerQuintal = parseFloat(productData?.price || 0);
-    const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
+    const basePricePerQuintal = parseFloat(productData?.processorId?.price || 0);
+    const totalAvailableQuintal = parseFloat(productData?.processorId?.quantity || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
     const enteredQuantity = parseFloat(value) || 0;
@@ -296,8 +277,8 @@ function View() {
     if (!/^\d*\.?\d*$/.test(value)) return;
     if (parseFloat(value) < 0) return;
 
-    const basePricePerQuintal = parseFloat(productData?.price || 0);
-    const totalAvailableQuintal = parseFloat(productData?.quantityProcessed || 0);
+    const basePricePerQuintal = parseFloat(productData?.processorId?.price || 0);
+    const totalAvailableQuintal = parseFloat(productData?.processorId?.quantity || 0);
     const unitPrice = unit === 'kg' ? basePricePerQuintal / 100 : basePricePerQuintal;
 
     const enteredPrice = parseFloat(value) || 0;
@@ -346,74 +327,74 @@ function View() {
       id: '1',
       heading: "Processor",
       processorId: productData?.processorId,
-      processorName: productData?.processorName,
-      processedDate: productData?.processedDate
-        ? new Date(productData?.processedDate).toLocaleDateString('en-GB') : '',
-      processorAddress: productData?.warehouseAddress,
-      quantityProcessed: productData?.quantityProcessed,
-      processingMethod: productData?.processingMethod,
-      packaging: productData?.packaging,
-      packagedDate: productData?.packagedDate
-        ? new Date(productData?.packagedDate).toLocaleDateString('en-GB') : '',
-      warehouse: productData?.warehouse,
-      destination: productData?.destination,
+      processorName: productData?.processorId?.processorName,
+      processedDate: productData?.processorId?.processedDate
+        ? new Date(productData?.processorId?.processedDate).toLocaleDateString('en-GB') : '',
+      processorAddress: productData?.processorId?.warehouseLocation,
+      quantityProcessed: productData?.processorId?.quantity,
+      processingMethod: productData?.processorId?.processingMethod,
+      packaging: productData?.processorId?.packaging,
+      packagedDate: productData?.processorId?.packagedDate
+        ? new Date(productData?.processorId?.packagedDate).toLocaleDateString('en-GB') : '',
+      warehouse: productData?.processorId?.warehouse,
+      destination: productData?.processorId?.destination,
 
     },
     {
       id: '2',
       heading: "Exporter",
       exporterId: productData?.exporterId,
-      exporterName: productData?.exporterName,
-      coordinationAddress: productData?.coordinationAddress,
-      shipName: productData?.shipName,
-      shipNo: productData?.shipNo,
-      departureDate: productData?.departureDate
-        ? new Date(productData?.departureDate).toLocaleDateString('en-GB') : '',
-      estimatedDate: productData?.estimatedDate
-        ? new Date(productData?.estimatedDate).toLocaleDateString('en-GB') : '',
-      exportedTo: productData?.exportedTo,
-      exportDate: productData?.exportDate
-        ? new Date(productData?.exportDate).toLocaleDateString('en-GB') : '',
+      exporterName: productData?.exporterId?.exporterName,
+      coordinationAddress: productData?.exporterId?.coordinationAddress,
+      shipName: productData?.exporterId?.shipName,
+      shipNo: productData?.exporterId?.shipNo,
+      departureDate: productData?.exporterId?.departureDate
+        ? new Date(productData?.exporterId?.departureDate).toLocaleDateString('en-GB') : '',
+      estimatedDate: productData?.exporterId?.estimatedDate
+        ? new Date(productData?.exporterId?.estimatedDate).toLocaleDateString('en-GB') : '',
+      exportedTo: productData?.exporterId?.exportedTo,
+      exportDate: productData?.exporterId?.exportDate
+        ? new Date(productData?.exporterId?.exportDate).toLocaleDateString('en-GB') : '',
     },
     {
       id: '3',
       heading: "Importer",
       importerId: productData?.importerId,
-      importerName: productData?.importerName,
-      quantityImported: productData?.quantityImported,
-      shipStorage: productData?.shipStorage,
-      arrivalDate: productData?.arrivalDate
-        ? new Date(productData?.arrivalDate).toLocaleDateString('en-GB') : '',
-      warehouseLocation: productData?.warehouseLocation,
-      warehouseArrivalDate: productData?.warehouseArrivalDate
-        ? new Date(productData?.warehouseArrivalDate).toLocaleDateString('en-GB') : '',
-      importerAddress: productData?.importerAddress,
-      importDate: productData?.importDate
-        ? new Date(productData?.importDate).toLocaleDateString('en-GB') : '',
+      importerName: productData?.importerId?.importerName,
+      quantityImported: productData?.importerId?.quantityImported,
+      shipStorage: productData?.importerId?.shipStorage,
+      arrivalDate: productData?.importerId?.arrivalDate
+        ? new Date(productData?.importerId?.arrivalDate).toLocaleDateString('en-GB') : '',
+      warehouseLocation: productData?.importerId?.warehouseLocation,
+      warehouseArrivalDate: productData?.importerId?.warehouseArrivalDate
+        ? new Date(productData?.importerId?.warehouseArrivalDate).toLocaleDateString('en-GB') : '',
+      importerAddress: productData?.importerId?.importerAddress,
+      importDate: productData?.importerId?.importDate
+        ? new Date(productData?.importerId?.importDate).toLocaleDateString('en-GB') : '',
     },
     {
       id: '4',
       heading: "Harvester",
       harvesterId: productData?.harvesterId,
-      harvesterName: productData?.harvesterName,
-      cropSampling: productData?.cropSampling,
-      temperatureLevel: productData?.temperatureLevel,
-      humidity: productData?.humidity,
-      harvestDate: productData?.harvestDate
-        ? new Date(productData?.harvestDate).toLocaleDateString('en-GB') : ''
+      harvesterName: productData?.harvesterId?.harvesterName,
+      cropSampling: productData?.harvesterId?.cropSampling,
+      temperatureLevel: productData?.harvesterId?.temperatureLevel,
+      humidity: productData?.harvesterId?.humidityLevel,
+      harvestDate: productData?.harvesterId?.harvestDate
+        ? new Date(productData?.harvesterId?.harvestDate).toLocaleDateString('en-GB') : ''
     },
     {
       id: '5',
       heading: "Inspection",
       farmInspectionId: productData?.farmInspectionId,
-      farmInspectionName: productData?.farmInspectionName,
-      productName: productData?.productName,
-      certificateNo: productData?.certificateNo,
-      certificateFrom: productData?.certificateFrom,
-      typeOfFertilizer: productData?.typeOfFertilizer,
-      fertilizerUsed: productData?.fertilizerUsed,
-      inspectionDate: productData?.inspectionDate
-        ? new Date(productData?.inspectionDate).toLocaleDateString('en-GB') : '',
+      farmInspectionName: productData?.farmInspectionId?.farmInspectionName,
+      productName: productData?.farmInspectionId?.productName,
+      certificateNo: productData?.farmInspectionId?.certificateNo,
+      certificateFrom: productData?.farmInspectionId?.certificateFrom,
+      typeOfFertilizer: productData?.farmInspectionId?.typeOfFertilizer,
+      fertilizerUsed: productData?.farmInspectionId?.fertilizerUsed,
+      inspectionDate: productData?.farmInspectionId?.inspectionDate
+        ? new Date(productData?.farmInspectionId?.inspectionDate).toLocaleDateString('en-GB') : '',
     }
 
   ];
@@ -424,8 +405,8 @@ function View() {
           <div className="carousel-wrapper">
             <div className="leftviewdiv" ref={scrollRef} onScroll={handleScroll}>
               {
-                productData?.images?.length > 0 && productData.images[0] !== ''
-                  ? productData?.images?.map((img, index) => (
+                productData?.processorId?.image?.length > 0 && productData.processorId?.image[0] !== ''
+                  ? productData?.processorId?.image?.map((img, index) => (
                     <div className="imagecontainerview" key={index}>
                       <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
                     </div>
@@ -436,7 +417,7 @@ function View() {
               }
             </div>
             <div className="dot-indicators">
-              {productData?.images?.map((_, index) => (
+              {productData?.processorId?.image?.map((_, index) => (
                 <span
                   key={index}
                   className={`dot ${activeIndex === index ? 'active' : ''}`}
@@ -449,18 +430,18 @@ function View() {
             <div className='rightviewfirstdiv'>
               <h2>
                 <a
-                  href={`https://www.google.com/maps?q=${encodeURIComponent(productData?.warehouseAddress)}`}
+                  href={`https://www.google.com/maps?q=${encodeURIComponent(productData?.processorId?.warehouseLocation)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}
                 >
                   <img src={locationImage} alt="Location" style={{ marginRight: '8px' }} />
-                  {productData?.warehouseAddress}
+                  {productData?.processorId?.warehouseLocation}
                 </a>
               </h2>
-              <h2 className='nameofproductowner'>{productData?.productName}</h2>
-              <h2>Price : <span className='priceproduct'>₹ {productData?.price}</span></h2>
-              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? product?.totalQuantityQuintal : productData?.quantityProcessed}  Qtl</span></h2>
+              <h2 className='nameofproductowner'>{productData?.coffeeType}</h2>
+              <h2>Price : <span className='priceproduct'>₹ {productData?.processorId?.price}</span></h2>
+              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? product?.totalQuantityQuintal : productData?.processorId?.quantity}  Qtl</span></h2>
               <div className='buynowbuttoncover'>
 
                 <div className='buynowbuttoncover'>
@@ -680,7 +661,7 @@ function View() {
             <h2 className="popupTitle">Buy Product</h2>
 
             <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
-              <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.quantityProcessed}</span></p>
+              <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.processorId?.quantity}</span></p>
               <div className='quantity_box'>
                 <input
                   type="number"
@@ -726,7 +707,7 @@ function View() {
                 Cancel
               </button>
               <button
-                onClick={() => handlebuynow(quantity, price, productData?.price)}
+                onClick={() => handlebuynow(quantity, price, productData?.processorId?.price)}
                 className="confirmButton"
               >
                 {isCircularloader ? <CircularLoader size={15} /> : 'confirm'}

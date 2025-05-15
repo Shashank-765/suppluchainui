@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 router.post('/create-checkout-session', async (req, res) => {
-    const { price, batchId, quantity, buyerId, sellerId, unit, productId } = req.body;
+    const { price, batchId, quantity, buyerId, sellerId, unit } = req.body;
 
     if (!price || isNaN(price)) {
         return res.status(400).json({ message: 'Invalid price' });
@@ -32,7 +32,7 @@ router.post('/create-checkout-session', async (req, res) => {
                     quantity: 1,
                 },
             ],
-            success_url: 'http://localhost:3000/invoice',
+            success_url: `http://localhost:3000/invoice?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: 'https://www.metaspace.com',
             metadata: {
                 batchId,
@@ -40,17 +40,26 @@ router.post('/create-checkout-session', async (req, res) => {
                 price,
                 buyerId,
                 sellerId,
-                productId,
                 unit
             },
         });
-
-        res.json({ id: session.id });
+        res.json({ id: session.id, sessionUrl: session.url });
     } catch (error) {
         console.error('Stripe session creation failed:', error);
         res.status(500).json({ error: 'Failed to create checkout session' });
     }
 });
+
+router.get('/stripe/getsession/:sessionId', async (req, res) => {
+    try {
+        const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
+        res.json(session);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to retrieve session' });
+    }
+});
+
 
 router.get('/gettransactionhistory', authorize, async (req, res) => {
     try {
@@ -102,7 +111,7 @@ const webhookHandler = async (req, res) => {
         const session = event.data.object;
 
         if (session.payment_status === 'paid') {
-            const { batchId, quantity, price, buyerId, sellerId, unit, productId } = session.metadata;
+            const { batchId, quantity, price, buyerId, sellerId, unit } = session.metadata;
 
             res.clearCookie('paymentIntentId', {
                 httpOnly: true,
@@ -153,7 +162,6 @@ const webhookHandler = async (req, res) => {
                     transactionId: session.payment_intent,
                     buyer: isBuyerEmail?.email,
                     seller: isSellerEmail?.email,
-                    productId,
                     price,
                     quantity: `${quantity} ${unit}`,
                 });

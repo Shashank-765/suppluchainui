@@ -5,6 +5,7 @@ import image1 from '../../Imges/Image6.png';
 import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import CircularLoader from '../CircularLoader/CircularLoader';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Product() {
     const navigate = useNavigate();
@@ -21,14 +22,16 @@ function Product() {
     const fetchAllProducts = async (pageToFetch) => {
         try {
             setIsCircularLoader(true);
-            const response = await api.get(`/products/getproducttomarkiting?page=${pageToFetch}&limit=3`);
+            // const response = await api.get(`/products/getproducttomarkiting?page=${pageToFetch}&limit=3`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter`);
+
             if (response.data) {
-                const newData = response.data.trackingDetails;
+                const newData = response.data.data;
 
                 // Prevent duplicates
                 setData(prev => {
-                    const ids = new Set(prev.map(p => p._id));
-                    const uniqueNew = newData.filter(item => !ids.has(item._id));
+                    const ids = new Set(prev.map(p => p.batchId));
+                    const uniqueNew = newData?.filter(item => !ids.has(item.batchId));
                     return [...prev, ...uniqueNew];
                 });
 
@@ -42,7 +45,7 @@ function Product() {
             setIsCircularLoader(false);
         }
     };
-
+   console.log(data, 'this is data');
     useEffect(() => {
             fetchAllProducts(1);    
     }, []);
@@ -63,21 +66,22 @@ function Product() {
             <div className='productmaincontainer'>
                 {data.length > 0  ? (
                     <>
-                        {data.map((ele, i) => (
-                            <div className='productcontainer' onClick={() => handleClick(ele)} key={`${ele._id}-${i}`}>
+                        {data?.map((ele, i) => (
+                            ele?.processorId?.processorStatus === 'Processed' &&
+                            <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                 <div className='productimagecontianer'>
-                                    {ele?.images[0] && ele?.images[0] !== "" ? (
-                                        <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.images[0]}`} alt='product' />
+                                    { ele?.processorId?.image?.length > 0 ? (
+                                        <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.processorId?.image[0]}`} alt='product' />
                                     ) : (
                                         <img src={image1} alt='default' />
                                     )}
                                 </div>
                                 <div className='productdetailscontainer'>
                                     <div className='productdetailscontainerdetails'>
-                                        <p>{ele?.productName}</p>
-                                        <p>Total QTY: <span className='pricevalueproduct'>{ele?.quantityProcessed} qtl</span></p>
+                                        <p>{ele?.coffeeType}</p>
+                                        <p>Total QTY: <span className='pricevalueproduct'>{ele?.processorId?.quantity} qtl</span></p>
                                     </div>
-                                    <p className='prices'>Price: <span className='pricevalueproduct'>{ele?.price}</span></p>
+                                    <p className='prices'>Price: <span className='pricevalueproduct'>{ele?.processorId?.price}</span></p>
                                 </div>
                             </div>
                         ))}

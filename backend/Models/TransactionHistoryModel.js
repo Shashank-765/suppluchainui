@@ -7,7 +7,7 @@ const TransactionSchema = new mongoose.Schema({
     buyer: { type: String, required: true },
     price: { type: String, required: true },
     quantity: { type: String, required: true },
-    productId: { type: String, required: true },
+    // productId: { type: String, required: true },
     isRefunded: { type: Boolean, default: false },
     refundId: { type: String },
 }, { timestamps: true });

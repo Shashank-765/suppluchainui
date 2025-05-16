@@ -27,7 +27,6 @@ function Product() {
 
             if (response.data) {
                 const newData = response.data.data;
-
                 // Prevent duplicates
                 setData(prev => {
                     const ids = new Set(prev.map(p => p.batchId));
@@ -45,7 +44,6 @@ function Product() {
             setIsCircularLoader(false);
         }
     };
-   console.log(data, 'this is data');
     useEffect(() => {
             fetchAllProducts(1);    
     }, []);
@@ -79,7 +77,7 @@ function Product() {
                                 <div className='productdetailscontainer'>
                                     <div className='productdetailscontainerdetails'>
                                         <p>{ele?.coffeeType}</p>
-                                        <p>Total QTY: <span className='pricevalueproduct'>{ele?.processorId?.quantity} qtl</span></p>
+                                        <p>Total QTY: <span className='pricevalueproduct'>{Number(ele?.processorId?.quantity).toFixed(2)} qtl</span></p>
                                     </div>
                                     <p className='prices'>Price: <span className='pricevalueproduct'>{ele?.processorId?.price}</span></p>
                                 </div>

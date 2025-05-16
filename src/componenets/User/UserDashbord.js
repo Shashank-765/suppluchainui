@@ -60,6 +60,7 @@ function UserDashBoard() {
     setPopupOpen(false);
   };
   const { userdata } = location.state || {};
+  console.log(userdata,'userdata')
   const initialFormData = {
     batchId: '',
     farmInspectionId: '',
@@ -322,12 +323,13 @@ function UserDashBoard() {
 
   const fetchbatchbyid = async () => {
     setIsCircularLoader(true);
-    const userrole = roleToFieldMap[user?.role?.label];
+    const userrole = userdata ? roleToFieldMap[userdata?.userRole] : roleToFieldMap[user?.role?.label];
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter?${userrole}=${user?._id}`,
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND2_URL}/batches/filter?${userrole}=${userdata ? userdata.userId : user?._id}`,
         {
           params: {
-            id: userdata?._id || user?._id,
+            id: userdata?.userId || user?._id,
             page: currnetBatchPage,
             limit: usersPerPage,
             search: searchBatchTerm,

@@ -21,13 +21,12 @@ function Navbar({ isAuthenticated }) {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
-      }
+      }    
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   function formatNotificationDate(createdAt) {
     const now = new Date();
     const createdDate = new Date(createdAt);
@@ -181,7 +180,7 @@ function Navbar({ isAuthenticated }) {
                 <ul className="dropdown-menu">
                   {notifications.length > 0 ? (
                     <>
-                      {notifications.slice(0, 4).map((note, index) => (
+                      {notifications.slice(0, 5).map((note, index) => (
                         <li key={index} className="notificationli" onClick={() => handleNotification(note)}>
                           <div className="notification-header" >
                             {note.batchId && note.message

@@ -225,6 +225,7 @@ router.post('/login', async (req, res) => {
       user.token = jwtToken;
       await user.save();
     }
+    console.log(refreshToken,'this is refreshToken')
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
@@ -366,48 +367,48 @@ router.post('/unblockUser', authorize, async (req, res) => {
 }
 );
 
-router.post('/insertRoles', async (req, res) => {
-  const roleMap = {
-    FARM_INSPECTION: {
-      name: 'Farm Inspection',
-      className: 'label info',
-    },
-    HARVESTER: {
-      name: 'Harvester',
-      className: 'label success',
-    },
-    EXPORTER: {
-      name: 'Exporter',
-      className: 'label warning',
-    },
-    IMPORTER: {
-      name: 'Importer',
-      className: 'label danger',
-    },
-    PROCESSOR: {
-      name: 'Processor',
-      className: 'label primary',
-    },
-  };
+// router.post('/insertRoles', async (req, res) => {
+//   const roleMap = {
+//     FARM_INSPECTION: {
+//       name: 'Farm Inspection',
+//       className: 'label info',
+//     },
+//     HARVESTER: {
+//       name: 'Harvester',
+//       className: 'label success',
+//     },
+//     EXPORTER: {
+//       name: 'Exporter',
+//       className: 'label warning',
+//     },
+//     IMPORTER: {
+//       name: 'Importer',
+//       className: 'label danger',
+//     },
+//     PROCESSOR: {
+//       name: 'Processor',
+//       className: 'label primary',
+//     },
+//   };
 
-  const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
-    key,
-    name: value.name,
-    className: value.className,
-  }));
+//   const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
+//     key,
+//     name: value.name,
+//     className: value.className,
+//   }));
 
-  try {
-    await Role.insertMany(roleDocs, { ordered: false });
-    res.status(201).json({ message: 'Roles inserted successfully.' });
-  } catch (err) {
-    if (err.code === 11000) {
-      res.status(409).json({ message: 'Some roles already exist.', error: err });
-    } else {
-    console.log('err', err)
-      res.status(500).json({ message: 'Error inserting roles.', error: err });
-    }
-  }
-});
+//   try {
+//     await Role.insertMany(roleDocs, { ordered: false });
+//     res.status(201).json({ message: 'Roles inserted successfully.' });
+//   } catch (err) {
+//     if (err.code === 11000) {
+//       res.status(409).json({ message: 'Some roles already exist.', error: err });
+//     } else {
+//     console.log('err', err)
+//       res.status(500).json({ message: 'Error inserting roles.', error: err });
+//     }
+//   }
+// });
 
 router.get('/getimages', authorize, async (req, res) => {
   try {

@@ -75,30 +75,67 @@ function View() {
     setActiveIndex(index);
   };
   const fetchHistory = async () => {
-    try {
-      const resp = await api.get(`/payments/gettransactionhistory`, {
-        params: {
-          productId: product?._id,
-          page: currentPage,
-          limit: pagination.limit
-        }
-      });
 
-      if (resp?.data) {
-        setHistory(resp?.data?.Data);
-        setPagination({
-          ...resp?.data?.pagination,
-          limit: pagination.limit 
-        });
+    if(user?.userType === 'admin'){
+
+      try {
+        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/viewbuy/${product?.batchId}`, 
+          {
+          params: {
+            page: currentPage,
+            limit: pagination.limit
+          }
+        }
+      );
+  
+        if (resp?.data?.data) {
+          setHistory(resp?.data?.data);
+          setPagination({
+            ...resp?.data?.totalRecords,
+            limit: pagination.limit || 5,
+            currentPage: currentPage || 1,
+            totalPages: Math.ceil(resp?.data?.totalRecords / (pagination.limit || 5)) 
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching history:', error);
       }
-    } catch (error) {
-      console.error('Error fetching history:', error);
+
+    }else{
+
+      try {
+        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user?._id}`, 
+          // {
+          // params: {
+          //   productId: product?._id,
+          //   page: currentPage,
+          //   limit: pagination.limit
+          // }
+        // }
+      );
+  
+        if (resp?.data?.userBuyProducts) {
+
+          const matched = resp?.data?.userBuyProducts?.filter(
+            (ele) => ele?.batchId === product?.batchId
+          );
+          
+          setHistory(matched);
+          setPagination({
+            ...resp?.data?.pagination,
+            limit: pagination.limit 
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching history:', error);
+      }
     }
+    
   }
 
   useEffect(() => {
     fetchHistory();
-  }, [currentPage, pagination.limit, product?._id]);
+  }, [currentPage, pagination.limit]);
 
 
   const handleUnitChange = (e) => {
@@ -202,7 +239,6 @@ function View() {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${product?.batchId}`);
       if (response.data) {
-        console.log(response.data, 'this is data of batch');
         setProductsData(response.data);
       } else {
         console.error('Error fetching products:', response.data.message);
@@ -441,13 +477,13 @@ function View() {
               </h2>
               <h2 className='nameofproductowner'>{productData?.coffeeType}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.processorId?.price}</span></h2>
-              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? product?.totalQuantityQuintal : productData?.processorId?.quantity}  Qtl</span></h2>
+              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? Number(product?.quantity).toFixed(2) : Number(productData?.processorId?.quantity).toFixed(2)}  Qtl</span></h2>
               <div className='buynowbuttoncover'>
 
                 <div className='buynowbuttoncover'>
 
                   {
-                    viewOnly ? '' : <button onClick={BuyNowHandler} className='buynowbutton'>Buy Now</button>
+                    viewOnly ? '' : user?.userType === 'admin' ? '' : <button onClick={BuyNowHandler} className='buynowbutton'>Buy Now</button>
                   }
 
                 </div>
@@ -557,11 +593,11 @@ function View() {
                     history.map((ele, i) => (
                       <tr key={i}>
                         <td>{ele?.transactionId ? `${ele.transactionId.slice(0, 3)}...${ele.transactionId.slice(-3)}` : ''}</td>
-                        <td>{ele?.seller}</td>
-                        <td>{ele?.buyer}</td>
+                        <td>{ele?.sellerId}</td>
+                        <td>{ele?.buyerId}</td>
                         <td>₹ {ele?.price}</td>
                         <td>{ele?.quantity}</td>
-                        <td>{new Date(ele?.createdAt).toLocaleDateString('en-GB')}</td>
+                        <td>{new Date(ele?.buyCreated).toLocaleDateString('en-GB')}</td>
                       </tr>
                     ))
                   ) : (
@@ -574,7 +610,7 @@ function View() {
                 </tbody>
               </table>
             </div>
-            {history?.length > 0 && (
+            {history?.length > 0 && user?.userType === 'admin' && (
               <div className="pagination-container" style={{
                 marginTop: '20px',
                 display: 'flex',
@@ -661,7 +697,7 @@ function View() {
             <h2 className="popupTitle">Buy Product</h2>
 
             <div className={`inputBlock ${editableField !== 'quantity' ? 'disabledBlock' : ''}`}>
-              <p className='totalquantityblock'><span>Total Quantity</span><span>{productData?.processorId?.quantity}</span></p>
+              <p className='totalquantityblock'><span>Total Quantity</span><span>{Number(productData?.processorId?.quantity).toFixed(2)}</span></p>
               <div className='quantity_box'>
                 <input
                   type="number"

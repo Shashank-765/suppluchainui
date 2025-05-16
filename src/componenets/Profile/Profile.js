@@ -16,7 +16,27 @@ function Profile({ setIsAuthenticated, setUser }) {
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
-    const [formData, setFormData] = useState({ name: '', email: '', userType: '', address: '', contact: '' });
+    const [buyProducts, setBuyProducts] = useState([]);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        userType: '',
+        address: '',
+        contact: '',
+        id: '',
+        password: '',
+        role: '',
+        status: '',
+        walletAddress: '',
+        isDeleted: '',
+        createdAt: '',
+        createdBy: '',
+        updatedAt: '',
+        updatedBy: '',
+        deletedAt: '',
+        deletedBy: '',
+        buyProducts: []
+    });
     const [isCircularloader, setIsCircularLoader] = useState(false);
     const { userdata } = location.state || {};
     useEffect(() => {
@@ -68,37 +88,63 @@ function Profile({ setIsAuthenticated, setUser }) {
     const fetchProducts = async () => {
         try {
             setIsCircularLoader(true);
-            const response = await api.get(`/products/getmyproducts?id=${userdata ? userdata?._id : user._id}`);
+            // const response = await api.get(`/products/getmyproducts?id=${userdata ? userdata?._id : user._id}`);
+            const response = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${userdata ? userdata?.userId : user._id}`);
             if (response.data) {
-                setIsCircularLoader(false);
-                const updatedProducts = response.data.products.map((product) => {
-                    let totalQuantityQuintal = 0;
+                
+                // const updatedProducts = response.data.products.map((product) => {
+                //     let totalQuantityQuintal = 0;
 
-                    (product?.purchaseHistory || [])?.forEach((history) => {
-                        const quantityStr = String(history?.quantityBought || '');
+                //     (product?.purchaseHistory || [])?.forEach((history) => {
+                //         const quantityStr = String(history?.quantityBought || '');
 
-                        const matches = quantityStr.match(/([\d.]+)\s*\/?\s*(kg|quintal)?/i);
+                //         const matches = quantityStr.match(/([\d.]+)\s*\/?\s*(kg|quintal)?/i);
 
-                        if (matches) {
-                            const quantity = parseFloat(matches[1]);
-                            const unit = matches[2]?.toLowerCase() || 'quintal';
+                //         if (matches) {
+                //             const quantity = parseFloat(matches[1]);
+                //             const unit = matches[2]?.toLowerCase() || 'quintal';
 
-                            if (unit.includes('kg')) {
-                                totalQuantityQuintal += quantity / 100;
-                            } else {
-                                totalQuantityQuintal += quantity;
-                            }
+                //             if (unit.includes('kg')) {
+                //                 totalQuantityQuintal += quantity / 100;
+                //             } else {
+                //                 totalQuantityQuintal += quantity;
+                //             }
+                //         }
+                //     });
+
+
+                //     return {
+                //         ...product,
+                //         totalQuantityQuintal: totalQuantityQuintal.toFixed(2),
+                //     };
+                // });
+
+                const products = response.data.userBuyProducts || [];
+                setBuyProducts(products);
+                const batchMap = {};
+                await Promise.all(
+                    products.map(async (product) => {
+                        const batchId = product.batchId;
+                        const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
+
+                        const productQuantity = Number(product.quantity) || 0;
+
+                        if (batchMap[batchId]) {
+                            batchMap[batchId].quantity += productQuantity;
+                        } else {
+                            batchMap[batchId] = {
+                                ...product,
+                                ...batchData,
+                                quantity: productQuantity
+                            };
                         }
-                    });
 
-
-                    return {
-                        ...product,
-                        totalQuantityQuintal: totalQuantityQuintal.toFixed(2),
-                    };
-                });
-
-                setProducts(updatedProducts);
+                    })
+                    
+                );
+                setIsCircularLoader(false);
+                const mergedProducts = Object.values(batchMap);
+                setProducts(mergedProducts);
             }
             else {
                 setIsCircularLoader(false);
@@ -110,23 +156,40 @@ function Profile({ setIsAuthenticated, setUser }) {
         }
     };
 
-    useEffect(() => {
+    useEffect(() => { 
         fetchProducts();
     }, []);
 
+    // const handleLogout = () => {
+    //     localStorage.removeItem('user');
+    //     document.cookie.split(";").forEach(cookie => {
+    //         const name = cookie.trim().split("=")[0];
+    //         document.cookie = `${name}=; Max-Age=0; path=/;`;
+    //         document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
+    //     });
+    //     setIsAuthenticated(false);
+    //     navigate('/auth');
+    //     showSuccess('Logout successful!');
+    // };
+
     const handleLogout = () => {
         localStorage.removeItem('user');
-        document.cookie.split(";").forEach(cookie => {
-            const name = cookie.trim().split("=")[0];
-            document.cookie = `${name}=; Max-Age=0; path=/;`;
-            document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
-        });
-
+        
+        // Get current domain
+        const domain = window.location.hostname;
+        
+        // Delete cookies with all possible attributes
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + domain + ';';
+        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + domain + ';';
+        
+        // Additional variants if needed
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        
         setIsAuthenticated(false);
         navigate('/auth');
         showSuccess('Logout successful!');
     };
-
 
 
     const handleEditToggle = () => {
@@ -137,6 +200,7 @@ function Profile({ setIsAuthenticated, setUser }) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
+
 
     const handleSave = async () => {
         try {
@@ -153,6 +217,9 @@ function Profile({ setIsAuthenticated, setUser }) {
                             userName: response.data.user?.name,
                             userEmail: response.data.user?.email,
                             userPhone: response.data.user?.contact,
+                            userBuyProducts: response.data.user?.buyProducts || buyProducts,
+                            userIsDeleted: response.data.user?.isDeleted || "False",
+                            userWalletAddress: response.data.user?.walletAddress,
                             userPassword: response.data.user?.password,
                             userAddress: response.data.user?.address || 'noida sector 12',
                             userStatus: response.data.user?.isBlocked || "True",
@@ -231,14 +298,14 @@ function Profile({ setIsAuthenticated, setUser }) {
                         <div className="profile-card">
                             <div className="profile-banner">
                                 <img src={profilecover} alt='images' />
-                                <h1>{userdata ? '' : 'Welcome,'} {userdata ? `${userdata?.name} Profiles` : userData.name}</h1>
+                                <h1>{userdata ? '' : 'Welcome,'} {userdata ? `${userdata?.userName}'s Profile` : userData.name}</h1>
                             </div>
                             <div className="profile-content">
                                 <img className="profile-image" src={profileImage} alt="Profile" />
                                 <div className="profile-details">
                                     <div className="contact-info">
                                         <p>Contact No</p>
-                                        <span className="contact-information">{userdata ? userdata?.contact : user?.contact}</span>
+                                        <span className="contact-information">{userdata ? userdata?.userPhone : user?.contact}</span>
                                     </div>
                                     {
                                         user?.userType === 'user' ? <div className="role-info">
@@ -251,15 +318,15 @@ function Profile({ setIsAuthenticated, setUser }) {
 
                                     <div className="settings">
                                         <p>{user?.role?.label} Email</p>
-                                        <span className="edit-btn">{userdata ? userdata?.email : user?.email}</span>
+                                        <span className="edit-btn">{userdata ? userdata?.userEmail : user?.email}</span>
                                     </div>
                                     <div className="settings">
                                         <p>Wallet Address</p>
                                         <span className="edit-btn">
-                                            {userdata?.walletAddress
-                                                ? `${userdata.walletAddress.slice(0, 4)}......${userdata.walletAddress.slice(-4)}`
+                                            {userdata?.userWalletAddress
+                                                ? `${userdata?.userWalletAddress.slice(0, 4)}......${userdata?.userWalletAddress.slice(-4)}`
                                                 : user?.walletAddress
-                                                    ? `${user.walletAddress.slice(0, 4)}......${user.walletAddress.slice(-4)}`
+                                                    ? `${user?.walletAddress.slice(0, 4)}......${user?.walletAddress.slice(-4)}`
                                                     : ''}
                                         </span>
 
@@ -282,12 +349,12 @@ function Profile({ setIsAuthenticated, setUser }) {
                                 <h2 className="my-products-only">{userdata ? 'Products' : 'My Products'}</h2>
                                 <div className="productmaincontainer">
                                     {products.length > 0 ? (
-                                        products.map((product, i) => (
+                                        products?.map((product, i) => (
                                             <div className="productcontainer" onClick={() => handleClick(product)} key={i}>
                                                 <div className="productimagecontianer">
-                                                    {product?.images?.length > 0 ? (
+                                                    {product?.processorId?.image?.length > 0 ? (
                                                         <img
-                                                            src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.images[0]}`}
+                                                            src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.processorId.image[0]}`}
                                                             alt={`product-${i}`}
                                                             className="product-image"
                                                         />
@@ -297,11 +364,11 @@ function Profile({ setIsAuthenticated, setUser }) {
                                                 </div>
                                                 <div className="productdetailscontainer">
                                                     <div className="productdetailscontainerdetails">
-                                                        <p>{product?.productName}</p>
-                                                        <p>Stock: <span className="pricevalueproduct">{product?.totalQuantityQuintal} qtl</span></p>
+                                                        <p>{product?.coffeeType}</p>
+                                                        <p>Stock: <span className="pricevalueproduct">{Number(product?.quantity).toFixed(2)} qtl</span></p>
                                                     </div>
                                                     <p className="prices">
-                                                        Price: <span className="pricevalueproduct">{product?.price}</span>
+                                                        Price: <span className="pricevalueproduct">{product?.processorId?.price}</span>
                                                     </p>
                                                 </div>
                                             </div>

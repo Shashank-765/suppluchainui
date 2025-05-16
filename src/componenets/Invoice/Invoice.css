@@ -17,6 +17,14 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
+.invoicecircularloader {
+
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .invoice-header {
     display: flex;
     justify-content: space-between;
@@ -299,16 +307,17 @@ i.fas.fa-building {
     }
 }
 
-.printbutton-container{
-width: 100%;
-text-align: center;
-padding-block: 2rem;
+.printbutton-container {
+    width: 100%;
+    text-align: center;
+    padding-block: 2rem;
 }
-.print-button{
- color: white;
- background: #24A0ED ;
- padding: 8px 23px;
- border: none;
- border-radius: 5px;
- cursor: pointer;
+
+.print-button {
+    color: white;
+    background: #24A0ED;
+    padding: 8px 23px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

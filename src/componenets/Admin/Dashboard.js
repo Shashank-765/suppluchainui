@@ -27,7 +27,7 @@ const Dashboard = () => {
     const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
-    const [usersPerPage] = useState(8);
+    const [usersPerPage] = useState(6);
     const [totalPages, setTotalPages] = useState(0);
     const [totalBatchPage, setTotalBatchPage] = useState(0);
     const [allBatch, setAllBatch] = useState([]);
@@ -47,18 +47,18 @@ const Dashboard = () => {
     const [simpleUserTotalPages, setSimpleUserTotalPages] = useState(1);
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
 
-
     const fetchSimpleUsers = async () => {
         try {
-            const res = await api.get(`${process.env.REACT_APP_BACKEND_URL}/users/getallsimpleusers`, {
+            const res = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/users/others`, {
                 params: {
                     page: simpleUserPage,
-                    limit: 5,
+                    limit: 6,
                     search: simpleUserSearch
                 }
             });
-            setSimpleUsers(res.data.users);
-            setSimpleUserTotalPages(res.data.totalPages);
+            setSimpleUsers(res.data.data);
+            setTotalUser(res?.data?.totalUsers);
+            setSimpleUserTotalPages(res?.data?.totalPages);
         } catch (error) {
             console.error('Failed to fetch simple users:', error);
         }
@@ -96,6 +96,7 @@ const Dashboard = () => {
     };
 
     const [allUser, setAllUser] = useState([]);
+    const [allCounts, setAllCounts] = useState(null);
     const [userForm, setUserForm] = useState({
         name: '',
         email: '',
@@ -185,6 +186,9 @@ const Dashboard = () => {
                         userEmail: updatedUser.email,
                         userPhone: updatedUser.contact,
                         userPassword: updatedUser?.password,
+                        userBuyProducts: edituserdata?.buyProducts,
+                        userIsDeleted: edituserdata?.isDeleted,
+                        userWalletAddress: edituserdata?.walletAddress,
                         userAddress: updatedUser.address,
                         userStatus: updatedUser.isBlocked || "True",
                         userCreatedAt: updatedUser.userCreatedAt || new Date().toISOString(),
@@ -349,29 +353,29 @@ const Dashboard = () => {
 
                 const couchdb = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addbatch`, {
                     batchId: (res?.data?.batch?.batchId)?.toString(),
-                    farmerRegNo:res?.data?.batch?.farmerRegNo,
-                    farmerName:res?.data?.batch?.farmerName,
-                    farmerAddress:res?.data?.batch?.farmerAddress,
-                    farmInspectionName:res?.data?.batch?.farmInspectionName,
-                    harvesterName:res?.data?.batch?.harvesterName,
-                    processorName:res?.data?.batch?.processorName,
-                    exporterName:res?.data?.batch?.exporterName,
-                    importerName:res?.data?.batch?.importerName,
-                    coffeeType:res?.data?.batch?.coffeeType,
-                    qrCode:res?.data?.batch?.qrCode,
-                    farmInspectionId:res?.data?.batch?.farmInspectionId,
-                    harvesterId:res?.data?.batch?.harvesterId,
-                    processorId:res?.data?.batch?.processorId,
-                    exporterId:res?.data?.batch?.exporterId,
-                    importerId:res?.data?.batch?.importerId,
-                    batchStatus:res?.data?.batch?.batchStatus || 'progress',
-                    batchIsDeleted:res?.data?.batch?.batchIsDeleted || "False",
-                    batchCreatedAt:res?.data?.batch?.batchCreatedAt || new Date().toISOString(),
-                    batchUpdatedAt:res?.data?.batch?.batchUpdatedAt || new Date().toISOString(),
-                    batchDeletedAt:res?.data?.batch?.batchDeletedAt || '00/00/0000',
-                    batchCreatedBy:res?.data?.batch?.batchCreatedBy || user?._id,
-                    batchUpdatedBy:res?.data?.batch?.batchUpdatedBy || user?._id,
-                    batchDeletedBy:res?.data?.batch?.batchDeletedBy || user?._id
+                    farmerRegNo: res?.data?.batch?.farmerRegNo,
+                    farmerName: res?.data?.batch?.farmerName,
+                    farmerAddress: res?.data?.batch?.farmerAddress,
+                    farmInspectionName: res?.data?.batch?.farmInspectionName,
+                    harvesterName: res?.data?.batch?.harvesterName,
+                    processorName: res?.data?.batch?.processorName,
+                    exporterName: res?.data?.batch?.exporterName,
+                    importerName: res?.data?.batch?.importerName,
+                    coffeeType: res?.data?.batch?.coffeeType,
+                    qrCode: res?.data?.batch?.qrCode,
+                    farmInspectionId: res?.data?.batch?.farmInspectionId,
+                    harvesterId: res?.data?.batch?.harvesterId,
+                    processorId: res?.data?.batch?.processorId,
+                    exporterId: res?.data?.batch?.exporterId,
+                    importerId: res?.data?.batch?.importerId,
+                    batchStatus: res?.data?.batch?.batchStatus || 'progress',
+                    batchIsDeleted: res?.data?.batch?.batchIsDeleted || "False",
+                    batchCreatedAt: res?.data?.batch?.batchCreatedAt || new Date().toISOString(),
+                    batchUpdatedAt: res?.data?.batch?.batchUpdatedAt || new Date().toISOString(),
+                    batchDeletedAt: res?.data?.batch?.batchDeletedAt || '00/00/0000',
+                    batchCreatedBy: res?.data?.batch?.batchCreatedBy || user?._id,
+                    batchUpdatedBy: res?.data?.batch?.batchUpdatedBy || user?._id,
+                    batchDeletedBy: res?.data?.batch?.batchDeletedBy || user?._id
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -444,7 +448,7 @@ const Dashboard = () => {
                     userUpdatedAt: res?.data?.user?.userUpdatedAt || '00/00/0000',
                     userDeletedAt: res?.data?.user?.userDeletedAt || '00/00/0000',
                     userCreatedBy: res?.data?.user?.userCreatedBy || user?._id,
-                    userUpdatedBy: res?.data?.user?.userUpdatedBy || user?._id ,
+                    userUpdatedBy: res?.data?.user?.userUpdatedBy || user?._id,
                     userDeletedBy: res?.data?.user?.userDeletedBy || user?._id,
                     userWalletAddress: res?.data?.user?.walletAddress,
                     userBuyProducts: [],
@@ -573,17 +577,50 @@ const Dashboard = () => {
         return isValid;
     };
 
-    const [edituserdata, setedituserdata] = useState({ name: '', email: '', userType: '', address: '', contact: '' })
+    const [edituserdata, setedituserdata] = useState({
+        name: '',
+        email: '',
+        userType: '',
+        address: '',
+        contact: '',
+        id: '',
+        password: '',
+        role: '',
+        status: '',
+        walletAddress: '',
+        isDeleted: '',
+        createdAt: '',
+        createdBy: '',
+        updatedAt: '',
+        updatedBy: '',
+        deletedAt: '',
+        deletedBy: '',
+        buyProducts: []
+    });
+
 
     const edithandler = (edituser) => {
-        console.log(edituser)
         setedituserdata({
             name: edituser?.userName,
             email: edituser?.userEmail,
             userType: edituser?.userType,
             address: edituser?.userAddress,
-            contact: edituser?.userPhone
-        })
+            contact: edituser?.userPhone,
+            id: edituser?.userId,
+            password: edituser?.userPassword,
+            role: edituser?.userRole,
+            status: edituser?.userStatus,
+            walletAddress: edituser?.userWalletAddress,
+            isDeleted: edituser?.userIsDeleted,
+            createdAt: edituser?.userCreatedAt,
+            createdBy: edituser?.userCreatedBy,
+            updatedAt: edituser?.userUpdatedAt,
+            updatedBy: edituser?.userUpdatedBy,
+            deletedAt: edituser?.userDeletedAt,
+            deletedBy: edituser?.userDeletedBy,
+            buyProducts: edituser?.userBuyProducts,
+        });
+
         setIsEditing(!isEditing);
     }
     const userview = (userdata) => {
@@ -591,8 +628,8 @@ const Dashboard = () => {
     }
 
     const blockhandler = async (user) => {
-        try {
-            const response = await api.post(`/users/blockUser?id=${user._id}`);
+        try {    
+            const response = await api.post(`/users/blockUser?id=${user.userId}`);
             if (response.data) {
                 showSuccess('User Blocked Succefully')
                 setToggle(!toggle);
@@ -608,7 +645,7 @@ const Dashboard = () => {
 
     const unblockhandler = async (user) => {
         try {
-            const response = await api.post(`/users/unblockUser?id=${user?._id}`,);
+            const response = await api.post(`/users/unblockUser?id=${user.userId}`,);
             if (response.data) {
                 showSuccess('User unblocked successfully!');
                 setToggle(!toggle);
@@ -650,7 +687,7 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users`, {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users/specific-roles`, {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
@@ -658,15 +695,45 @@ const Dashboard = () => {
                 },
             });
             setAllUser(response.data.data);
+
+            const roleCounts = {
+                'Farm Inspection': 0,
+                'Harvester': 0,
+                'Importer': 0,
+                'Exporter': 0,
+                'Processor': 0,
+                'admin': 0,
+                'Unknown': 0 // For all roles not in the known list
+              };
+              
+              const knownRoles = [
+                'Farm Inspection',
+                'Harvester',
+                'Importer',
+                'Exporter',
+                'Processor',
+                'admin'
+              ];
+              
+              response.data.data?.forEach((item) => {
+                const role = item.userRole?.trim();
+              
+                if (knownRoles.includes(role)) {
+                  roleCounts[role]++;
+                } else {
+                  roleCounts['Unknown']++;
+                }
+              });
+              
+              setAllCounts(roleCounts);
+              
             setwithoutPaginaitonalluser(response.data.data)
             setTotalPages(response?.data?.totalPages);
-            setTotalUser(response?.data?.totalUsers);
-            setRoleCounts(response?.data?.roleCounts);
+            setRoleCounts(roleCounts);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
     };
-
     const downloadQrImage = () => {
         const imageElement = qrImageRef.current;
         if (!imageElement) return;
@@ -788,31 +855,31 @@ const Dashboard = () => {
             console.log(batch)
             // const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
             // if (response?.data) {
-            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`,{
+            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`, {
                 batchId: batch?.batchId,
-                farmerRegNo:batch?.farmerRegNo,
-                farmerName:batch?.farmerName,
-                farmerAddress:batch?.farmerAddress,
-                farmInspectionName:batch?.farmInspectionName,
-                harvesterName:batch?.harvesterName,
-                processorName:batch?.processorName,
-                exporterName:batch?.exporterName,
-                importerName:batch?.importerName,
-                coffeeType:batch?.coffeeType,
-                qrCode:batch?.qrCode,
-                farmInspectionId:batch?.farmInspectionId?.id?.split("_")[1],
-                harvesterId:batch?.harvesterId?.id?.split("_")[1],
-                processorId:batch?.processorId?.id?.split("_")[1],
-                exporterId:batch?.exporterId?.id?.split("_")[1],
-                importerId:batch?.importerId?.id?.split("_")[1],
-                batchStatus:'deleted',
-                batchIsDeleted:'true',
-                batchCreatedAt:batch?.batchCreatedAt || new Date().toISOString(),
-                batchUpdatedAt:batch?.batchUpdatedAt || new Date().toISOString(),
-                batchDeletedAt:new Date().toISOString(),
-                batchCreatedBy:batch?.batchCreatedBy || user?._id,
-                batchUpdatedBy:batch?.batchUpdatedBy || user?._id,
-                batchDeletedBy:batch?.batchDeletedBy || user?._id
+                farmerRegNo: batch?.farmerRegNo,
+                farmerName: batch?.farmerName,
+                farmerAddress: batch?.farmerAddress,
+                farmInspectionName: batch?.farmInspectionName,
+                harvesterName: batch?.harvesterName,
+                processorName: batch?.processorName,
+                exporterName: batch?.exporterName,
+                importerName: batch?.importerName,
+                coffeeType: batch?.coffeeType,
+                qrCode: batch?.qrCode,
+                farmInspectionId: batch?.farmInspectionId?.id?.split("_")[1],
+                harvesterId: batch?.harvesterId?.id?.split("_")[1],
+                processorId: batch?.processorId?.id?.split("_")[1],
+                exporterId: batch?.exporterId?.id?.split("_")[1],
+                importerId: batch?.importerId?.id?.split("_")[1],
+                batchStatus: 'deleted',
+                batchIsDeleted: 'true',
+                batchCreatedAt: batch?.batchCreatedAt || new Date().toISOString(),
+                batchUpdatedAt: batch?.batchUpdatedAt || new Date().toISOString(),
+                batchDeletedAt: new Date().toISOString(),
+                batchCreatedBy: batch?.batchCreatedBy || user?._id,
+                batchUpdatedBy: batch?.batchUpdatedBy || user?._id,
+                batchDeletedBy: batch?.batchDeletedBy || user?._id
             })
             setToggle(!toggle);
             showSuccess("Batch deleted succefully")
@@ -857,39 +924,39 @@ const Dashboard = () => {
                 <div className={styles.card2}>
                     <div className={styles.roleBlock}>
                         <h4>Users</h4>
-                        <p className={styles.counter1}>{toatalUser}</p>
+                        <p className={styles.counter1}>{toatalUser || 0}</p>
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Inspector</h4>
-                        {/* <p className={styles.counter1}>{roleCounts['Farm Inspection'] || 0}</p> */}
+                        <p className={styles.counter1}>{allCounts?.['Farm Inspection'] || 0}</p>
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Harvester</h4>
-                        {/* <p className={styles.counter1}>{roleCounts['Harvester'] || 0}</p> */}
+                        <p className={styles.counter1}>{allCounts?.['Harvester'] || 0}</p>
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Importer</h4>
-                        {/* <p className={styles.counter1}>{roleCounts['Importer'] || 0}</p> */}
+                        <p className={styles.counter1}>{allCounts?.['Importer'] || 0}</p>
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Exporter</h4>
-                        {/* <p className={styles.counter1}>{roleCounts['Exporter'] || 0}</p> */}
+                        <p className={styles.counter1}>{allCounts?.['Exporter'] || 0}</p>
                     </div>
 
                     <div className={styles.roleBlock}>
                         <h4>Processor</h4>
-                        {/* <p className={styles.counter1}>{roleCounts['Processor'] || 0}</p> */}
+                        <p className={styles.counter1}>{allCounts?.['Processor'] || 0}</p>
                     </div>
                 </div>
 
 
                 <div className={styles.card}>
                     <h3>Total Roles</h3>
-                    {/* <p className={styles.counter}>{totalRoles}</p> */}
+                    <p className={styles.counter}>{'5'}</p>
                 </div>
                 <div className={styles.card}>
                     <h3>Total Batches</h3>
@@ -1165,7 +1232,7 @@ const Dashboard = () => {
                                 <tbody>
                                     {allUser?.length > 0 ? (
                                         allUser.map((user, index) => (
-                                            user?.userRole !== 'SimpleUser' && user?.userRole !== 'admin' &&
+                                        
                                             <tr key={index}>
                                                 <td>
                                                     {user.userWalletAddress
@@ -1177,12 +1244,12 @@ const Dashboard = () => {
                                                 <td>
                                                     {user.userType ? (
                                                         <span
-                                                            // className={
-                                                            //     user.userType.className
-                                                            //         .split(' ')
-                                                            //         .map(cn => styles[cn])
-                                                            //         .join(' ')
-                                                            // }
+                                                        // className={
+                                                        //     user.userType.className
+                                                        //         .split(' ')
+                                                        //         .map(cn => styles[cn])
+                                                        //         .join(' ')
+                                                        // }
                                                         >
                                                             {user.userRole}
                                                         </span>
@@ -1247,20 +1314,19 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {allUser.length === 0 ? (
+                            {simpleUsers?.length === 0 ? (
                                 <tr>
                                     <td colSpan="3">No users found</td>
                                 </tr>
                             ) : (
-                                allUser.map((user) => (
-                                    user?.userRole === 'SimpleUser' &&
+                                simpleUsers?.map((user) => (
                                     <tr key={user.userId}>
                                         <td>{user.userName}</td>
                                         <td>{user.userEmail}</td>
                                         <td>{user.userPhone}</td>
                                         <td>{user.userRole || '---'}</td>
                                         <td>{user.userAddress}</td>
-                                        <td>{new Date(user?.createdAt).toLocaleDateString('en-GB')}</td>
+                                        <td>{new Date(user?.userCreatedAt).toLocaleDateString('en-GB')}</td>
                                         <td>
                                             {
                                                 !user?.isBlocked ? (
@@ -1469,13 +1535,13 @@ const Dashboard = () => {
                                 <input
                                     type="text"
                                     name="name"
-                                    value={edituserdata.userName}
+                                    value={edituserdata.name}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
-                                    className={editErrors.userName ? styles.errorInput : ''}
+                                    className={editErrors.name ? styles.errorInput : ''}
                                 />
                             </label>
-                            {editErrors.userName && <span className={styles.errorText}>{editErrors.userName}</span>}
+                            {editErrors.name && <span className={styles.errorText}>{editErrors.name}</span>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -1484,7 +1550,7 @@ const Dashboard = () => {
                                 <input
                                     type="email"
                                     name="email"
-                                    value={edituserdata.userEmail}
+                                    value={edituserdata.email}
                                     onChange={handleeditChange}
                                     disabled
                                 />
@@ -1498,12 +1564,12 @@ const Dashboard = () => {
                                     type="number"
                                     className={`${styles.contactnumber} ${editErrors.contact ? styles.errorInput : ''}`}
                                     name="contact"
-                                    value={edituserdata.userPhone}
+                                    value={edituserdata.contact}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
                                 />
                             </label>
-                            {editErrors.userPhone && <span className={styles.errorText}>{editErrors.userPhone}</span>}
+                            {editErrors.contact && <span className={styles.errorText}>{editErrors.contact}</span>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -1512,13 +1578,13 @@ const Dashboard = () => {
                                 <input
                                     type="text"
                                     name="address"
-                                    value={edituserdata.userAddress}
+                                    value={edituserdata.address}
                                     onChange={handleeditChange}
                                     onBlur={handleEditBlur}
-                                    className={editErrors.userAddress ? styles.errorInput : ''}
+                                    className={editErrors.address ? styles.errorInput : ''}
                                 />
                             </label>
-                            {editErrors.userAddress && <span className={styles.errorText}>{editErrors.userAddress}</span>}
+                            {editErrors.address && <span className={styles.errorText}>{editErrors.address}</span>}
                         </div>
 
                         {(edituserdata?.userType !== 'user' && edituserdata?.userType !== 'admin') ? (

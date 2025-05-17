@@ -60,7 +60,6 @@ function UserDashBoard() {
     setPopupOpen(false);
   };
   const { userdata } = location.state || {};
-  console.log(userdata,'userdata')
   const initialFormData = {
     batchId: '',
     farmInspectionId: '',

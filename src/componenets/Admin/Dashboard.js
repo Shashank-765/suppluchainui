@@ -23,8 +23,6 @@ const Dashboard = () => {
     const [searchBatchTerm, setSearchBatchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [toatalUser, setTotalUser] = useState(0);
-    const [roleCounts, setRoleCounts] = useState({});
-    const [totalRoles, setTotalRoles] = useState(0);
     const [totalBatch, setTotalBatch] = useState(0);
     const [toggle, setToggle] = useState(false);
     const [usersPerPage] = useState(6);
@@ -36,7 +34,6 @@ const Dashboard = () => {
     const [isEditing, setIsEditing] = useState(false);
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const qrImageRef = useRef(null);
-    const [withoutPaginaitonalluser, setwithoutPaginaitonalluser] = useState([]);
     const [isCircularloader, setIsCircularLoader] = useState(false);
     const [popupOpen, setPopupOpen] = useState(false);
     const [popupAction, setPopupAction] = useState('');
@@ -46,6 +43,7 @@ const Dashboard = () => {
     const [simpleUserPage, setSimpleUserPage] = useState(1);
     const [simpleUserTotalPages, setSimpleUserTotalPages] = useState(1);
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
+    const [userBuyProducts, setUserBuyProducts] = useState([]);
 
     const fetchSimpleUsers = async () => {
         try {
@@ -72,7 +70,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (showBatchModal || showUserModal || isEditing)
-
             document.body.style.overflow = 'hidden';
         else
             document.body.style.overflow = 'auto';
@@ -154,10 +151,7 @@ const Dashboard = () => {
         };
     }, [showBatchModal]);
 
-
-
     const handleSave = async () => {
-        // e.preventDefault();
         setIsCircularLoader(true);
         const allTouched = {};
         Object.keys(edituserdata).forEach(key => {
@@ -181,7 +175,7 @@ const Dashboard = () => {
                     {
                         userId: updatedUser.id,
                         userType: updatedUser.userType,
-                        userRole: 'random',
+                        userRole: updatedUser.role?.label || updatedUser.userType,
                         userName: updatedUser.name,
                         userEmail: updatedUser.email,
                         userPhone: updatedUser.contact,
@@ -210,7 +204,6 @@ const Dashboard = () => {
             setIsCircularLoader(false);
             showError('Failed to update profile')
         }
-
     };
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
@@ -426,10 +419,6 @@ const Dashboard = () => {
         });
         setUserTouched(allTouched);
 
-
-
-
-
         try {
             const res = await api.post(`/users/createuser`, userForm);
             if (res.data) {
@@ -598,6 +587,7 @@ const Dashboard = () => {
         buyProducts: []
     });
 
+    const [loadingUserId, setLoadingUserId] = useState(null);
 
     const edithandler = (edituser) => {
         setedituserdata({
@@ -628,32 +618,78 @@ const Dashboard = () => {
     }
 
     const blockhandler = async (user) => {
-        try {    
+        try {
+            setLoadingUserId(user.userId);
+
+            const res2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user.userId}`);
+            if (res2.data?.userBuyProducts) {
+                setUserBuyProducts(res2.data?.userBuyProducts);
+            }
+
             const response = await api.post(`/users/blockUser?id=${user.userId}`);
             if (response.data) {
-                showSuccess('User Blocked Succefully')
-                setToggle(!toggle);
+                await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateuser/${user.userId}`, {
+                    ...user,
+                    userBuyProducts: userBuyProducts,
+                    userStatus: "False",
+                    userUpdatedAt: new Date().toISOString(),
+                });
+
+                showSuccess('User Blocked Successfully');
+                setToggle(prev => !prev);
             } else {
-                console.error('Failed to block user');
+                setLoadingUserId(null);
                 showError('Failed to block user');
             }
         } catch (error) {
+            setLoadingUserId(null);
             console.error('Error blocking user:', error);
             showError('Error blocking user');
+        } finally {
+            setLoadingUserId(null);
         }
-    }
+    };
+
 
     const unblockhandler = async (user) => {
         try {
+            setLoadingUserId(user.userId);
+            const res2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user.userId}`);
+            if (res2.data?.userBuyProducts) {
+                setUserBuyProducts(res2.data?.userBuyProducts);
+            }
             const response = await api.post(`/users/unblockUser?id=${user.userId}`,);
             if (response.data) {
+                const updateUser = await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateuser/${user.userId}`, {
+                    userId: user.userId,
+                    userType: user.userType,
+                    userRole: user.userRole,
+                    userName: user.userName,
+                    userEmail: user.userEmail,
+                    userPhone: user.userPhone,
+                    userPassword: user.userPassword,
+                    userBuyProducts: userBuyProducts,
+                    userIsDeleted: user.userIsDeleted,
+                    userWalletAddress: user.userWalletAddress,
+                    userAddress: user.userAddress,
+                    userStatus: "True",
+                    userCreatedAt: user.userCreatedAt || new Date().toISOString(),
+                    userUpdatedAt: new Date().toISOString(),
+                    userDeletedAt: user.userDeletedAt || '00/00/0000',
+                    userCreatedBy: user.userCreatedBy || user?._id,
+                    userUpdatedBy: user.userUpdatedBy || user?._id,
+                    userDeletedBy: user.userDeletedBy || 'null'
+                })
+                setLoadingUserId(null);
                 showSuccess('User unblocked successfully!');
                 setToggle(!toggle);
             } else {
+                setLoadingUserId(null);
                 console.error('Failed to unblock user');
                 showError('Failed to unblock user');
             }
         } catch (error) {
+            setLoadingUserId(null);
             console.error('Error unblocking user:', error);
         }
     }
@@ -695,41 +731,8 @@ const Dashboard = () => {
                 },
             });
             setAllUser(response.data.data);
-
-            const roleCounts = {
-                'Farm Inspection': 0,
-                'Harvester': 0,
-                'Importer': 0,
-                'Exporter': 0,
-                'Processor': 0,
-                'admin': 0,
-                'Unknown': 0 // For all roles not in the known list
-              };
-              
-              const knownRoles = [
-                'Farm Inspection',
-                'Harvester',
-                'Importer',
-                'Exporter',
-                'Processor',
-                'admin'
-              ];
-              
-              response.data.data?.forEach((item) => {
-                const role = item.userRole?.trim();
-              
-                if (knownRoles.includes(role)) {
-                  roleCounts[role]++;
-                } else {
-                  roleCounts['Unknown']++;
-                }
-              });
-              
-              setAllCounts(roleCounts);
-              
-            setwithoutPaginaitonalluser(response.data.data)
+            setAllCounts(response.data.roleCounts);
             setTotalPages(response?.data?.totalPages);
-            setRoleCounts(roleCounts);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -852,9 +855,6 @@ const Dashboard = () => {
     };
     const deleteBatch = async (batch) => {
         try {
-            console.log(batch)
-            // const response = await api.delete(`/batch/deletebatch?batchId=${id}`)
-            // if (response?.data) {
             const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`, {
                 batchId: batch?.batchId,
                 farmerRegNo: batch?.farmerRegNo,
@@ -883,7 +883,6 @@ const Dashboard = () => {
             })
             setToggle(!toggle);
             showSuccess("Batch deleted succefully")
-            // }
         } catch (error) {
             console.log(error)
             showError("failed to delte batch")
@@ -903,8 +902,8 @@ const Dashboard = () => {
             const res = await api.get(`/batch/getRoles`);
             if (res.data?.roles) {
                 setRoles(res.data?.roles);
-                setTotalRoles(res?.data?.totalCount)
             }
+
         } catch (err) {
             console.error('Error fetching roles:', err);
         }
@@ -1149,7 +1148,6 @@ const Dashboard = () => {
                             </div>
                         )}
 
-
                     </table>
                 </div>
 
@@ -1232,7 +1230,7 @@ const Dashboard = () => {
                                 <tbody>
                                     {allUser?.length > 0 ? (
                                         allUser.map((user, index) => (
-                                        
+
                                             <tr key={index}>
                                                 <td>
                                                     {user.userWalletAddress
@@ -1243,26 +1241,37 @@ const Dashboard = () => {
                                                 <td>{user.userPhone}</td>
                                                 <td>
                                                     {user.userType ? (
-                                                        <span
-                                                        // className={
-                                                        //     user.userType.className
-                                                        //         .split(' ')
-                                                        //         .map(cn => styles[cn])
-                                                        //         .join(' ')
-                                                        // }
-                                                        >
-                                                            {user.userRole}
-                                                        </span>
+                                                        <span>{user.userRole}</span>
                                                     ) : ' -----'}
                                                 </td>
                                                 <td>
                                                     <button onClick={() => edithandler(user)} className={styles.editButton}><img src={edit} alt='images' /></button>
                                                     {
-                                                        !user?.isBlocked ? (
-                                                            <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
+                                                        user?.userStatus === 'True' ? (
+                                                            <button
+                                                                onClick={() => showPopup("block this user", blockhandler, [user])}
+                                                                className={styles.editButton}
+                                                            >
+                                                                {
+                                                                    loadingUserId === user.userId
+                                                                        ? <CircularLoader size={20} />
+                                                                        : <img src={unblock} alt="unblock" />
+                                                                }
+                                                            </button>
                                                         ) : (
-                                                            <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
-                                                        )}
+                                                            <button
+                                                                onClick={() => showPopup("unblock this user", unblockhandler, [user])}
+                                                                className={styles.editButton}
+                                                            >
+                                                                {
+                                                                    loadingUserId === user.userId
+                                                                        ? <CircularLoader size={20} />
+                                                                        : <img src={block} alt="block" />
+                                                                }
+                                                            </button>
+                                                        )
+                                                    }
+
                                                     <button onClick={() => userview(user)} className={styles.editButton}><img src={view} alt='images' /></button>
                                                 </td>
                                             </tr>
@@ -1289,7 +1298,6 @@ const Dashboard = () => {
 
                 </div>
             </div>
-
 
             <div className={styles.simpleUserWrapper}>
                 <h3>Other Users</h3>
@@ -1329,13 +1337,39 @@ const Dashboard = () => {
                                         <td>{new Date(user?.userCreatedAt).toLocaleDateString('en-GB')}</td>
                                         <td>
                                             {
-                                                !user?.isBlocked ? (
-                                                    <button onClick={() => showPopup("block this user", blockhandler, [user])} className={styles.editButton}><img src={unblock} alt='images' /></button>
+                                                user?.userStatus === "True" ? (
+                                                    <button
+                                                        onClick={() => showPopup("block this user", blockhandler, [user])}
+                                                        className={styles.editButton}
+                                                    >
+                                                        {
+                                                            loadingUserId === user.userId
+                                                                ? <CircularLoader size={20} />
+                                                                : <img src={unblock} alt='unblock icon' />
+                                                        }
+                                                    </button>
                                                 ) : (
-                                                    <button onClick={() => showPopup("unblock this user", unblockhandler, [user])} className={styles.editButton}><img src={block} alt='images' /></button>
-                                                )}
-                                            <button onClick={() => UserNavigateHandler(user)} className={styles.editButton}><img src={view} alt='images' /></button>
+                                                    <button
+                                                        onClick={() => showPopup("unblock this user", unblockhandler, [user])}
+                                                        className={styles.editButton}
+                                                    >
+                                                        {
+                                                            loadingUserId === user.userId
+                                                                ? <CircularLoader size={20} />
+                                                                : <img src={block} alt='block icon' />
+                                                        }
+                                                    </button>
+                                                )
+                                            }
+
+                                            <button
+                                                onClick={() => UserNavigateHandler(user)}
+                                                className={styles.editButton}
+                                            >
+                                                <img src={view} alt='view icon' />
+                                            </button>
                                         </td>
+
                                     </tr>
                                 ))
                             )}
@@ -1687,7 +1721,6 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
-
 
             <Popup
                 isOpen={popupOpen}

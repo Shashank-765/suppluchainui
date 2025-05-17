@@ -53,15 +53,13 @@ function Invoice() {
             Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`,
           },
         }).then(res => res.data);
-
-        // 1. Log buy transaction
         try {
           const data = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/buy`, {
             transactionId: session.payment_intent,
             buyerId: invoiceData.buyerId,
             batchId: invoiceData.batchId,
             sellerId: invoiceData.sellerId,
-            quantity: invoiceData.quantity,
+            quantity: `${invoiceData.quantity} ${invoiceData.unit}`,
             price: invoiceData.price,
             buyStatus: 'completed',
             buyCreated: new Date().toISOString(),
@@ -74,7 +72,6 @@ function Invoice() {
           return;
         }
 
-        // 2. Update processor
         let purchaseQuantity = parseFloat(invoiceData.quantity);
         if (invoiceData.unit === 'kg') {
           purchaseQuantity = purchaseQuantity / 100;

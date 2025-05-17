@@ -20,7 +20,6 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log(error.response?.status, 'status')
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -39,10 +38,14 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("user");
-        document.cookie.split(";").forEach(cookie => {
+        const cookies = document.cookie.split(";");
+        cookies.forEach(cookie => {
           const name = cookie.trim().split("=")[0];
-          document.cookie = `${name}=; Max-Age=0; path=/;`;
-          document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
+          const paths = ["/", window.location.pathname];
+          paths.forEach(path => {
+            document.cookie = `${name}=; Max-Age=0; path=${path};`;
+            document.cookie = `${name}=; Max-Age=0; path=${path}; SameSite=None; Secure`;
+          });
         });
         window.location.href = "/auth";
         return Promise.reject(refreshError);

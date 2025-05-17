@@ -60,7 +60,6 @@ router.get('/stripe/getsession/:sessionId', async (req, res) => {
     }
 });
 
-
 router.get('/gettransactionhistory', authorize, async (req, res) => {
     try {
         const { productId, page = 1, limit = 10 } = req.query;
@@ -98,7 +97,6 @@ router.get('/gettransactionhistory', authorize, async (req, res) => {
 const webhookHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.WEB_HOOK_SECRET;
-    console.log('api hitts');
     let event;
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
@@ -165,13 +163,6 @@ const webhookHandler = async (req, res) => {
                     price,
                     quantity: `${quantity} ${unit}`,
                 });
-                res.cookie("paymentIntentId", session.payment_intent, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: "None",
-                    maxAge: 24 * 60 * 60 * 1000,
-                });
-                console.log(session.payment_intent, 'this is payment id');
 
                 if (event.type === 'charge.refunded') {
                     const charge = event.data.object;
@@ -187,7 +178,6 @@ const webhookHandler = async (req, res) => {
                                 }
                             }
                         );
-                        console.log('Transaction marked as refunded:', paymentIntentId);
                     } catch (err) {
                         console.error('Error updating refund status:', err);
                         return res.status(500).json({ message: 'Failed to update refund status' });
@@ -224,7 +214,6 @@ router.get('/transaction/:sessionId', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
 
 router.post('/refund', async (req, res) => {
     const { transactionId, reason } = req.body;

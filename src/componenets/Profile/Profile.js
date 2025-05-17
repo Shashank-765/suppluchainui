@@ -87,38 +87,8 @@ function Profile({ setIsAuthenticated, setUser }) {
 
     const fetchProducts = async () => {
         try {
-            setIsCircularLoader(true);
-            // const response = await api.get(`/products/getmyproducts?id=${userdata ? userdata?._id : user._id}`);
             const response = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${userdata ? userdata?.userId : user._id}`);
             if (response.data) {
-                
-                // const updatedProducts = response.data.products.map((product) => {
-                //     let totalQuantityQuintal = 0;
-
-                //     (product?.purchaseHistory || [])?.forEach((history) => {
-                //         const quantityStr = String(history?.quantityBought || '');
-
-                //         const matches = quantityStr.match(/([\d.]+)\s*\/?\s*(kg|quintal)?/i);
-
-                //         if (matches) {
-                //             const quantity = parseFloat(matches[1]);
-                //             const unit = matches[2]?.toLowerCase() || 'quintal';
-
-                //             if (unit.includes('kg')) {
-                //                 totalQuantityQuintal += quantity / 100;
-                //             } else {
-                //                 totalQuantityQuintal += quantity;
-                //             }
-                //         }
-                //     });
-
-
-                //     return {
-                //         ...product,
-                //         totalQuantityQuintal: totalQuantityQuintal.toFixed(2),
-                //     };
-                // });
-
                 const products = response.data.userBuyProducts || [];
                 setBuyProducts(products);
                 const batchMap = {};
@@ -160,31 +130,17 @@ function Profile({ setIsAuthenticated, setUser }) {
         fetchProducts();
     }, []);
 
-    // const handleLogout = () => {
-    //     localStorage.removeItem('user');
-    //     document.cookie.split(";").forEach(cookie => {
-    //         const name = cookie.trim().split("=")[0];
-    //         document.cookie = `${name}=; Max-Age=0; path=/;`;
-    //         document.cookie = `${name}=; Max-Age=0; path=/; SameSite=None; Secure`;
-    //     });
-    //     setIsAuthenticated(false);
-    //     navigate('/auth');
-    //     showSuccess('Logout successful!');
-    // };
-
     const handleLogout = () => {
         localStorage.removeItem('user');
-        
-        // Get current domain
-        const domain = window.location.hostname;
-        
-        // Delete cookies with all possible attributes
-        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + domain + ';';
-        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + domain + ';';
-        
-        // Additional variants if needed
-        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        const cookies = document.cookie.split(";");
+        cookies.forEach(cookie => {
+          const name = cookie.trim().split("=")[0];
+          const paths = ["/", window.location.pathname];
+          paths.forEach(path => {
+            document.cookie = `${name}=; Max-Age=0; path=${path};`;
+            document.cookie = `${name}=; Max-Age=0; path=${path}; SameSite=None; Secure`;
+          });
+        });
         
         setIsAuthenticated(false);
         navigate('/auth');

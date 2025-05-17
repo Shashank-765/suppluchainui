@@ -11,7 +11,6 @@ import informat from '../../Imges/information.png';
 import locationImage from '../../Imges/location.png';
 import { showError } from '../ToastMessage/ToastMessage';
 import axios from 'axios';
-const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
 
 function View() {
   const location = useLocation();
@@ -39,9 +38,6 @@ function View() {
     hasNextPage: false,
     hasPrevPage: false
   });
-  const [loading, setLoading] = useState(false);
-
-
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
       setCurrentPage(newPage);
@@ -53,8 +49,8 @@ function View() {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
         setQuantity('');
         setPrice('');
-        setPriceError('')
-        setQuantityError('')
+        setPriceError('');
+        setQuantityError('');
         setShowPopup(false);
       }
     }
@@ -76,61 +72,59 @@ function View() {
   };
   const fetchHistory = async () => {
 
-    if(user?.userType === 'admin'){
-
+    if (user?.userType === 'admin') {
       try {
-        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/viewbuy/${product?.batchId}`, 
+        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/viewbuy/${product?.batchId}`,
           {
-          params: {
-            page: currentPage,
-            limit: pagination.limit
+            params: {
+              page: currentPage,
+              limit: pagination.limit
+            }
           }
-        }
-      );
-  
+        );
         if (resp?.data?.data) {
           setHistory(resp?.data?.data);
           setPagination({
             ...resp?.data?.totalRecords,
             limit: pagination.limit || 5,
             currentPage: currentPage || 1,
-            totalPages: Math.ceil(resp?.data?.totalRecords / (pagination.limit || 5)) 
+            totalPages: Math.ceil(resp?.data?.totalRecords / (pagination.limit || 5))
           });
         }
       } catch (error) {
         console.error('Error fetching history:', error);
       }
 
-    }else{
+    } else {
 
       try {
-        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user?._id}`, 
+        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user?._id}`,
           // {
           // params: {
           //   productId: product?._id,
           //   page: currentPage,
           //   limit: pagination.limit
           // }
-        // }
-      );
-  
+          // }
+        );
+
         if (resp?.data?.userBuyProducts) {
 
           const matched = resp?.data?.userBuyProducts?.filter(
             (ele) => ele?.batchId === product?.batchId
           );
-          
+
           setHistory(matched);
           setPagination({
             ...resp?.data?.pagination,
-            limit: pagination.limit 
+            limit: pagination.limit
           });
         }
       } catch (error) {
         console.error('Error fetching history:', error);
       }
     }
-    
+
   }
 
   useEffect(() => {
@@ -173,6 +167,7 @@ function View() {
       behavior: 'smooth',
     });
   };
+
   const handlebuynow = async (quantity, price, realprice) => {
     setQuantityError('');
     setPriceError('');
@@ -187,52 +182,71 @@ function View() {
       return;
     }
     setIsCircularLoader(true);
-    try {
-      const stripe = await stripePromise;
-      const sessionRes = await api.post(`/payments/create-checkout-session`, {
-        batchId: productData?.batchId,
-        quantity,
-        price,
-        buyerId: user?._id,
-        sellerId: productData?.processorId?.processorId.split("_")[1],
-        unit,
-      });
-     console.log(sessionRes, 'this is sessionRes');
-      const session = sessionRes.data;
-      sessionStorage.setItem('invoiceData', JSON.stringify({
-        processorName: productData?.processorName,
-        farmddress: productData?.warehouseAddress,
-        farmId: productData?.farmInspectionId?.farmInspectionId.split("_")[1],
-        farmContact: productData?.farmContact || '9453495435',
-        quantity,
-        price,
-        realprice,
-        buyerId: user?._id,
-        batchId: productData?.batchId,
-        sellerId: productData?.processorId?.processorId.split("_")[1],
-        productname: productData?.coffeeType,
-        unit,
-        paymentDate: new Date().toLocaleDateString(),
-        recieverName: user?.name,
-        receiverId: user?._id,
-        receiverAddress: user?.address || 'noida sector - 4',
-        receiverContact: user?.contact
-      }));
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
-      setIsCircularLoader(false);
 
-      if (result.error) {
-        console.log(result.error.message);
-        setIsCircularLoader(false);
-        showError('Stripe redirect error');
-      }
-    } catch (error) {
-      console.log('Error:====>', error);
-      setIsCircularLoader(false);
-      showError(error?.response?.data?.message);
+    let stripe;
+
+  try {
+    const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
+    stripe = await stripePromise;
+
+    if (!stripe) {
+      throw new Error('Stripe.js failed to load.');
     }
+  } catch (error) {
+    console.error('Stripe failed to load=====:', error);
+    setIsCircularLoader(false);
+    showError('Payment could not be initialized. Please check your internet connection.');
+    return;
+  }
+
+  try {
+    const sessionRes = await api.post(`/payments/create-checkout-session`, {
+      batchId: productData?.batchId,
+      quantity,
+      price,
+      buyerId: user?._id,
+      sellerId: productData?.processorId?.processorId.split("_")[1],
+      unit,
+    });
+
+    const session = sessionRes.data;
+
+    sessionStorage.setItem('invoiceData', JSON.stringify({
+      processorName: productData?.processorId?.processorName,
+      farmddress: productData?.processorId?.warehouseLocation,
+      farmId: productData?.processorId?.processorId.split("_")[1],
+      farmContact: productData?.processorId?.processorPhone || '9453495435',
+      quantity,
+      price,
+      realprice,
+      buyerId: user?._id,
+      batchId: productData?.batchId,
+      sellerId: productData?.processorId?.processorId.split("_")[1],
+      productname: productData?.coffeeType,
+      unit,
+      paymentDate: new Date().toLocaleDateString(),
+      recieverName: user?.name,
+      receiverId: user?._id,
+      receiverAddress: user?.address || 'noida sector - 4',
+      receiverContact: user?.contact
+    }));
+
+    const result = await stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
+
+    setIsCircularLoader(false);
+
+    if (result.error) {
+      console.log(result.error.message);
+      setIsCircularLoader(false);
+      showError('Stripe redirect error');
+    }
+  } catch (error) {
+    console.log('Error:====>', error);
+    setIsCircularLoader(false);
+    showError(error?.response?.data?.message);
+  }
   };
 
   const fetchProducts = async () => {
@@ -623,7 +637,7 @@ function View() {
                 <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1 || loading}
+                    disabled={currentPage === 1}
                     style={{
                       padding: '5px 10px',
                       border: '1px solid #ddd',
@@ -637,7 +651,7 @@ function View() {
 
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1 || loading}
+                    disabled={currentPage === 1 }
                     style={{
                       padding: '5px 8px',
                       border: '1px solid #ddd',
@@ -655,7 +669,7 @@ function View() {
 
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === pagination.totalPages || loading}
+                    disabled={currentPage === pagination.totalPages}
                     style={{
                       padding: '5px 8px',
                       border: '1px solid #ddd',
@@ -669,7 +683,7 @@ function View() {
 
                   <button
                     onClick={() => handlePageChange(pagination.totalPages)}
-                    disabled={currentPage === pagination.totalPages || loading}
+                    disabled={currentPage === pagination.totalPages}
                     style={{
                       padding: '5px 10px',
                       border: '1px solid #ddd',

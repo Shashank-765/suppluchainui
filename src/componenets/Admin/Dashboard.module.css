@@ -65,6 +65,9 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    >h3{
+      margin-left: 1rem;
+    }
 }
 
 .sectionHeader1 {

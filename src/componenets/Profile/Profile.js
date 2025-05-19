@@ -91,31 +91,36 @@ function Profile({ setIsAuthenticated, setUser }) {
             if (response.data) {
                 const products = response.data.userBuyProducts || [];
                 setBuyProducts(products);
+              
                 const batchMap = {};
+              
                 await Promise.all(
-                    products.map(async (product) => {
-                        const batchId = product.batchId;
-                        const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
-
-                        const productQuantity = Number(product.quantity) || 0;
-
-                        if (batchMap[batchId]) {
-                            batchMap[batchId].quantity += productQuantity;
-                        } else {
-                            batchMap[batchId] = {
-                                ...product,
-                                ...batchData,
-                                quantity: productQuantity
-                            };
-                        }
-
-                    })
-                    
+                  products.map(async (product) => {
+                    const batchId = product.batchId;
+            
+                    const productQuantity = parseFloat(product.quantity) || 0;
+              
+                    const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
+              
+                    if (batchMap[batchId]) {
+                      batchMap[batchId].quantity += productQuantity;
+                    } else {
+                      const { quantity: _, ...cleanBatchData } = batchData;
+              
+                      batchMap[batchId] = {
+                        ...cleanBatchData,
+                        ...product,
+                        quantity: productQuantity
+                      };
+                    }
+                  })
                 );
-                setIsCircularLoader(false);
+              
                 const mergedProducts = Object.values(batchMap);
                 setProducts(mergedProducts);
-            }
+                setIsCircularLoader(false);
+              }
+              
             else {
                 setIsCircularLoader(false);
                 showError('Failed to fetch products');

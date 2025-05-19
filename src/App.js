@@ -57,7 +57,7 @@ function App() {
           <Route path="/viewpage" element={<View />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-
+          <Route path="/screening/:batchId" element={<ScreeningPage />} />
 
           {!isAuthenticated && (
             <Route
@@ -73,7 +73,8 @@ function App() {
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/userdashboard" element={<UserDashBoard />} />
               <Route path="/batchprogress" element={<BatchProgressView />} />
-              <Route path="/screening" element={<ScreeningPage />} />
+              <Route path="/notifications" element={<NotificationPage />} />
+              <Route path="/screening/:batchId" element={<ScreeningPage />} />
               <Route
                 path="/profile"
                 element={<Profile setIsAuthenticated={setIsAuthenticated} />}

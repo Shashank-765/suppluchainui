@@ -48,6 +48,7 @@ router.post('/createBatch', authorize, async (req, res) => {
     let processorId = null;
     let exporterId = null;
     let importerId = null;
+    let adminId = req.userData.id;
 
     if (farmInspectionName) {
       farmInspectionId = await User.findOne({ name: farmInspectionName });
@@ -84,9 +85,8 @@ router.post('/createBatch', authorize, async (req, res) => {
     await newBatch.save();
 
     if (newBatch) {
-      const frontendBaseUrl = 'https://lfgkx3p7-3000.inc1.devtunnels.ms/';
+      const frontendBaseUrl = `https://lfgkx3p7-3000.inc1.devtunnels.ms/screening/${newBatch.batchId}`;
       const qrData = `${frontendBaseUrl}`;
-      // scanresult/${newBatch.batchId}
       const qrCode = await QRCode.toDataURL(qrData);
 
       newBatch.qrCode = qrCode;

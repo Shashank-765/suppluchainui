@@ -2,6 +2,7 @@ const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const TrackingModel = require('../../Models/BatchProductModel.js');
 const TransactionModel = require('../../Models/TransactionHistoryModel.js');
+const {PurchaseNotifyModel,NotifyModel} = require('../../Models/NotifictionModel.js');
 const User = require('../../Models/userModel.js');
 const { authorize } = require('../../Auth/Authenticate.js')
 const router = express.Router();
@@ -33,7 +34,7 @@ router.post('/create-checkout-session', async (req, res) => {
                 },
             ],
             success_url: `http://localhost:3000/invoice?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: 'https://www.metaspace.com',
+            cancel_url: 'http://localhost:3000',
             metadata: {
                 batchId,
                 quantity,
@@ -142,8 +143,6 @@ const webhookHandler = async (req, res) => {
                 }
 
                 product.purchaseHistory = product.purchaseHistory || [];
-
-                const seller = sellerId?.split('_')[1];
                 product.purchaseHistory.push({
                     buyerId,
                     quantityBought: `${quantity} ${unit}`,
@@ -153,7 +152,7 @@ const webhookHandler = async (req, res) => {
                 });
                 await product.save();
                 const isBuyerEmail = await User.findById(buyerId);
-                const isSellerEmail = await User.findById(seller);
+                const isSellerEmail = await User.findById(sellerId);
 
                 await TransactionModel.create({
                     batchId,
@@ -163,6 +162,34 @@ const webhookHandler = async (req, res) => {
                     price,
                     quantity: `${quantity} ${unit}`,
                 });
+                const purchaseNotification = await NotifyModel.findOne({ batchId });
+                if (purchaseNotification) {
+                    const readStatus = {
+                        [purchaseNotification?.farmInspection]: false,
+                        [purchaseNotification?.harvester]: false,
+                        [purchaseNotification?.importer]: false,
+                        [purchaseNotification?.exporter]: false,
+                        [purchaseNotification?.processor]: false,
+                        [purchaseNotification?.createdBy]: false
+                    };
+
+                    await PurchaseNotifyModel.create({
+                        batchId,
+                        farmInspection: purchaseNotification?.farmInspection,
+                        harvester: purchaseNotification?.harvester,
+                        importer: purchaseNotification?.importer,
+                        exporter: purchaseNotification?.exporter,
+                        processor: purchaseNotification?.processor,
+                        createdBy: purchaseNotification?.createdBy,
+                        buyerId: isBuyerEmail?._id,
+                        sellerId: isSellerEmail?._id,
+                        price,
+                        quantity: `${quantity} ${unit}`,
+                        readStatus
+                    });
+                }
+
+
 
                 if (event.type === 'charge.refunded') {
                     const charge = event.data.object;

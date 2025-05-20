@@ -8,7 +8,7 @@ const User = require('../../Models/userModel.js');
 const BatchModel = require('../../Models/BatchModel.js');
 const TrackingModel = require('../../Models/BatchProductModel.js');
 const Role = require('../../Models/RolesModel.js');
-const NotifyModel = require('../../Models/NotifictionModel.js')
+const { NotifyModel } = require('../../Models/NotifictionModel.js')
 const { authorize } = require('../../Auth/Authenticate.js');
 const QRCode = require('qrcode');
 
@@ -34,7 +34,6 @@ const upload = multer({
   { name: 'images', maxCount: 15 },
   { name: 'inspectedImages', maxCount: 15 }
 ]);
-
 
 router.post('/createBatch', authorize, async (req, res) => {
   try {
@@ -97,7 +96,8 @@ router.post('/createBatch', authorize, async (req, res) => {
       [harvesterId?._id]: false,
       [importerId?._id]: false,
       [exporterId?._id]: false,
-      [processorId?._id]: false
+      [processorId?._id]: false,
+      [adminId]: false
     };
 
     const notification = new NotifyModel({
@@ -110,7 +110,6 @@ router.post('/createBatch', authorize, async (req, res) => {
       createdBy: req.userData.id,
       readStatus
     });
-
     await notification.save();
     return res.status(200).json({ batch: newBatch, message: 'Batch created successfully' });
 
@@ -485,6 +484,5 @@ router.post('/updateBatch', authorize, upload, async (req, res) => {
     return res.status(500).json({ message: 'Server error while updating batch' });
   }
 });
-
 
 module.exports = router;

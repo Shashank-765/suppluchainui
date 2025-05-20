@@ -44,6 +44,7 @@ const Dashboard = () => {
     const [simpleUserTotalPages, setSimpleUserTotalPages] = useState(1);
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
     const [userBuyProducts, setUserBuyProducts] = useState([]);
+    const [deletingBatchId, setDeletingBatchId] = useState(null);
 
     const fetchSimpleUsers = async () => {
         try {
@@ -854,7 +855,8 @@ const Dashboard = () => {
         return isValid;
     };
     const deleteBatch = async (batch) => {
-        try {       
+        try {
+            setDeletingBatchId(batch?.batchId); 
             const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`, {
                 batchId: batch?.batchId,
                 farmerRegNo: batch?.farmerRegNo,
@@ -867,11 +869,11 @@ const Dashboard = () => {
                 importerName: batch?.importerName,
                 coffeeType: batch?.coffeeType,
                 qrCode: batch?.qrCode,
-                farmInspectionId: batch?.farmInspectionId?.farmInspectionId?.split("_")[1],
-                harvesterId: batch?.harvesterId?.harvestId?.split("_")[1],
-                processorId: batch?.processorId?.processorId?.split("_")[1],
-                exporterId: batch?.exporterId?.exporterId?.split("_")[1],
-                importerId: batch?.importerId?.importerId?.split("_")[1],
+                farmInspectionId: batch?.farmInspectionId?.id?.split("_")[1],
+                harvesterId: batch?.harvesterId?.id?.split("_")[1],
+                processorId: batch?.processorId?.id?.split("_")[1],
+                exporterId: batch?.exporterId?.id?.split("_")[1],
+                importerId: batch?.importerId?.id?.split("_")[1],
                 batchStatus: 'deleted',
                 batchIsDeleted: 'true',
                 batchCreatedAt: batch?.batchCreatedAt || new Date().toISOString(),
@@ -883,9 +885,11 @@ const Dashboard = () => {
             })
             setToggle(!toggle);
             showSuccess("Batch deleted succefully")
+            setDeletingBatchId(null);
         } catch (error) {
             console.log(error)
             showError("failed to delte batch")
+            setDeletingBatchId(null);
         }
     }
     useEffect(() => {
@@ -1114,8 +1118,17 @@ const Dashboard = () => {
                                                 <img src={view} alt='images' />
                                             </button>
                                             {
-                                               batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch])} className={styles.deleteButton}>
-                                                    <img src={deleteimage} alt='images' />
+                                                batch?.farmInspectionId?.farmInspectionStatus === 'Completed' ? '' : <button onClick={() => showPopup("delete this batch", deleteBatch, [batch])} className={styles.deleteButton}>
+                                                    {deletingBatchId === batch.batchId ? (
+                                                        <CircularLoader size={20} />
+                                                    ) : (
+                                                        <img
+                                                            src={deleteimage}
+                                                            alt="delete"
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                    )}
+
                                                 </button>
                                             }
 

@@ -49,7 +49,7 @@ const BatchProgressView = () => {
       const data = response?.data;
 
       if (data) {
-        setAllBatch(data);    
+        setAllBatch(data);
       }
     } catch (error) {
       console.error('Error fetching batch or related data:', error);
@@ -132,7 +132,7 @@ const BatchProgressView = () => {
               <p><span className={styles.batchesheading}>Fertilizer Used:</span><span className={styles.batchesdatavalue}> {allBatch?.farmInspectionId?.fertilizerUsed}</span></p>
             </div>
             <div className={styles.imgecontainer}>
-              {allBatch?.farmInspectionId?.image?.length > 0 && allBatch?.farmInspectionId?.image[0] !=='nil' ? (
+              {allBatch?.farmInspectionId?.image?.length > 0 && allBatch?.farmInspectionId?.image[0] !== 'nil' ? (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
                     <button className={styles.navButton} onClick={prevInspected}><img src={leftarrow} alt='images' /></button>
@@ -156,7 +156,7 @@ const BatchProgressView = () => {
                     })}
                   </div>
                 </div>
-              ):''}
+              ) : ''}
             </div>
 
           </div>
@@ -183,7 +183,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
-            {allBatch?.importerId?. importerStatus ==='Received' ?
+            {allBatch?.importerId?.importerStatus === 'Received' ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -203,7 +203,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.left}`}>
           <div className={styles.circle}>
-            {allBatch?.exporterId?.exporterStatus ==='Shipped' ?
+            {allBatch?.exporterId?.exporterStatus === 'Shipped' ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -224,7 +224,7 @@ const BatchProgressView = () => {
 
         <div className={`${styles.timelineItem} ${styles.right}`}>
           <div className={styles.circle2}>
-            {allBatch?.processorId?.processorStatus ==='Processed' ?
+            {allBatch?.processorId?.processorStatus === 'Processed' ?
               <img src={check} alt="Checked" className={styles.checkIcon} />
               :
               <img src={No} alt="Not Checked" className={styles.checkIcon} />
@@ -243,7 +243,7 @@ const BatchProgressView = () => {
               <p><span className={styles.batchesheading}>Destination:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.destination}</span></p>
             </div>
             <div className={styles.imgecontainer}>
-              {allBatch?.processorId?.image?.length > 0  && allBatch?.processorId?.image[0]!=='nil' ? (
+              {allBatch?.processorId?.image?.length > 0 && allBatch?.processorId?.image[0] !== 'nil' ? (
                 <div className={styles.carouselWrapper}>
                   <div className={styles.arrowContainer}>
                     <button className={styles.navButton} onClick={prevImage}><img src={leftarrow} alt='images' /></button>
@@ -267,7 +267,7 @@ const BatchProgressView = () => {
                     })}
                   </div>
                 </div>
-              ):''}
+              ) : ''}
             </div>
 
           </div>

@@ -91,22 +91,16 @@ function Profile({ setIsAuthenticated, setUser }) {
             if (response.data) {
                 const products = response.data.userBuyProducts || [];
                 setBuyProducts(products);
-              
                 const batchMap = {};
-              
                 await Promise.all(
                   products.map(async (product) => {
                     const batchId = product.batchId;
-            
                     const productQuantity = parseFloat(product.quantity) || 0;
-              
                     const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
-              
                     if (batchMap[batchId]) {
                       batchMap[batchId].quantity += productQuantity;
                     } else {
-                      const { quantity: _, ...cleanBatchData } = batchData;
-              
+                      const { quantity: _, ...cleanBatchData } = batchData;             
                       batchMap[batchId] = {
                         ...cleanBatchData,
                         ...product,
@@ -115,12 +109,10 @@ function Profile({ setIsAuthenticated, setUser }) {
                     }
                   })
                 );
-              
                 const mergedProducts = Object.values(batchMap);
                 setProducts(mergedProducts);
                 setIsCircularLoader(false);
-              }
-              
+            }
             else {
                 setIsCircularLoader(false);
                 showError('Failed to fetch products');
@@ -248,8 +240,8 @@ function Profile({ setIsAuthenticated, setUser }) {
                                 ) : null}
 
                                 <div className='buttoncancesave'>
-                                    <button onClick={handleSave} className="profile-save-btn">{isCircularloader ? <CircularLoader size={13} /> : 'save'}</button>
                                     <button onClick={handleEditToggle} className="profile-cancel-btn">Cancel</button>
+                                    <button onClick={handleSave} className="profile-save-btn">{isCircularloader ? <CircularLoader size={13} /> : 'save'}</button>
                                 </div>
 
                             </div>

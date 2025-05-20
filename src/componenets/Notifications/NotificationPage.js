@@ -94,7 +94,6 @@ const NotificationPage = () => {
     useEffect(() => {
         fetchNotifications(false);
     }, [notifyToggle]);
-
     const notificationHandler = (batch) => {
         markAsRead(batch?._id);
         navigate('/batchprogress', { state: { batch } })
@@ -126,8 +125,9 @@ const NotificationPage = () => {
                         <li key={index} onClick={() => notificationHandler(note)} className={styles.notificationItem}>
                             <div className={styles.notificationContent}>
                                 <div className={styles.message}>
-                                    <strong>A new batch has been successfully created for  {note?.coffeeType}.This batch has been assigned the unique identification number  {note.batchId}</strong>  <br />
-                                    You can now proceed to track, manage, or update its status as required.
+                                    <strong>{ `${note?.message==='Product sold' ?'':`A new batch has been successfully created for  ${note?.coffeeType}`}`}This batch has been assigned the unique identification number  {note.batchId}</strong>  <br />
+                                    {note?.message === 'Product sold' ? `This batch has been sold with quantity ${note.quantity} and price ${note.price}`
+                                        : ' You can now proceed to track, manage, or update its status as required.'}
                                     <br />
                                     {note.message || 'New Notification'}
                                 </div>

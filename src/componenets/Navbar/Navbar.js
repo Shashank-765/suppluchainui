@@ -115,7 +115,6 @@ function Navbar({ isAuthenticated }) {
     }
   };
 
-
   return (
     <div className='navbarsection'>
       <div className='navbarleftlog'>
@@ -169,7 +168,7 @@ function Navbar({ isAuthenticated }) {
 
           )}
 
-          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && data?.userType !=='admin' && (
+          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
             <li className="dropdown notification-bell" ref={dropdownRef}>
               <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
                 <img src={notificationimage} alt='images' />
@@ -183,9 +182,9 @@ function Navbar({ isAuthenticated }) {
                       {notifications.slice(0, 5).map((note, index) => (
                         <li key={index} className="notificationli" onClick={() => handleNotification(note)}>
                           <div className="notification-header" >
-                            {note.batchId && note.message
-                              ? `Batch with Id ${note.batchId} ${note.message}`
-                              : 'New Notification'}
+                            {note.batchId && note.message === 'Product sold'
+                              ? `Batch with Id ${note.batchId} ${note.message} with quantity ${note.quantity}`
+                              : `Batch with Id ${note.batchId} ${note.message}`}
                           </div>
                           <div className="notification-date">
                             {formatNotificationDate(note.createdAt)}

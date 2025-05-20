@@ -365,7 +365,7 @@ router.post('/unblockUser', authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while unblocking user' });
   }
 }
-);
+)
 
 // router.post('/insertRoles', async (req, res) => {
 //   const roleMap = {

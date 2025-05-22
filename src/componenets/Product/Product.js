@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './Product.css';
-import api from '../../axios';
 import image1 from '../../Imges/Image6.png';
 import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import CircularLoader from '../CircularLoader/CircularLoader';
@@ -27,7 +26,6 @@ function Product() {
 
             if (response.data) {
                 const newData = response.data.data;
-                // Prevent duplicates
                 setData(prev => {
                     const ids = new Set(prev.map(p => p.batchId));
                     const uniqueNew = newData?.filter(item => !ids.has(item.batchId));

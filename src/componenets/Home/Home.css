@@ -27,7 +27,7 @@
         line-height: 105%;
         letter-spacing: 0%;
         text-align: center;
-        word-break: break-all
+        word-break: break-word;
     }
 
     >p {

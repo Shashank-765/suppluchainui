@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
     walletAddress: { type: String},
     email: { type: String, unique: true },
     password: { type: String },
+    profileImage: { type: String },
     contact: { type: String },
     isBlocked: { type: Boolean, default: false },
     role: { type: Object },

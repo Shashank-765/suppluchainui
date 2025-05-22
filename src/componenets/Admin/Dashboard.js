@@ -45,6 +45,7 @@ const Dashboard = () => {
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
     const [userBuyProducts, setUserBuyProducts] = useState([]);
     const [deletingBatchId, setDeletingBatchId] = useState(null);
+    const [withoutPaginationAllUsers,setWithoutPaginationAllUser]=useState([]);
 
     const fetchSimpleUsers = async () => {
         try {
@@ -319,15 +320,12 @@ const Dashboard = () => {
         return isValid;
     };
     const handlepopupSubmit = async (e) => {
-
         e.preventDefault();
         const allTouched = {};
         Object.keys(formData).forEach(key => {
             allTouched[key] = true;
         });
         setTouched(allTouched);
-
-
         if (!validateForm()) {
             setIsCircularLoader(false);
             return;
@@ -337,14 +335,12 @@ const Dashboard = () => {
 
     };
 
-    const handleSubmit = async () => {
-
+    const handleSubmit = async (e) => {
         setIsCircularLoader(true);
-
+        setShowBatchModal(true);
         try {
             const res = await api.post(`/batch/createBatch`, formData);
             if (res.data) {
-
                 const couchdb = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addbatch`, {
                     batchId: (res?.data?.batch?.batchId)?.toString(),
                     farmerRegNo: res?.data?.batch?.farmerRegNo,
@@ -375,10 +371,6 @@ const Dashboard = () => {
                         'Content-Type': 'application/json',
                     }
                 })
-
-                if (couchdb) {
-                    console.log(couchdb)
-                }
                 setIsCircularLoader(false);
                 showSuccess("Batch Created")
                 setToggle(!toggle);
@@ -398,6 +390,7 @@ const Dashboard = () => {
         } catch (error) {
             console.log(error);
             setIsCircularLoader(false);
+            setShowBatchModal(true);
             showError("Failed to create Batch")
         }
     }
@@ -734,6 +727,17 @@ const Dashboard = () => {
             setAllUser(response.data.data);
             setAllCounts(response.data.roleCounts);
             setTotalPages(response?.data?.totalPages);
+
+            const response2 = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users/specific-roles`, {
+                params: {
+                    page: currentPage,
+                    limit: 1000,
+                    search: searchTerm,
+                },
+            });
+            if(response2.data){
+                setWithoutPaginationAllUser(response2.data.data)
+            }
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -995,6 +999,7 @@ const Dashboard = () => {
                                 <th>Importer</th>
                                 <th>Exporter</th>
                                 <th>Processor</th>
+                                <th>Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1112,6 +1117,9 @@ const Dashboard = () => {
                                                     Pending
                                                 </button>
                                             )}
+                                        </td>
+                                        <td>
+                                            {new Date(batch?.batchCreatedAt).toLocaleDateString('en-GB')}
                                         </td>
                                         <td>
                                             <button onClick={() => HandleBatchviewPage(batch)} className={styles.editButton}>
@@ -1478,7 +1486,7 @@ const Dashboard = () => {
                                     style={{ color: formData.farmInspectionName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a farmInspection Name</option>
-                                    {allUser.map((user) => (
+                                    {withoutPaginationAllUsers.map((user) => (
                                         user?.userRole === 'Farm Inspection' && (
                                             <option key={user.userId} value={user.userName} style={{ color: "black" }}>
                                                 {user?.userName}
@@ -1500,7 +1508,7 @@ const Dashboard = () => {
                                     style={{ color: formData.harvesterName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a harvesterName Name</option>
-                                    {allUser.map((user) => (
+                                    {withoutPaginationAllUsers.map((user) => (
                                         user?.userRole === 'Harvester' && (
                                             <option key={user.userId} value={user.userName} style={{ color: "black" }}>
                                                 {user?.userName}
@@ -1520,7 +1528,7 @@ const Dashboard = () => {
                                     style={{ color: formData.processorName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a processorName Name</option>
-                                    {allUser.map((user) => (
+                                    {withoutPaginationAllUsers.map((user) => (
                                         (user?.userRole === 'Processor' && <option key={user.userId} style={{ color: "black" }}>
                                             {user?.userRole === 'Processor' && user?.userName}
                                         </option>)
@@ -1538,7 +1546,7 @@ const Dashboard = () => {
                                     style={{ color: formData.exporterName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a exporterName Name</option>
-                                    {allUser.map((user) => (
+                                    {withoutPaginationAllUsers.map((user) => (
                                         (user?.userRole === 'Exporter' && <option key={user.userId} style={{ color: "black" }}>
                                             {user?.userRole === 'Exporter' && user?.userName}
                                         </option>)
@@ -1556,7 +1564,7 @@ const Dashboard = () => {
                                     style={{ color: formData.importerName ? "black" : "#757587" }}
                                 >
                                     <option value="" disabled>Select a importerName Name</option>
-                                    {allUser.map((user) => (
+                                    {withoutPaginationAllUsers.map((user) => (
                                         (user?.userRole === 'Importer' && <option key={user.userId} style={{ color: "black" }}>
                                             {user?.userRole === 'Importer' && user?.userName}
                                         </option>)

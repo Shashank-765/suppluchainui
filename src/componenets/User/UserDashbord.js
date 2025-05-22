@@ -124,7 +124,7 @@ function UserDashBoard() {
       ...prev,
       images: updatedImages
     }));
-    setImagePreviews((prev=[] )=> [...prev, ...newPreviews]);
+    setImagePreviews((prev = []) => [...prev, ...newPreviews]);
 
     processorFileInputRef.current.value = '';
   };
@@ -1267,7 +1267,7 @@ function UserDashBoard() {
       </div>
 
       <footer className={styles.footer}>
-        © 2025 Food SupplyChain by <a href="https://bastionex.net/" target="_blank" rel="noopener noreferrer">Bastionex Infotech Pvt Ltd</a>
+        © 2025 Food SupplyChain by <a href="https://bastionex.net/" target="_blank" rel="noopener noreferrer">BASTIONEX INDIA TECHNOLOGIES PRIVATE LIMITED</a>
       </footer>
 
 

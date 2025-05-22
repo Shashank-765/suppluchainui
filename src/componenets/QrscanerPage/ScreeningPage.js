@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import certificqte from '../../Imges/certificqte.jpg'
 import check from '../../Imges/check.png'
 import No from '../../Imges/no.png'
@@ -9,10 +9,24 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 const ScreeningPage = () => {
   const location = useLocation();
+  const qrImageRef = useRef(null);
   const { batch } = location.state || {};
   const [allBatch, setAllBatch] = useState([]);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedQr, setSelectedQr] = useState(null);
+
+  const downloadQrImage = () => {
+    const imageElement = qrImageRef.current;
+    if (!imageElement) return;
+    const imageURL = imageElement.src;
+
+    const link = document.createElement('a');
+    link.href = imageURL;
+    link.download = 'qr-code.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const openQrModal = (qr) => {
     setSelectedQr(qr);
@@ -25,8 +39,8 @@ const ScreeningPage = () => {
 
 
   const pathSegments = window.location.pathname.split('/');
-  const batchId = pathSegments[pathSegments.length-1];
-  console.log(batchId,'batchId');
+  const batchId = pathSegments[pathSegments.length - 1];
+  console.log(batchId, 'batchId');
 
   const [imageIndex, setImageIndex] = useState(0);
   const [inspectedIndex, setInspectedIndex] = useState(0);
@@ -112,11 +126,15 @@ const ScreeningPage = () => {
         {qrModalOpen && (
           <div className={styles.qrModalOverlay} onClick={closeQrModal}>
             <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
-              <img src={selectedQr} alt="Full QR Code" className={styles.qrModalImg} />
+              <img src={selectedQr} ref={qrImageRef} alt="Full QR Code" className={styles.qrModalImg} />
               <button onClick={closeQrModal} className={styles.closeBtn}>×</button>
+              <button onClick={downloadQrImage} className={styles.qrDownloadButton}>
+                Download
+              </button>
             </div>
           </div>
         )}
+
 
 
         <div className={`${styles.timelineItem} ${styles.right}`}>

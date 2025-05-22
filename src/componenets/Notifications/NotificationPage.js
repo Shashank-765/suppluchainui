@@ -3,6 +3,7 @@ import api from '../../axios'
 import styles from './NotificationPage.module.css';
 import CircularLoader from '../CircularLoader/CircularLoader'
 import { useNavigate } from 'react-router-dom';
+import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 
 const NotificationPage = () => {
     const navigate = useNavigate();
@@ -74,7 +75,7 @@ const NotificationPage = () => {
             setIsCircularLoader(false);
         } catch (err) {
             setIsCircularLoader(false);
-            console.error('Failed to fetch notifications:', err);
+            showError('Failed to fetch notifications');
         }
     };
 
@@ -87,7 +88,7 @@ const NotificationPage = () => {
             });
             setNotifications(prev => prev.filter(n => n._id !== id));
         } catch (err) {
-            console.error("Failed to mark as read", err);
+            showError("Failed to mark as read");
         }
     };
 
@@ -125,10 +126,10 @@ const NotificationPage = () => {
                         <li key={index} onClick={() => notificationHandler(note)} className={styles.notificationItem}>
                             <div className={styles.notificationContent}>
                                 <div className={styles.message}>
-                                    <strong>{ `${note?.message==='Product sold' ?'':`A new batch has been successfully created for  ${note?.coffeeType}`}`}This batch has been assigned the unique identification number  {note.batchId}</strong>  <br />
-                                    {note?.message === 'Product sold' ? `This batch has been sold with quantity ${note.quantity} and price ${note.price}`
+                                    <strong>{`${note?.message === 'Product sold' ? '' : `A new batch has been successfully created for  ${note?.coffeeType}`}`}This batch has been assigned the unique identification number  {note.batchId}. </strong>
+                                    {note?.message === 'Product sold' ? `This batch has been sold with quantity ${note.quantity} and price ${note.price} `
                                         : ' You can now proceed to track, manage, or update its status as required.'}
-                                    <br />
+
                                     {note.message || 'New Notification'}
                                 </div>
                                 <div className={styles.date}>

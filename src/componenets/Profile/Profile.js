@@ -2,21 +2,24 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { showSuccess, showError } from '../ToastMessage/ToastMessage';
 import image1 from '../../Imges/Image6.png'
-import profileImage from '../../Imges/portrait-322470_1280.jpg';
+import profileImage1 from '../../Imges/portrait-322470_1280.jpg';
 import profilecover from '../../Imges/green-tea-plantation-sunrise-timenature-260nw-2322999967.webp';
 import CircularLoader from '../CircularLoader/CircularLoader'
+import profileIcon from '../../Imges/photo-camera.png';
 import api from '../../axios'
-
 import './Profile.css';
 
 
-function Profile({ setIsAuthenticated, setUser }) {
+function Profile({ setIsAuthenticated }) {
     const popupRef = useRef(null);
+    const fileInputRef = useRef(null);
     const location = useLocation();
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [products, setProducts] = useState([]);
     const [buyProducts, setBuyProducts] = useState([]);
+    const [profileImage, setProfileImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -25,6 +28,7 @@ function Profile({ setIsAuthenticated, setUser }) {
         contact: '',
         id: '',
         password: '',
+        profileImage: '',
         role: '',
         status: '',
         walletAddress: '',
@@ -93,25 +97,31 @@ function Profile({ setIsAuthenticated, setUser }) {
                 setBuyProducts(products);
                 const batchMap = {};
                 await Promise.all(
-                  products.map(async (product) => {
-                    const batchId = product.batchId;
-                    const productQuantity = parseFloat(product.quantity) || 0;
-                    const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
-                    if (batchMap[batchId]) {
-                      batchMap[batchId].quantity += productQuantity;
-                    } else {
-                      const { quantity: _, ...cleanBatchData } = batchData;             
-                      batchMap[batchId] = {
-                        ...cleanBatchData,
-                        ...product,
-                        quantity: productQuantity
-                      };
-                    }
-                  })
+                    products.map(async (product) => {
+                        const batchId = product.batchId;
+                        const productQuantity = parseFloat(product.quantity) || 0;
+                        const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
+                        if (batchMap[batchId]) {
+                            batchMap[batchId].quantity += productQuantity;
+                        } else {
+                            const { quantity: _, ...cleanBatchData } = batchData;
+                            batchMap[batchId] = {
+                                ...cleanBatchData,
+                                ...product,
+                                quantity: productQuantity
+                            };
+                        }
+                    })
                 );
                 const mergedProducts = Object.values(batchMap);
                 setProducts(mergedProducts);
                 setIsCircularLoader(false);
+            }
+
+            const responseimage = await api.get(`${process.env.REACT_APP_BACKEND_URL}/users/user/${userdata ? userdata?.userId : user._id}`);
+            if (responseimage.data) {
+                const image = responseimage?.data?.user?.profileImage;
+                setPreviewImage(image);
             }
             else {
                 setIsCircularLoader(false);
@@ -119,26 +129,26 @@ function Profile({ setIsAuthenticated, setUser }) {
             }
         } catch (error) {
             setIsCircularLoader(false);
-            console.log(error)
+            showError('Failed to fetch products');
         }
     };
 
-    useEffect(() => { 
+    useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [profileImage]);
 
     const handleLogout = () => {
         localStorage.removeItem('user');
         const cookies = document.cookie.split(";");
         cookies.forEach(cookie => {
-          const name = cookie.trim().split("=")[0];
-          const paths = ["/", window.location.pathname];
-          paths.forEach(path => {
-            document.cookie = `${name}=; Max-Age=0; path=${path};`;
-            document.cookie = `${name}=; Max-Age=0; path=${path}; SameSite=None; Secure`;
-          });
+            const name = cookie.trim().split("=")[0];
+            const paths = ["/", window.location.pathname];
+            paths.forEach(path => {
+                document.cookie = `${name}=; Max-Age=0; path=${path};`;
+                document.cookie = `${name}=; Max-Age=0; path=${path}; SameSite=None; Secure`;
+            });
         });
-        
+
         setIsAuthenticated(false);
         navigate('/auth');
         showSuccess('Logout successful!');
@@ -159,7 +169,6 @@ function Profile({ setIsAuthenticated, setUser }) {
         try {
             setIsCircularLoader(true);
             const response = await api.post(`/users/updateprofile`, formData)
-            console.log(response?.data)
             if (response?.data) {
                 try {
                     const updatedb = await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateUser/${response.data?.user?._id}`,
@@ -185,7 +194,7 @@ function Profile({ setIsAuthenticated, setUser }) {
                         })
                 }
                 catch (error) {
-                    console.log(error)
+                    showError('Failed to update profile')
                 }
 
                 setIsEditing(false);
@@ -199,6 +208,61 @@ function Profile({ setIsAuthenticated, setUser }) {
         }
 
     };
+
+    const handleIconClick = () => {
+        fileInputRef.current.click();
+    };
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        // Preview image (base64)
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfileImage(reader.result); // if you use it for preview
+        };
+        reader.readAsDataURL(file);
+    
+        // ✅ Update formData state with the selected File object
+        setFormData((prev) => ({
+            ...prev,
+            profileImage: file,
+        }));
+    
+        // Optional: clear input
+        e.target.value = '';
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    
+        // ❗Wait until the state updates before submitting OR pass the file directly
+        const updatedFormData = {
+            ...formData,
+            profileImage: file, // ensure the latest file is used
+        };
+    
+        const data = new FormData();
+        Object.entries(updatedFormData).forEach(([key, value]) => {
+            if (key === 'profileImage' && value instanceof File) {
+                data.append(key, value);
+            } else if (Array.isArray(value)) {
+                data.append(key, JSON.stringify(value));
+            } else {
+                data.append(key, value ?? '');
+            }
+        });
+    
+        try {
+            const response = await api.post('/users/updateprofile', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            showSuccess('Profile Image updated!');
+        } catch (error) {
+            showError('Failed to update profile image');
+        }
+    };    
 
     return (
         <div className="profile-container">
@@ -254,7 +318,22 @@ function Profile({ setIsAuthenticated, setUser }) {
                                 <h1>{userdata ? '' : 'Welcome,'} {userdata ? `${userdata?.userName}'s Profile` : userData.name}</h1>
                             </div>
                             <div className="profile-content">
-                                <img className="profile-image" src={profileImage} alt="Profile" />
+                                {
+
+                                    previewImage ? <img className="profile-image" src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${previewImage}`} alt="Profile" /> : <img className="profile-image" src={profileImage1} alt="Profile" />
+                                }
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                />
+                                {userdata ? '' : <p className='profile-image-icon' onClick={handleIconClick}>
+                                    <img src={profileIcon} alt="Profile Icon" />
+                                </p>}
+
                                 <div className="profile-details">
                                     <div className="contact-info">
                                         <p>Contact No</p>

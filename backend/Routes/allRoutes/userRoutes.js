@@ -2,12 +2,36 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../Models/userModel.js');
 const TrackingModel = require('../../Models/BatchProductModel.js');
-const Role = require('../../Models/RolesModel.js')
+const Role = require('../../Models/RolesModel.js');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const nodemailer = require("nodemailer")
 const { authorize } = require('../../Auth/Authenticate.js')
 const bcrypt = require('bcryptjs');
 const { generateToken, generateWallet, generateRefreshToken } = require('../../Auth/Authenticate.js');
 
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = './uploads';
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath);
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+}).fields([
+  { name: 'profileImage', maxCount: 1 },
+]);
 
 let transporter = nodemailer.createTransport({
   host: "mail.smtp2go.com",
@@ -176,20 +200,21 @@ router.post('/createuser', authorize, async (req, res) => {
 
 })
 
-router.post('/updateprofile', authorize, async (req, res) => {
+router.post('/updateprofile', authorize, upload, async (req, res) => {
   try {
     const { email, name, contact, address, userType } = req.body;
-
     const isExist = await User.findOne({ email });
     if (!isExist) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
+    if (req.files?.profileImage && req.files?.profileImage?.length > 0) {
+      const profileImageName = req.files?.profileImage[0]?.filename;
+      isExist.profileImage = `/uploads/${profileImageName}`;
+    }
     isExist.name = name;
     isExist.contact = contact;
     isExist.address = address;
     isExist.userType = userType;
-
     await isExist.save();
     return res.status(200).json({
       message: 'Profile updated successfully',
@@ -225,7 +250,7 @@ router.post('/login', async (req, res) => {
       user.token = jwtToken;
       await user.save();
     }
-    console.log(refreshToken,'this is refreshToken')
+    console.log(user, 'this is user')
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
@@ -241,6 +266,19 @@ router.post('/login', async (req, res) => {
   }
 }
 )
+router.get('/user/:userId', authorize, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+})
 
 router.get('/fetchalluser', authorize, async (req, res) => {
   try {
@@ -410,7 +448,7 @@ router.post('/unblockUser', authorize, async (req, res) => {
 //   }
 // });
 
-router.get('/getimages', authorize, async (req, res) => {
+router.get('/getimages', async (req, res) => {
   try {
     const trackingRecords = await TrackingModel.find({});
 

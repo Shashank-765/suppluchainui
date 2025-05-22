@@ -5,11 +5,11 @@ import coverImage from '../../Imges/green-tea-plantation-sunrise-timenature-260n
 function Contact() {
   return (
     <div className="contact-wrapper">
-    <div className='contactcoverimagecontianer'>
-       <img  src={coverImage} alt='images'/>
+      <div className='contactcoverimagecontianer'>
+        <img src={coverImage} alt='images' />
         <h1>Contact Us</h1>
-    </div>
-     
+      </div>
+
 
       <div className="map-fullwidth">
         <iframe
@@ -25,7 +25,6 @@ function Contact() {
       </div>
 
       <div className="contact-grid below-map">
-    
         <div className="contact-card form-card">
           <h2>Send Us a Message</h2>
           <form className="contact-form">

@@ -155,6 +155,7 @@ const Dashboard = () => {
 
     const handleSave = async () => {
         setIsCircularLoader(true);
+        setIsEditing(true);
         const allTouched = {};
         Object.keys(edituserdata).forEach(key => {
             if (key !== 'email') {
@@ -165,6 +166,7 @@ const Dashboard = () => {
 
         if (!validateEditForm()) {
             setIsCircularLoader(false);
+            setIsEditing(true);
             return;
         }
         try {
@@ -256,15 +258,20 @@ const Dashboard = () => {
         switch (name) {
             case 'farmerRegNo':
                 if (value.length < 3) error = 'Registration number must be at least 3 characters';
+                else if (value.length > 10) error = 'Registration number must be at most 10 characters';
                 break;
             case 'farmerName':
                 if (!/^[a-zA-Z\s]+$/.test(value)) error = 'Name should contain only letters';
+                else if (value.length < 3) error = 'Name must be at least 3 characters';
+                else if (value.length > 50) error = 'Name must be at most 50 characters';
                 break;
             case 'coffeeType':
                 if (value.length < 2) error = 'Please enter a valid food type';
+                else if (value.length > 50) error = 'Type must be at most 50 characters';
                 break;
             case 'farmerAddress':
                 if (value.length < 10) error = 'Address should be more detailed';
+                else if (value.length > 80) error = 'Address must be at most 80 characters';
                 break;
             case 'farmInspectionName':
             case 'harvesterName':

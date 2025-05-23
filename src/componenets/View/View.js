@@ -31,6 +31,7 @@ function View() {
   const popupRef = useRef(null);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [processorcontact, setProcessorContact] = useState('')
   const [pagination, setPagination] = useState({
     total: 0,
     limit: 5,
@@ -71,7 +72,6 @@ function View() {
     setActiveIndex(index);
   };
   const fetchHistory = async () => {
-
     if (user?.userType === 'admin') {
       try {
         const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/viewbuy/${product?.batchId}`,
@@ -107,6 +107,8 @@ function View() {
           // }
           // }
         );
+        const resp2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${product?.processorId?.processorId.split("_")[1]}`)
+        setProcessorContact(resp2?.data?.userPhone)
 
         if (resp?.data?.userBuyProducts) {
 
@@ -126,7 +128,6 @@ function View() {
     }
 
   }
-
   useEffect(() => {
     fetchHistory();
   }, [currentPage, pagination.limit]);
@@ -185,68 +186,68 @@ function View() {
 
     let stripe;
 
-  try {
-    const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
-    stripe = await stripePromise;
+    try {
+      const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHED_KEY);
+      stripe = await stripePromise;
 
-    if (!stripe) {
-      throw new Error('Stripe.js failed to load.');
-    }
-  } catch (error) {
-    console.error('Stripe failed to load=====:', error);
-    setIsCircularLoader(false);
-    showError('Payment could not be initialized. Please check your internet connection.');
-    return;
-  }
-
-  try {
-    const sessionRes = await api.post(`/payments/create-checkout-session`, {
-      batchId: productData?.batchId,
-      quantity,
-      price,
-      buyerId: user?._id,
-      sellerId: productData?.processorId?.processorId.split("_")[1],
-      unit,
-    });
-
-    const session = sessionRes.data;
-
-    sessionStorage.setItem('invoiceData', JSON.stringify({
-      processorName: productData?.processorId?.processorName,
-      farmddress: productData?.processorId?.warehouseLocation,
-      farmId: productData?.processorId?.processorId.split("_")[1],
-      farmContact: productData?.processorId?.processorPhone || '9453495435',
-      quantity,
-      price,
-      realprice,
-      buyerId: user?._id,
-      batchId: productData?.batchId,
-      sellerId: productData?.processorId?.processorId.split("_")[1],
-      productname: productData?.coffeeType,
-      unit,
-      paymentDate: new Date().toLocaleDateString(),
-      recieverName: user?.name,
-      receiverId: user?._id,
-      receiverAddress: user?.address || 'noida sector - 4',
-      receiverContact: user?.contact
-    }));
-
-    const result = await stripe.redirectToCheckout({
-      sessionId: session.id,
-    });
-
-    setIsCircularLoader(false);
-
-    if (result.error) {
-      console.log(result.error.message);
+      if (!stripe) {
+        throw new Error('Stripe.js failed to load.');
+      }
+    } catch (error) {
+      console.error('Stripe failed to load=====:', error);
       setIsCircularLoader(false);
-      showError('Stripe redirect error');
+      showError('Payment could not be initialized. Please check your internet connection.');
+      return;
     }
-  } catch (error) {
-    console.log('Error:====>', error);
-    setIsCircularLoader(false);
-    showError(error?.response?.data?.message);
-  }
+
+    try {
+      const sessionRes = await api.post(`/payments/create-checkout-session`, {
+        batchId: productData?.batchId,
+        quantity,
+        price,
+        buyerId: user?._id,
+        sellerId: productData?.processorId?.processorId.split("_")[1],
+        unit,
+      });
+
+      const session = sessionRes.data;
+
+      sessionStorage.setItem('invoiceData', JSON.stringify({
+        processorName: productData?.processorId?.processorName,
+        farmddress: productData?.processorId?.warehouseLocation,
+        farmId: productData?.processorId?.processorId.split("_")[1],
+        farmContact: processorcontact || '9453495435',
+        quantity,
+        price,
+        realprice,
+        buyerId: user?._id,
+        batchId: productData?.batchId,
+        sellerId: productData?.processorId?.processorId.split("_")[1],
+        productname: productData?.coffeeType,
+        unit,
+        paymentDate: new Date().toLocaleDateString(),
+        recieverName: user?.name,
+        receiverId: user?._id,
+        receiverAddress: user?.address || 'noida sector - 4',
+        receiverContact: user?.contact
+      }));
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      setIsCircularLoader(false);
+
+      if (result.error) {
+        console.log(result.error.message);
+        setIsCircularLoader(false);
+        showError('Stripe redirect error');
+      }
+    } catch (error) {
+      console.log('Error:====>', error);
+      setIsCircularLoader(false);
+      showError(error?.response?.data?.message);
+    }
   };
 
   const fetchProducts = async () => {
@@ -491,7 +492,7 @@ function View() {
               </h2>
               <h2 className='nameofproductowner'>{productData?.coffeeType}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.processorId?.price}</span></h2>
-              <h2> {viewOnly ? 'Stock' : 'Qty'} : <span className='priceproduct'>{viewOnly ? Number(product?.quantity).toFixed(2) : Number(productData?.processorId?.quantity).toFixed(2)}  Qtl</span></h2>
+              <h2> {viewOnly ? 'Stock' : 'Quantity'} : <span className='priceproduct'>{viewOnly ? Number(product?.quantity).toFixed(2) || 0 : Number(productData?.processorId?.quantity).toFixed(2) || 0 }   Qtl</span></h2>
               <div className='buynowbuttoncover'>
 
                 <div className='buynowbuttoncover'>
@@ -651,7 +652,7 @@ function View() {
 
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1 }
+                    disabled={currentPage === 1}
                     style={{
                       padding: '5px 8px',
                       border: '1px solid #ddd',

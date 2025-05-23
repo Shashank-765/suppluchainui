@@ -189,7 +189,7 @@ function Invoice() {
                 </h4>
               </div>
               <p>Company ID: {invoiceData?.receiverId}</p>
-              <p>{invoiceData?.receiverAddress}</p>
+              <p>Address: {invoiceData?.receiverAddress}</p>
               <p>Phone: +91-{invoiceData?.receiverContact}</p>
             </div>
           </div>

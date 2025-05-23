@@ -214,7 +214,7 @@ function UserDashBoard() {
         ...prevData,
         batchId: selectedBatch?.batchId,
         farmInspectionId: selectedBatch?.farmInspectionId?.farmInspectionId || selectedBatch?.farmInspectionId?.id,
-        farmInspectionName: selectedBatch?.farmInspectionName || 'Janiifer ojedja',
+        farmInspectionName: user?.name || 'Janiifer ojedja',
         productName: selectedBatch?.farmInspectionId?.productName || '',
         certificateNo: selectedBatch?.farmInspectionId?.certificateNo || '',
         certificateFrom: selectedBatch?.farmInspectionId?.certificateFrom || '',
@@ -224,14 +224,14 @@ function UserDashBoard() {
         inspectionStatus: selectedBatch?.farmInspectionId?.farmInspectionStatus || '',
 
         harvesterId: selectedBatch?.harvesterId?.harvestId || selectedBatch?.harvesterId?.id,
-        harvesterName: selectedBatch?.harvesterName || 'Janiifer ojedja',
+        harvesterName: user?.name || 'Janiifer ojedja',
         cropSampling: selectedBatch?.harvesterId?.cropSampling || '',
         temperatureLevel: selectedBatch?.harvesterId?.temperatureLevel || '',
         humidity: selectedBatch?.harvesterId?.humidityLevel || '',
         harvestStatus: selectedBatch?.harvesterId?.harvestStatus || '',
 
         exporterId: selectedBatch?.exporterId?.exporterId || selectedBatch?.exporterId?.id,
-        exporterName: selectedBatch?.exporterName || 'Janiifer ojedja',
+        exporterName: user?.name || 'Janiifer ojedja',
         coordinationAddress: selectedBatch?.exporterId?.coordinationAddress || '',
         shipName: selectedBatch?.exporterId?.shipName || '',
         shipNo: selectedBatch?.exporterId?.shipNo || '',
@@ -245,7 +245,7 @@ function UserDashBoard() {
         exportStatus: selectedBatch?.exporterId?.exporterStatus || '',
 
         importerId: selectedBatch?.importerId?.importerId || selectedBatch?.importerId?.id,
-        importerName: selectedBatch?.importerName || 'Janiifer ojedja',
+        importerName: user?.name || 'Janiifer ojedja',
         quantityImported: selectedBatch?.importerId?.quantity || '',
         shipStorage: selectedBatch?.importerId?.shipStorage || '',
         arrivalDate: selectedBatch?.importerId?.arrivalDate
@@ -259,7 +259,7 @@ function UserDashBoard() {
         importStatus: selectedBatch?.importerId?.importerStatus || '',
 
         processorId: selectedBatch?.processorId?.processorId || selectedBatch?.processorId?.id,
-        processorName: selectedBatch?.processorName || 'random name',
+        processorName: user?.name || 'random name',
         quantityProcessed: selectedBatch?.processorId?.quantity || '',
         processingMethod: selectedBatch?.processorId?.processingMethod || '',
         packaging: selectedBatch?.processorId?.packaging || '',
@@ -370,8 +370,10 @@ function UserDashBoard() {
       return error;
     }
     switch (name) {
+
       case 'certificateNo':
         if (value.length < 3) error = 'Certificate No must be at least 3 characters';
+        if (value.length > 15) error = 'Certificate No must be at most 15 characters';
         break;
       case 'temperatureLevel':
       case 'humidity':
@@ -383,11 +385,12 @@ function UserDashBoard() {
       case 'quantityProcessed':
         if (isNaN(value)) error = 'Must be a number';
         else if (value <= 0) error = 'Must be greater than 0';
+        else if (value.length > 8) error = 'Must be at most 8 characters';
         break;
-      case 'departureDate':
-      case 'estimatedDate':
-      case 'arrivalDate':
-      case 'warehouseArrivalDate':
+      // case 'departureDate':
+      // case 'estimatedDate':
+      // case 'arrivalDate':
+      // case 'warehouseArrivalDate':
       case 'packagedDate':
         if (new Date(value) > new Date()) error = 'Date cannot be in the future';
         break;
@@ -395,6 +398,21 @@ function UserDashBoard() {
         if (formData.departureDate && new Date(value) < new Date(formData.departureDate)) {
           error = 'Estimated date cannot be before departure date';
         }
+        break;
+      case 'shipStorage':
+        const shipStorageValue = Number(value);
+        if (isNaN(shipStorageValue)) error = 'Ship Storage must be a number';
+        else if (shipStorageValue <= 0) error = 'Ship Storage must be greater than 0';
+        else if (value.toString().length > 8) error = 'Must be at most 8 digits';
+        break;
+
+      case 'shipName':
+        if (value.length < 3) error = 'Ship Name must be at least 3 characters';
+        if (value.length > 30) error = 'Ship Name must be at most 30 characters';
+        break;
+      case 'shipNo':
+        if (value.length < 3) error = 'Ship No must be at least 3 characters';
+        if (value.length > 15) error = 'Ship No must be at most 15 characters';
         break;
       case 'warehouseArrivalDate':
         if (formData.arrivalDate && new Date(value) < new Date(formData.arrivalDate)) {
@@ -406,11 +424,16 @@ function UserDashBoard() {
       case 'maxiQuantity':
         if (isNaN(value)) error = 'Must be a number';
         else if (value <= 0) error = 'Must be greater than 0';
+        else if (value.toString().length > 8) error = 'Must be at most 8 digits';
         break;
       case 'miniQuantity':
         if (formData.maxiQuantity && parseFloat(value) > parseFloat(formData.maxiQuantity)) {
           error = 'Minimum quantity cannot be greater than maximum';
         }
+        break;
+      case 'coordinationAddress':
+        if (value.length < 3) error = 'Coordination Address must be at least 3 characters';
+        if (value.length > 80) error = 'Coordination Address must be at most 80 characters';
         break;
       case 'maxiQuantity':
         if (formData.miniQuantity && parseFloat(value) < parseFloat(formData.miniQuantity)) {
@@ -585,7 +608,7 @@ function UserDashBoard() {
               ? `${process.env.REACT_APP_BACKEND2_URL}/updateInspector/${combinedId}`
               : `${process.env.REACT_APP_BACKEND2_URL}/addInspector`;
             const method = toUpdate ? axios.put : axios.post;
-
+            const batch = res?.data?.batch;
             farmdata = await method(url, {
               batchId,
               farmInspectionId: combinedId,
@@ -724,10 +747,11 @@ function UserDashBoard() {
 
   const renderInput = (name, label, type = 'text', disabled = false, options = []) => (
     <div className={styles.formGroup}>
-      <label>
+      <label htmlFor={name}>
         {label}:
         {type === 'select' ? (
           <select
+            id={name}
             name={name}
             value={formData[name] || ''}
             onChange={handleChange}
@@ -735,15 +759,15 @@ function UserDashBoard() {
             disabled={disabled}
             className={errors[name] && touched[name] ? styles.errorInput : ''}
           >
-            <option value="" disabled>Select Status</option>
-            {options.slice(1).map((option, idx) => (
-              <option key={idx} value={option}>
+            {options.map((option, idx) => (
+              <option key={idx} value={idx === 0 ? '' : option} disabled={idx === 0}>
                 {option}
               </option>
             ))}
           </select>
         ) : (
           <input
+            id={name}
             type={type}
             name={name}
             value={formData[name] || ''}
@@ -759,6 +783,7 @@ function UserDashBoard() {
       )}
     </div>
   );
+
 
 
   return (
@@ -824,11 +849,12 @@ function UserDashBoard() {
                   <>
                     {renderInput('harvesterId', 'Harvester Id', 'text', true)}
                     {renderInput('harvesterName', 'Harvester Name', 'text', true)}
-                    {renderInput('cropSampling', 'Crop Sampling')}
-                    {renderInput('temperatureLevel', 'Temperature Level')}
-                    {renderInput('humidity', 'Humidity')}
+                    {renderInput('cropSampling', 'Crop Sampling', 'select', false, ['Select Sampling', 'Soil', 'Leaf', 'Fruit'])}
+                    {renderInput('temperatureLevel', 'Temperature Level (°C)', 'number')}
+                    {renderInput('humidity', 'Humidity (%)', 'number')}
                     {renderInput('harvestStatus', 'Harvest Status', 'select', false, ['Select Status', 'Pending', 'Completed'])}
                   </>
+
                 )}
 
                 {user?.role?.label === 'Exporter' && (
@@ -849,28 +875,35 @@ function UserDashBoard() {
                   <>
                     {renderInput('importerId', 'Importer ID', 'text', true)}
                     {renderInput('importerName', 'Importer Name', 'text', true)}
-                    {renderInput('quantityImported', 'Quantity')}
-                    {renderInput('shipStorage', 'Ship Storage')}
+                    {renderInput('quantityImported', 'Quantity (quintals)', 'number')}
+                    {renderInput('shipStorage', 'Ship Storage (quintals)')}
                     {renderInput('arrivalDate', 'Arrival Date', 'date')}
                     {renderInput('warehouseLocation', 'Warehouse Location')}
                     {renderInput('warehouseArrivalDate', 'Warehouse Arrival Date', 'date')}
                     {renderInput('importerAddress', 'Importer Address')}
                     {renderInput('importStatus', 'Import Status', 'select', false, ['Select Status', 'Pending', 'Received'])}
                   </>
+
                 )}
 
                 {user?.role?.label === 'Processor' && (
                   <>
                     {renderInput('processorId', 'Processor ID', 'text', true)}
                     {renderInput('processorName', 'Processor Name', 'text', true)}
-                    {renderInput('quantityProcessed', 'Quantity')}
-                    {renderInput('processingMethod', 'Processing Method')}
-                    {renderInput('packaging', 'Packaging')}
+                    {renderInput('quantityProcessed', 'Quantity (quintals)', 'number')}
+                    {renderInput('processingMethod', 'Processing Method', 'select', false, ['Select Method', 'Drying', 'Milling', 'Roasting', 'Cleaning'])}
+                    {renderInput('packaging', 'Packaging', 'select', false, ['Select Type', 'Plastic Bags', 'Jute Bags', 'Vacuum Sealed', 'Cardboard Boxes'])}
                     {renderInput('packagedDate', 'Packaged Date', 'date')}
-                    {renderInput('warehouse', 'Warehouse')}
+                    {renderInput('warehouse', 'Warehouse', 'select', false, [
+                      'Select Warehouse',
+                      'WH-A1 (North Zone)',
+                      'WH-B2 (South Zone)',
+                      'WH-C3 (East Zone)',
+                      'WH-D4 (West Zone)'
+                    ])}
                     {renderInput('warehouseAddress', 'Warehouse Address')}
                     {renderInput('destination', 'Destination')}
-                    {renderInput('price', 'Price')}
+                    {renderInput('price', 'Price (₹)', 'number')}
                     {renderInput('processingStatus', 'Processing Status', 'select', false, ['Select Status', 'Pending', 'Processed'])}
 
                     <div className='custom-file-upload'>

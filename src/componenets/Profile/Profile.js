@@ -97,10 +97,26 @@ function Profile({ setIsAuthenticated }) {
                 setBuyProducts(products);
                 const batchMap = {};
                 await Promise.all(
+
                     products.map(async (product) => {
                         const batchId = product.batchId;
-                        const productQuantity = parseFloat(product.quantity) || 0;
+                        const parseToQuintal = (quantityStr) => {
+                            if (!quantityStr) return 0;
+                            const [amount, unit] = quantityStr.toLowerCase().split(' ');
+
+                            const numericAmount = parseFloat(amount);
+                            if (isNaN(numericAmount)) return 0;
+
+                            if (unit === 'kg') return numericAmount / 100;
+                            if (unit === 'quintal' || unit === 'quintals') return numericAmount;
+
+                            return 0;
+                        };
+
+                        const productQuantity = parseToQuintal(product.quantity);
+
                         const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
+
                         if (batchMap[batchId]) {
                             batchMap[batchId].quantity += productQuantity;
                         } else {
@@ -112,6 +128,7 @@ function Profile({ setIsAuthenticated }) {
                             };
                         }
                     })
+
                 );
                 const mergedProducts = Object.values(batchMap);
                 setProducts(mergedProducts);
@@ -215,32 +232,32 @@ function Profile({ setIsAuthenticated }) {
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-    
+
         // Preview image (base64)
         const reader = new FileReader();
         reader.onloadend = () => {
             setProfileImage(reader.result); // if you use it for preview
         };
         reader.readAsDataURL(file);
-    
+
         // ✅ Update formData state with the selected File object
         setFormData((prev) => ({
             ...prev,
             profileImage: file,
         }));
-    
+
         // Optional: clear input
         e.target.value = '';
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
-    
+
         // ❗Wait until the state updates before submitting OR pass the file directly
         const updatedFormData = {
             ...formData,
             profileImage: file, // ensure the latest file is used
         };
-    
+
         const data = new FormData();
         Object.entries(updatedFormData).forEach(([key, value]) => {
             if (key === 'profileImage' && value instanceof File) {
@@ -251,7 +268,7 @@ function Profile({ setIsAuthenticated }) {
                 data.append(key, value ?? '');
             }
         });
-    
+
         try {
             const response = await api.post('/users/updateprofile', data, {
                 headers: {
@@ -262,7 +279,7 @@ function Profile({ setIsAuthenticated }) {
         } catch (error) {
             showError('Failed to update profile image');
         }
-    };    
+    };
 
     return (
         <div className="profile-container">

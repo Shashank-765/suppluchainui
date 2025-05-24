@@ -42,10 +42,10 @@ function Invoice() {
     const fetchSession = async () => {
       setIsCircularLoader(true);
       const sessionId = new URLSearchParams(window.location.search).get('session_id');
-      if (!sessionId){
+      if (!sessionId) {
         setIsCircularLoader(false);
         return;
-      } 
+      }
 
       try {
         const session = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/payments/stripe/getsession/${sessionId}`, {
@@ -140,9 +140,9 @@ function Invoice() {
   return (
     isCircularloader ? (
       <>
-       <div className='invoicecircularloader'>
-      <CircularLoader size={20} />
-       </div>
+        <div className='invoicecircularloader'>
+          <CircularLoader size={20} />
+        </div>
       </>
     ) : (
       <div>
@@ -166,7 +166,7 @@ function Invoice() {
               </div>
             </div>
           </header>
-  
+
           <div className="parties-container">
             <div className="party from">
               <div className="party-header">
@@ -193,7 +193,7 @@ function Invoice() {
               <p>Phone: +91-{invoiceData?.receiverContact}</p>
             </div>
           </div>
-  
+
           <div className="invoice-content">
             <table className="invoice-table">
               <thead>
@@ -221,7 +221,7 @@ function Invoice() {
                 </tr>
               </tfoot>
             </table>
-  
+
             <div className="invoice-summary">
               <div className="calculations">
                 <div className="calc-row">
@@ -245,7 +245,7 @@ function Invoice() {
                   <span>₹{price}</span>
                 </div>
               </div>
-  
+
               <div className="invoice-details">
                 <div className="details-header">
                   <div className="document-icon"><i className="fas fa-file-invoice"></i></div>
@@ -259,7 +259,7 @@ function Invoice() {
               </div>
             </div>
           </div>
-  
+
           <footer className="invoice-footer">
             <div className="blockchain-proof">
               <h3>Blockchain Proof</h3>
@@ -270,7 +270,7 @@ function Invoice() {
                 <p>On-chain visaro <br />on-chain</p>
               </div>
             </div>
-  
+
             <div className="signatures">
               <h3>Authorized Signatory</h3>
               <p>Digitally signed via blockchain</p>
@@ -280,7 +280,7 @@ function Invoice() {
             </div>
           </footer>
         </div>
-  
+
         <div className='printbutton-container'>
           <button className='print-button' onClick={handlePrint}>
             {isCircularloader ? <CircularLoader size={20} /> : 'Print'}

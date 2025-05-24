@@ -492,7 +492,7 @@ function View() {
               </h2>
               <h2 className='nameofproductowner'>{productData?.coffeeType}</h2>
               <h2>Price : <span className='priceproduct'>₹ {productData?.processorId?.price}</span></h2>
-              <h2> {viewOnly ? 'Stock' : 'Quantity'} : <span className='priceproduct'>{viewOnly ? Number(product?.quantity).toFixed(2) || 0 : Number(productData?.processorId?.quantity).toFixed(2) || 0 }   Qtl</span></h2>
+              <h2> {viewOnly ? 'Stock' : 'Quantity'} : <span className='priceproduct'>{viewOnly ? Number(product?.quantity).toFixed(2) || 0 : Number(productData?.processorId?.quantity).toFixed(2) || 0}   Qtl</span></h2>
               <div className='buynowbuttoncover'>
 
                 <div className='buynowbuttoncover'>

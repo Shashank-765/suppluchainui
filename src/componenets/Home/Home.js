@@ -26,14 +26,14 @@ function Home() {
   const userhandler = () => {
     Navigate('/auth')
   }
- const hangelesinghup =()=>{
-   if(user){
-     Navigate('/product')
-   }
-   else{
-   Navigate('/auth')
-   }
- }
+  const hangelesinghup = () => {
+    if (user) {
+      Navigate('/product')
+    }
+    else {
+      Navigate('/auth')
+    }
+  }
   const getimages = async () => {
     try {
       const response = await api.get(`/users/getimages`)
@@ -58,7 +58,7 @@ function Home() {
           <h3>Built on Hyperledger Fabric for Secure, Transparent, and Trusted Agriculture</h3>
           <p>AgriChain is an enterprise-grade crop supply chain management platform that leverages the power of Hyperledger Fabric to ensure transparency, traceability, and trust across all agricultural processes — from sowing to sale.</p>
           <div className='greenleasvehorizontl'><img src={image14} alt='images' /></div>
-          <button className='button-explore'onClick={hangelesinghup}>Get Started</button>
+          <button className='button-explore' onClick={hangelesinghup}>Get Started</button>
           <div className='greenleasveverticle'><img src={image13} alt='images' /></div>
           <div className='reddotimage'><img src={image12} alt='images' /></div>
         </div>
@@ -116,33 +116,33 @@ function Home() {
         <div className='boxes_container'>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
-            {
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} alt='images' />
-              : <img src={image1} alt='images' />
-            }
-              
+              {
+                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} alt='images' />
+                  : <img src={image1} alt='images' />
+              }
+
             </div>
             <p> Achieve Increased Crop Yields</p>
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>{
               inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} alt='images' />
-              : <img src={image2} alt='images' />
-            } 
+                : <img src={image2} alt='images' />
+            }
             </div>
             <p> Ensure Quality and Freshness</p>
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
               {
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} alt='images' />
-              : <img src={image3} alt='images' />
-            }
+                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} alt='images' />
+                  : <img src={image3} alt='images' />
+              }
             </div>
-            
+
             <p>Minimize Waste and Spoilage</p>
           </div>
-         
+
         </div>
         <div className='blankimagecontainer'>
           <img src={image4} alt='images' />
@@ -198,23 +198,23 @@ function Home() {
           <div className='section-6-lowercontainer'>
             <div className='section-6imgcontainer'>
 
-            {
+              {
                 images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} alt='images' />
-                : <img  src={image5} alt='images'/>
-            }
-              
+                  : <img src={image5} alt='images' />
+              }
+
             </div>
             <div className='section-6imgcontainer'>
               {
                 images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} alt='images' />
-                : <img  src={image6} alt='images'/>
-            }
+                  : <img src={image6} alt='images' />
+              }
             </div>
             <div className='section-6imgcontainer'>
-             {
+              {
                 images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} alt='images' />
-                : <img  src={image7} alt='images'/>
-            }
+                  : <img src={image7} alt='images' />
+              }
             </div>
           </div>
         </div>

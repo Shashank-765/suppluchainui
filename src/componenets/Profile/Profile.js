@@ -422,12 +422,15 @@ function Profile({ setIsAuthenticated }) {
                                                 </div>
                                             </div>
                                         ))
-                                    ) : (
+                                    ) : ''}
+                                </div>
+
+                                {
+                                    products.length > 0 ? '' :
                                         <div className="no-product-container-profile">
                                             <p>{isCircularloader ? <CircularLoader size={20} /> : 'No Product Available'}</p>
                                         </div>
-                                    )}
-                                </div>
+                                }
                             </div>
                         }
                     </>

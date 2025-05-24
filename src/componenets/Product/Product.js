@@ -43,7 +43,7 @@ function Product() {
         }
     };
     useEffect(() => {
-            fetchAllProducts(1);    
+        fetchAllProducts(1);
     }, []);
 
     const handleSeeMore = () => {
@@ -60,13 +60,13 @@ function Product() {
             </div>
 
             <div className='productmaincontainer'>
-                {data.length > 0  ? (
+                {data.length > 0 ? (
                     <>
                         {data?.map((ele, i) => (
                             ele?.processorId?.processorStatus === 'Processed' &&
                             <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                 <div className='productimagecontianer'>
-                                    { ele?.processorId?.image?.length > 0 ? (
+                                    {ele?.processorId?.image?.length > 0 ? (
                                         <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.processorId?.image[0]}`} alt='product' />
                                     ) : (
                                         <img src={image1} alt='default' />
@@ -87,7 +87,7 @@ function Product() {
                         {!isCircularloader && page < totalPages && (
                             <div className='productcontainer see-more-card' onClick={handleSeeMore}>
                                 <div className='productimagecontianer'>
-                                
+
                                 </div>
                                 <div className='productdetailscontainer'>
                                     <div className='productdetailscontainerdetails'>

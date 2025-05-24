@@ -45,7 +45,7 @@ const Dashboard = () => {
     const [simpleUserSearch, setSimpleUserSearch] = useState('');
     const [userBuyProducts, setUserBuyProducts] = useState([]);
     const [deletingBatchId, setDeletingBatchId] = useState(null);
-    const [withoutPaginationAllUsers,setWithoutPaginationAllUser]=useState([]);
+    const [withoutPaginationAllUsers, setWithoutPaginationAllUser] = useState([]);
 
     const fetchSimpleUsers = async () => {
         try {
@@ -742,7 +742,7 @@ const Dashboard = () => {
                     search: searchTerm,
                 },
             });
-            if(response2.data){
+            if (response2.data) {
                 setWithoutPaginationAllUser(response2.data.data)
             }
         } catch (error) {
@@ -867,7 +867,7 @@ const Dashboard = () => {
     };
     const deleteBatch = async (batch) => {
         try {
-            setDeletingBatchId(batch?.batchId); 
+            setDeletingBatchId(batch?.batchId);
             const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`, {
                 batchId: batch?.batchId,
                 farmerRegNo: batch?.farmerRegNo,

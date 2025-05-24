@@ -21,7 +21,7 @@ function Navbar({ isAuthenticated }) {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
-      }    
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -168,7 +168,7 @@ function Navbar({ isAuthenticated }) {
 
           )}
 
-          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
+          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && navstae && (
             <li className="dropdown notification-bell" ref={dropdownRef}>
               <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
                 <img src={notificationimage} alt='images' />
@@ -211,7 +211,50 @@ function Navbar({ isAuthenticated }) {
       </div>
 
       {navstae ? (
-        <img className='menubutton' onClick={() => setNavState(!navstae)} src={menu} alt='menu' />
+        <>
+          <div className='notification-belltoggle'>
+            {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
+              <li className="dropdown notification-bell" ref={dropdownRef}>
+                <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
+                  <img src={notificationimage} alt='images' />
+                  {notifications.length > 0 && <span className="badge">{notifications?.length}</span>}
+                </span>
+
+                {showDropdown && (
+                  <ul className="dropdown-menu">
+                    {notifications.length > 0 ? (
+                      <>
+                        {notifications.slice(0, 5).map((note, index) => (
+                          <li key={index} className="notificationli" onClick={() => handleNotification(note)}>
+                            <div className="notification-header" >
+                              {note.batchId && note.message === 'Product sold'
+                                ? `Batch with Id ${note.batchId} ${note.message} with quantity ${note.quantity}`
+                                : `Batch with Id ${note.batchId} ${note.message}`}
+                            </div>
+                            <div className="notification-date">
+                              {formatNotificationDate(note.createdAt)}
+                            </div>
+                          </li>
+                        ))}
+
+                        {notifications.length > 5 && (
+                          <li className="notification-see-more">
+                            <button className='seemorebutton' onClick={() => seemoreHandler()}>
+                              See more
+                            </button>
+                          </li>
+                        )}
+                      </>
+                    ) : (
+                      <li className="notificationlino">No notifications</li>
+                    )}
+                  </ul>
+                )}
+              </li>
+            )}
+          <img className='menubutton' onClick={() => setNavState(!navstae)} src={menu} alt='menu' />
+          </div>
+        </>
       ) : (
         <img className='menubutton' onClick={() => setNavState(!navstae)} src={cross} alt='close' />
       )}

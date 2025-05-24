@@ -7,6 +7,9 @@
   background: #FEF7F0;
   border-bottom: 3px solid #51947a;
 }
+.notification-belltoggle{
+  display: none;
+}
 
 .logocontainercompany {
   width: 30%;
@@ -24,7 +27,7 @@
 
 .navbarleftlog {
   width: 20%;
-  z-index: 2;
+  z-index: 99999;
 
   >img {
     margin-left: 10%;
@@ -95,6 +98,12 @@
       margin-left: 10%;
     }
   }
+  .notification-belltoggle{
+    width: 50%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+  }
 
   .navafterbutton {
     position: absolute;
@@ -139,7 +148,7 @@
 
   .menubutton {
     display: block;
-    margin-left: 38%;
+    margin-left: 10%;
   }
 
   .navbarsection {
@@ -222,7 +231,8 @@
 
   .menubutton {
     display: block;
-    margin-left: 38%;
+    margin-left: 15%;
+    z-index: 99999;
   }
 
   .navbarsection {
@@ -267,6 +277,10 @@
 @media screen and (max-width:420px) {
   .navafterbutton {
     margin-top: 75%;
+  }
+  .dropdown-menu{
+    width: 250px !important;
+    right: -68px !important;
   }
 }
 
@@ -323,7 +337,7 @@
   background-color: #FEF7F0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   padding: 10px 0;
-  min-width: 300px;
+  width: 300px;
   max-height: 300px;
   margin-top: 1rem;
   overflow-x: scroll;

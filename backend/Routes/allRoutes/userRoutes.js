@@ -43,7 +43,6 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-
 router.post('/register', async (req, res) => {
 
   try {
@@ -81,7 +80,7 @@ router.post('/register', async (req, res) => {
 
   }
 
-})
+});
 
 router.post('/createuser', authorize, async (req, res) => {
 
@@ -198,7 +197,7 @@ router.post('/createuser', authorize, async (req, res) => {
 
   }
 
-})
+});
 
 router.post('/updateprofile', authorize, upload, async (req, res) => {
   try {
@@ -265,7 +264,8 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
-)
+);
+
 router.get('/user/:userId', authorize, async (req, res) => {
   try {
     const { userId } = req.params;
@@ -278,7 +278,7 @@ router.get('/user/:userId', authorize, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
-})
+});
 
 router.get('/fetchalluser', authorize, async (req, res) => {
   try {
@@ -403,7 +403,7 @@ router.post('/unblockUser', authorize, async (req, res) => {
     return res.status(500).json({ message: 'Server error while unblocking user' });
   }
 }
-)
+);
 
 // router.post('/insertRoles', async (req, res) => {
 //   const roleMap = {

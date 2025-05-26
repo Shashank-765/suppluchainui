@@ -17,16 +17,28 @@ function Navbar({ isAuthenticated }) {
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const lastSegment = pathSegments[pathSegments.length - 1];
   const dropdownRef = useRef(null);
+  const dropdownRef2 = useRef(null);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        dropdownRef2.current &&
+        !dropdownRef2.current.contains(event.target)
+      ) {
         setShowDropdown(false);
       }
     };
-
+  
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
+  
+
+  
   function formatNotificationDate(createdAt) {
     const now = new Date();
     const createdDate = new Date(createdAt);
@@ -168,7 +180,7 @@ function Navbar({ isAuthenticated }) {
 
           )}
 
-          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && navstae && (
+          {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
             <li className="dropdown notification-bell" ref={dropdownRef}>
               <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
                 <img src={notificationimage} alt='images' />
@@ -214,7 +226,7 @@ function Navbar({ isAuthenticated }) {
         <>
           <div className='notification-belltoggle'>
             {isAuthenticated && lastSegment !== 'batchprogress' && lastSegment !== 'notifications' && (
-              <li className="dropdown notification-bell" ref={dropdownRef}>
+              <li className="dropdown notification-bell" ref={dropdownRef2}>
                 <span className="dropdown-toggle" onClick={() => setShowDropdown(!showDropdown)}>
                   <img src={notificationimage} alt='images' />
                   {notifications.length > 0 && <span className="badge">{notifications?.length}</span>}

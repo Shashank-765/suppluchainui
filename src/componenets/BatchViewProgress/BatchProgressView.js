@@ -103,11 +103,11 @@ const BatchProgressView = () => {
             <p><span className={styles.batchesheading}>Registration No:</span><span className={styles.batchesdatavalue}> {allBatch?.farmerRegNo}</span></p>
             <p><span className={styles.batchesheading}>Farmer Name:</span><span className={styles.batchesdatavalue}> {allBatch?.farmerName}</span></p>
             <p><span className={styles.batchesheading}>Farm Address:</span><span className={styles.batchesdatavalue}> {allBatch?.farmerAddress}</span></p>
-            <p><span className={styles.batchesheading}>Inspector Name:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionName}</span></p>
-            <p><span className={styles.batchesheading}>Harvester Name:</span><span className={styles.batchesdatavalue}> {allBatch?.harvesterName}</span></p>
-            <p><span className={styles.batchesheading}>Importer Name:</span><span className={styles.batchesdatavalue}> {allBatch?.importerName}</span></p>
-            <p><span className={styles.batchesheading}>Exporter Name:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterName}</span></p>
-            <p><span className={styles.batchesheading}>Processor Name:</span><span className={styles.batchesdatavalue}> {allBatch?.processorName}</span></p>
+            <p><span className={styles.batchesheading}>Inspector Name:</span><span className={styles.batchesdatavalue}>{allBatch?.farmInspectionId?.farmInspectionName}</span></p>
+            <p><span className={styles.batchesheading}>Harvester Name:</span><span className={styles.batchesdatavalue}> {allBatch?.harvesterId?.harvesterName}</span></p>
+            <p><span className={styles.batchesheading}>Importer Name:</span><span className={styles.batchesdatavalue}> {allBatch?.importerId?.importerName}</span></p>
+            <p><span className={styles.batchesheading}>Exporter Name:</span><span className={styles.batchesdatavalue}> {allBatch?.exporterId?.exporterName}</span></p>
+            <p><span className={styles.batchesheading}>Processor Name:</span><span className={styles.batchesdatavalue}> {allBatch?.processorId?.processorName}</span></p>
 
             <img
               src={certificqte}

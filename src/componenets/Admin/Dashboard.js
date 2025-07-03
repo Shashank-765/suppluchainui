@@ -123,18 +123,18 @@ const Dashboard = () => {
     useEffect(() => {
         const handleClickOutsideModal = (event) => {
             if (modalUserRef.current && !modalUserRef.current.contains(event.target)) {
+                setShowUserModal(false);
                 setIsCircularLoader(false);
             }
-        };
-
+        };   
         if (showUserModal) {
             document.addEventListener('mousedown', handleClickOutsideModal);
-        }
-
+        }   
         return () => {
             document.removeEventListener('mousedown', handleClickOutsideModal);
         };
     }, [showUserModal]);
+    
 
 
     useEffect(() => {

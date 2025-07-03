@@ -93,13 +93,18 @@ router.post('/createuser', authorize, async (req, res) => {
     const userCount = await User.countDocuments();
 
     let generatedPassword = '';
-    if (name && contact && contact.length >= 7) {
-      const namePart = name.slice(0, 3);
-      const contactLast3 = contact.slice(-3);
-      const lastDigit = contact.slice(-1);
-      generatedPassword = `${namePart}${contactLast3}${lastDigit}@${userCount + 1}`;
+    if (name && contact && contact.length >= 3) {
+      const trimmedName = name.trim().toLowerCase();
+      const paddedName = trimmedName.padEnd(3, "x");
+      const namePart = paddedName.charAt(0).toUpperCase() + paddedName.slice(1, 3);
+
+      const contactLast3Digits = contact.slice(-3).replace(/\D/g, ""); 
+
+      generatedPassword = `${namePart}${contactLast3Digits}@${userCount + 1}`;
     }
 
+
+    console.log(generatedPassword, 'this is generated password')
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
@@ -370,7 +375,7 @@ router.get('/getallsimpleusers', async (req, res) => {
 
   } catch (error) {
     console.log('Error fetching simple users:', error);
-    return res.status(500).json({ message: 'Server error while fetching users',error });
+    return res.status(500).json({ message: 'Server error while fetching users', error });
   }
 });
 
@@ -413,7 +418,7 @@ router.post('/unblockUser', authorize, async (req, res) => {
 
 router.post('/adminregister', async (req, res) => {
   try {
-    const { name, email, password, role,contact } = req.body;
+    const { name, email, password, role, contact } = req.body;
 
     if (!name || !email || !password || !role || !contact) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -422,14 +427,19 @@ router.post('/adminregister', async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: 'User already exists' });
     }
-        const userCount = await User.countDocuments();
-        let generatedPassword = '';
-    if (name && contact && contact.length >= 7) {
-      const namePart = name.slice(0, 3);
-      const contactLast3 = contact.slice(-3);
-      const lastDigit = contact.slice(-1);
-      generatedPassword = `${namePart}${contactLast3}${lastDigit}@${userCount + 1}`;
+    const userCount = await User.countDocuments();
+
+    let generatedPassword = '';
+    if (name && contact && contact.length >= 3) {
+      const trimmedName = name.trim().toLowerCase();
+      const paddedName = trimmedName.padEnd(3, "x");
+      const namePart = paddedName.charAt(0).toUpperCase() + paddedName.slice(1, 3);
+
+      const contactLast3Digits = contact.slice(-3).replace(/\D/g, ""); // Remove non-digits
+
+      generatedPassword = `${namePart}${contactLast3Digits}@${userCount + 1}`;
     }
+
 
     console.log(generatedPassword, 'this is generated password')
     const wallet = await generateWallet();
@@ -467,7 +477,7 @@ router.post('/adminregister', async (req, res) => {
                         userIsDeleted: 'False'
                     })
     console.log(userdata, 'this is user data')
-    return res.status(201).json({ user: newUser, message: 'Admin registered successfully' });
+    return res.status(201).json({ user: generatedPassword, message: 'Admin registered successfully' });
   } catch (error) {
     console.error('Error registering admin:', error);
     return res.status(500).json({ message: 'Server error while registering admin' });
@@ -511,7 +521,7 @@ router.post('/insertRoles', async (req, res) => {
     if (err.code === 11000) {
       res.status(409).json({ message: 'Some roles already exist.', error: err });
     } else {
-    console.log('err', err)
+      console.log('err', err)
       res.status(500).json({ message: 'Error inserting roles.', error: err });
     }
   }
@@ -525,7 +535,7 @@ router.get('/getimages', async (req, res) => {
     let allInspectedImages = [];
     let allImages = [];
 
-    if(trackingRecords.length === 0){
+    if (trackingRecords.length === 0) {
       return res.status(200).json({
         randomInspectedImages: [],
         randomImages: [],
@@ -540,8 +550,8 @@ router.get('/getimages', async (req, res) => {
         allImages.push(...record.images);
       }
     });
-console.log(allInspectedImages, 'this is all inspected images')
-console.log(allImages, 'this is all images')
+    console.log(allInspectedImages, 'this is all inspected images')
+    console.log(allImages, 'this is all images')
     const randomInspectedImages = getRandomImages(allInspectedImages, 3);
     const randomImages = getRandomImages(allImages, 3);
 

@@ -369,7 +369,7 @@ router.get('/getallsimpleusers', async (req, res) => {
 
   } catch (error) {
     console.log('Error fetching simple users:', error);
-    return res.status(500).json({ message: 'Server error while fetching users' });
+    return res.status(500).json({ message: 'Server error while fetching users',error });
   }
 });
 

@@ -19,6 +19,10 @@ app.use(helmet());
 
 app.use('/api',require('./Routes/Routes.js'))
 
+
+app.get('/api', (req, res) => {
+  res.json({ message: 'NOde API is working! === : 9000' });
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

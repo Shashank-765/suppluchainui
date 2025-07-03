@@ -91,7 +91,7 @@ function Profile({ setIsAuthenticated }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await api.get(`${process.env.REACT_APP_BACKEND_URL}/user/${userdata ? userdata?.userId : user._id}`);
+            const response = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${userdata ? userdata?.userId : user._id}`);
             if (response.data) {
                 const products = response.data.userBuyProducts || [];
                 setBuyProducts(products);

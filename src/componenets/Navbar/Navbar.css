@@ -148,7 +148,7 @@
 
   .menubutton {
     display: block;
-    margin-left: 40%;
+    margin-left: 10%;
   }
 
   .navbarsection {
@@ -231,7 +231,7 @@
 
   .menubutton {
     display: block;
-    margin-left: 25%;
+    margin-left: 15%;
     z-index: 99999;
   }
 

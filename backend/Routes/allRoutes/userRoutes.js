@@ -432,11 +432,11 @@ router.post('/adminregister', async (req, res) => {
     }
 
     console.log(generatedPassword, 'this is generated password')
-    const wallet = await generateWallet();
+    // const wallet = await generateWallet();
     const newUser = new User({
       name,
       email,
-      password:generatedPassword,
+      password,
       role,
       userType: 'admin',
       walletAddress: wallet.address,

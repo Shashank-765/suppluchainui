@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { ethers } = require('ethers');
 const bcrypt = require('bcryptjs');
 const User = require('../Models/userModel.js');
-const mnemonic = process.env.mnemonic;
+const mnemonic = process.env.MNEMONIC;
 const SECRET = process.env.JWT_SECRET;
 
 const generateToken = (id) => {

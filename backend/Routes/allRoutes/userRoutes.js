@@ -228,6 +228,7 @@ router.post('/updateprofile', authorize, upload, async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
+    console.log('login request body', req.body);
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Please fill all fields' });
@@ -435,7 +436,7 @@ router.post('/adminregister', async (req, res) => {
     const newUser = new User({
       name,
       email,
-      password,
+      password:generatedPassword,
       role,
       userType: 'admin',
       walletAddress: wallet.address,

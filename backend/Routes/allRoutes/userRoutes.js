@@ -410,111 +410,111 @@ router.post('/unblockUser', authorize, async (req, res) => {
 }
 );
 
-// router.post('/adminregister', async (req, res) => {
-//   try {
-//     const { name, email, password, role,contact } = req.body;
+router.post('/adminregister', async (req, res) => {
+  try {
+    const { name, email, password, role,contact } = req.body;
 
-//     if (!name || !email || !password || !role || !contact) {
-//       return res.status(400).json({ message: 'All fields are required' });
-//     }
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(409).json({ message: 'User already exists' });
-//     }
-//         const userCount = await User.countDocuments();
-//         let generatedPassword = '';
-//     if (name && contact && contact.length >= 7) {
-//       const namePart = name.slice(0, 3);
-//       const contactLast3 = contact.slice(-3);
-//       const lastDigit = contact.slice(-1);
-//       generatedPassword = `${namePart}${contactLast3}${lastDigit}@${userCount + 1}`;
-//     }
+    if (!name || !email || !password || !role || !contact) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'User already exists' });
+    }
+        const userCount = await User.countDocuments();
+        let generatedPassword = '';
+    if (name && contact && contact.length >= 7) {
+      const namePart = name.slice(0, 3);
+      const contactLast3 = contact.slice(-3);
+      const lastDigit = contact.slice(-1);
+      generatedPassword = `${namePart}${contactLast3}${lastDigit}@${userCount + 1}`;
+    }
 
-//     console.log(generatedPassword, 'this is generated password')
-//     const wallet = await generateWallet();
-//     const newUser = new User({
-//       name,
-//       email,
-//       password,
-//       role,
-//       userType: 'admin',
-//       walletAddress: wallet.address,
-//       isBlocked: false,
-//       contact
-//     });
+    console.log(generatedPassword, 'this is generated password')
+    const wallet = await generateWallet();
+    const newUser = new User({
+      name,
+      email,
+      password,
+      role,
+      userType: 'admin',
+      walletAddress: wallet.address,
+      isBlocked: false,
+      contact
+    });
 
-//     await newUser.save();
-//     console.log(newUser, 'this is new user')
-//      const userdata = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/addUser`, {
-//                         userId: newUser?._id,
-//                         userType: newUser?.userType,
-//                         userRole: newUser?.role,
-//                         userName: newUser?.name,
-//                         userEmail: newUser?.email,
-//                         userPhone: newUser?.contact,
-//                         userAddress: newUser?.address || 'noida',
-//                         userPassword: newUser?.password,
-//                         userStatus: newUser?.isBlocked || "True",
-//                         userCreatedAt: newUser?.createdAt || new Date().toISOString(),
-//                         userUpdatedAt: newUser?.updatedAt || '00/00/0000',
-//                         userDeletedAt: newUser?.deletedAt || '00/00/0000',
-//                         userCreatedBy: newUser?.createdBy || 'admin',
-//                         userUpdatedBy: newUser?.updatedBy || 'admin',
-//                         userDeletedBy: newUser?.deletedBy || 'admin',
-//                         userWalletAddress: newUser?.walletAddress,
-//                         userBuyProducts: [],
-//                         userIsDeleted: 'False'
-//                     })
-//     console.log(userdata, 'this is user data')
-//     return res.status(201).json({ user: newUser, message: 'Admin registered successfully' });
-//   } catch (error) {
-//     console.error('Error registering admin:', error);
-//     return res.status(500).json({ message: 'Server error while registering admin' });
-//   }
-// });
+    await newUser.save();
+    console.log(newUser, 'this is new user')
+     const userdata = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/addUser`, {
+                        userId: newUser?._id,
+                        userType: newUser?.userType,
+                        userRole: newUser?.role,
+                        userName: newUser?.name,
+                        userEmail: newUser?.email,
+                        userPhone: newUser?.contact,
+                        userAddress: newUser?.address || 'noida',
+                        userPassword: newUser?.password,
+                        userStatus: newUser?.isBlocked || "True",
+                        userCreatedAt: newUser?.createdAt || new Date().toISOString(),
+                        userUpdatedAt: newUser?.updatedAt || '00/00/0000',
+                        userDeletedAt: newUser?.deletedAt || '00/00/0000',
+                        userCreatedBy: newUser?.createdBy || 'admin',
+                        userUpdatedBy: newUser?.updatedBy || 'admin',
+                        userDeletedBy: newUser?.deletedBy || 'admin',
+                        userWalletAddress: newUser?.walletAddress,
+                        userBuyProducts: [],
+                        userIsDeleted: 'False'
+                    })
+    console.log(userdata, 'this is user data')
+    return res.status(201).json({ user: newUser, message: 'Admin registered successfully' });
+  } catch (error) {
+    console.error('Error registering admin:', error);
+    return res.status(500).json({ message: 'Server error while registering admin' });
+  }
+});
 
-// router.post('/insertRoles', async (req, res) => {
-//   const roleMap = {
-//     FARM_INSPECTION: {
-//       name: 'Farm Inspection',
-//       className: 'label info',
-//     },
-//     HARVESTER: {
-//       name: 'Harvester',
-//       className: 'label success',
-//     },
-//     EXPORTER: {
-//       name: 'Exporter',
-//       className: 'label warning',
-//     },
-//     IMPORTER: {
-//       name: 'Importer',
-//       className: 'label danger',
-//     },
-//     PROCESSOR: {
-//       name: 'Processor',
-//       className: 'label primary',
-//     },
-//   };
+router.post('/insertRoles', async (req, res) => {
+  const roleMap = {
+    FARM_INSPECTION: {
+      name: 'Farm Inspection',
+      className: 'label info',
+    },
+    HARVESTER: {
+      name: 'Harvester',
+      className: 'label success',
+    },
+    EXPORTER: {
+      name: 'Exporter',
+      className: 'label warning',
+    },
+    IMPORTER: {
+      name: 'Importer',
+      className: 'label danger',
+    },
+    PROCESSOR: {
+      name: 'Processor',
+      className: 'label primary',
+    },
+  };
 
-//   const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
-//     key,
-//     name: value.name,
-//     className: value.className,
-//   }));
+  const roleDocs = Object.entries(roleMap).map(([key, value]) => ({
+    key,
+    name: value.name,
+    className: value.className,
+  }));
 
-//   try {
-//     await Role.insertMany(roleDocs, { ordered: false });
-//     res.status(201).json({ message: 'Roles inserted successfully.' });
-//   } catch (err) {
-//     if (err.code === 11000) {
-//       res.status(409).json({ message: 'Some roles already exist.', error: err });
-//     } else {
-//     console.log('err', err)
-//       res.status(500).json({ message: 'Error inserting roles.', error: err });
-//     }
-//   }
-// });
+  try {
+    await Role.insertMany(roleDocs, { ordered: false });
+    res.status(201).json({ message: 'Roles inserted successfully.' });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(409).json({ message: 'Some roles already exist.', error: err });
+    } else {
+    console.log('err', err)
+      res.status(500).json({ message: 'Error inserting roles.', error: err });
+    }
+  }
+});
 
 router.get('/getimages', async (req, res) => {
   try {

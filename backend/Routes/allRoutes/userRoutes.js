@@ -518,8 +518,9 @@ router.post('/insertRoles', async (req, res) => {
 
 router.get('/getimages', async (req, res) => {
   try {
+    console.log('this is get images')
     const trackingRecords = await TrackingModel.find({});
-
+    console.log(trackingRecords, 'this is tracking records')
     let allInspectedImages = [];
     let allImages = [];
 
@@ -538,7 +539,8 @@ router.get('/getimages', async (req, res) => {
         allImages.push(...record.images);
       }
     });
-
+console.log(allInspectedImages, 'this is all inspected images')
+console.log(allImages, 'this is all images')
     const randomInspectedImages = getRandomImages(allInspectedImages, 3);
     const randomImages = getRandomImages(allImages, 3);
 

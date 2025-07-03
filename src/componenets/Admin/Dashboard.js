@@ -49,7 +49,7 @@ const Dashboard = () => {
 
     const fetchSimpleUsers = async () => {
         try {
-            const res = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/users/others`, {
+            const res = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/users/others`, {
                 params: {
                     page: simpleUserPage,
                     limit: 6,
@@ -175,7 +175,7 @@ const Dashboard = () => {
             if (response?.data) {
                 const updatedUser = response.data.user;
                 const updateRes = await axios.put(
-                    `${process.env.REACT_APP_BACKEND2_URL}/updateUser/${updatedUser._id}`,
+                    `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateUser/${updatedUser._id}`,
                     {
                         userId: updatedUser.id,
                         userType: updatedUser.userType,
@@ -348,7 +348,7 @@ const Dashboard = () => {
         try {
             const res = await api.post(`/batch/createBatch`, formData);
             if (res.data) {
-                const couchdb = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addbatch`, {
+                const couchdb = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/addbatch`, {
                     batchId: (res?.data?.batch?.batchId)?.toString(),
                     farmerRegNo: res?.data?.batch?.farmerRegNo,
                     farmerName: res?.data?.batch?.farmerName,
@@ -424,7 +424,7 @@ const Dashboard = () => {
             const res = await api.post(`/users/createuser`, userForm);
             if (res.data) {
 
-                const userdata = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addUser`, {
+                const userdata = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/addUser`, {
                     userId: res?.data?.user?._id,
                     userType: res?.data?.user?.userType,
                     userRole: res?.data?.user?.role?.label,
@@ -622,14 +622,14 @@ const Dashboard = () => {
         try {
             setLoadingUserId(user.userId);
 
-            const res2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user.userId}`);
+            const res2 = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${user.userId}`);
             if (res2.data?.userBuyProducts) {
                 setUserBuyProducts(res2.data?.userBuyProducts);
             }
 
             const response = await api.post(`/users/blockUser?id=${user.userId}`);
             if (response.data) {
-                await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateuser/${user.userId}`, {
+                await api.put(`${process.env.REACT_APP_BLOCKCHAIN_URL}/updateuser/${user.userId}`, {
                     ...user,
                     userBuyProducts: userBuyProducts,
                     userStatus: "False",
@@ -655,13 +655,13 @@ const Dashboard = () => {
     const unblockhandler = async (user) => {
         try {
             setLoadingUserId(user.userId);
-            const res2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user.userId}`);
+            const res2 = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${user.userId}`);
             if (res2.data?.userBuyProducts) {
                 setUserBuyProducts(res2.data?.userBuyProducts);
             }
             const response = await api.post(`/users/unblockUser?id=${user.userId}`,);
             if (response.data) {
-                const updateUser = await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateuser/${user.userId}`, {
+                const updateUser = await api.put(`${process.env.REACT_APP_BLOCKCHAIN_URL}/updateuser/${user.userId}`, {
                     userId: user.userId,
                     userType: user.userType,
                     userRole: user.userRole,
@@ -724,7 +724,7 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users/specific-roles`, {
+            const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/users/specific-roles`, {
                 params: {
                     page: currentPage,
                     limit: usersPerPage,
@@ -735,7 +735,7 @@ const Dashboard = () => {
             setAllCounts(response.data.roleCounts);
             setTotalPages(response?.data?.totalPages);
 
-            const response2 = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/users/specific-roles`, {
+            const response2 = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/users/specific-roles`, {
                 params: {
                     page: currentPage,
                     limit: 1000,
@@ -764,7 +764,7 @@ const Dashboard = () => {
 
     const fetchbatch = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter`,
+            const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/batches/filter`,
                 {
                     params: {
                         page: currnetBatchPage,
@@ -868,7 +868,7 @@ const Dashboard = () => {
     const deleteBatch = async (batch) => {
         try {
             setDeletingBatchId(batch?.batchId);
-            const resp = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updatebatch/${batch?.batchId}`, {
+            const resp = await axios.put(`${process.env.REACT_APP_BLOCKCHAIN_URL}/updatebatch/${batch?.batchId}`, {
                 batchId: batch?.batchId,
                 farmerRegNo: batch?.farmerRegNo,
                 farmerName: batch?.farmerName,

@@ -91,7 +91,7 @@ function Profile({ setIsAuthenticated }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${userdata ? userdata?.userId : user._id}`);
+            const response = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${userdata ? userdata?.userId : user._id}`);
             if (response.data) {
                 const products = response.data.userBuyProducts || [];
                 setBuyProducts(products);
@@ -115,7 +115,7 @@ function Profile({ setIsAuthenticated }) {
 
                         const productQuantity = parseToQuintal(product.quantity);
 
-                        const { data: batchData } = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batchId}`);
+                        const { data: batchData } = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/batch/${batchId}`);
 
                         if (batchMap[batchId]) {
                             batchMap[batchId].quantity += productQuantity;
@@ -188,7 +188,7 @@ function Profile({ setIsAuthenticated }) {
             const response = await api.post(`/users/updateprofile`, formData)
             if (response?.data) {
                 try {
-                    const updatedb = await api.put(`${process.env.REACT_APP_BACKEND2_URL}/updateUser/${response.data?.user?._id}`,
+                    const updatedb = await api.put(`${process.env.REACT_APP_BLOCKCHAIN_URL}/updateUser/${response.data?.user?._id}`,
                         {
                             userId: response.data?.user?._id,
                             userType: response.data.user?.userType,
@@ -337,7 +337,7 @@ function Profile({ setIsAuthenticated }) {
                             <div className="profile-content">
                                 {
 
-                                    previewImage ? <img className="profile-image" src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${previewImage}`} alt="Profile" /> : <img className="profile-image" src={profileImage1} alt="Profile" />
+                                    previewImage ? <img className="profile-image" src={`${process.env.REACT_APP_BACKEND_URL}${previewImage}`} alt="Profile" /> : <img className="profile-image" src={profileImage1} alt="Profile" />
                                 }
 
                                 <input
@@ -403,7 +403,7 @@ function Profile({ setIsAuthenticated }) {
                                                 <div className="productimagecontianer">
                                                     {product?.processorId?.image?.length > 0 ? (
                                                         <img
-                                                            src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${product.processorId.image[0]}`}
+                                                            src={`${process.env.REACT_APP_BACKEND_URL}${product.processorId.image[0]}`}
                                                             alt={`product-${i}`}
                                                             className="product-image"
                                                         />

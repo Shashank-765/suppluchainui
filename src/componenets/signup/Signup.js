@@ -109,7 +109,7 @@ function SignupLogin({ setIsAuthenticated, setUserData }) {
                 if (registeredUser && registeredUser.data) {
 
                     try {
-                        const user = await api.post(`${process.env.REACT_APP_BACKEND2_URL}/adduser`, {
+                        const user = await api.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/adduser`, {
                             userId: registeredUser?.data?.user?._id,
                             userType: registeredUser?.data?.user?.userType,
                             userRole: registeredUser?.data?.user?.userType,

@@ -22,7 +22,7 @@ function Product() {
         try {
             setIsCircularLoader(true);
             // const response = await api.get(`/products/getproducttomarkiting?page=${pageToFetch}&limit=3`);
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batches/filter`);
+            const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/batches/filter`);
 
             if (response.data) {
                 const newData = response.data.data;
@@ -67,7 +67,7 @@ function Product() {
                             <div className='productcontainer' onClick={() => handleClick(ele)} key={i}>
                                 <div className='productimagecontianer'>
                                     {ele?.processorId?.image?.length > 0 ? (
-                                        <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${ele?.processorId?.image[0]}`} alt='product' />
+                                        <img src={`${process.env.REACT_APP_BACKEND_URL}${ele?.processorId?.image[0]}`} alt='product' />
                                     ) : (
                                         <img src={image1} alt='default' />
                                     )}

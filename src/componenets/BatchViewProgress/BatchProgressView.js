@@ -59,7 +59,7 @@ const BatchProgressView = () => {
 
   const fetchBatchById = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${batch?.batchId}`);
+      const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/batch/${batch?.batchId}`);
       const data = response?.data;
 
       if (data) {
@@ -165,7 +165,7 @@ const BatchProgressView = () => {
                       return (
                         <img
                           key={idx}
-                          src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`}
+                          src={`${process.env.REACT_APP_BACKEND_URL}${img}`}
                           alt={`image-${idx}`}
                           className={`${styles.carouselImage} ${positionClass}`}
                         />
@@ -276,7 +276,7 @@ const BatchProgressView = () => {
                       return (
                         <img
                           key={idx}
-                          src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`}
+                          src={`${process.env.REACT_APP_BACKEND_URL}${img}`}
                           alt={`inspected-${idx}`}
                           className={`${styles.carouselImage} ${positionClass}`}
                         />

@@ -276,14 +276,14 @@ function UserDashBoard() {
       setImagePreviews(
         selectedBatch?.processorId?.image?.map(img =>
           typeof img === 'string'
-            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+            ? `${process.env.REACT_APP_BACKEND_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
         )
       );
       setInspectedImagePreviews(
         selectedBatch?.farmInspectionId?.image?.map(img =>
           typeof img === 'string'
-            ? `${process.env.REACT_APP_BACKEND_IMAGE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+            ? `${process.env.REACT_APP_BACKEND_URL}${img.startsWith('/') ? '' : '/'}${img}`
             : URL.createObjectURL(img)
         )
       );
@@ -325,7 +325,7 @@ function UserDashBoard() {
     const userrole = userdata ? roleToFieldMap[userdata?.userRole] : roleToFieldMap[user?.role?.label];
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND2_URL}/batches/filter?${userrole}=${userdata ? userdata.userId : user?._id}`,
+        `${process.env.REACT_APP_BLOCKCHAIN_URL}/batches/filter?${userrole}=${userdata ? userdata.userId : user?._id}`,
         {
           params: {
             id: userdata?.userId || user?._id,
@@ -605,8 +605,8 @@ function UserDashBoard() {
           const now = new Date().toISOString();
           if (user?.role?.label === 'Farm Inspection') {
             const url = toUpdate
-              ? `${process.env.REACT_APP_BACKEND2_URL}/updateInspector/${combinedId}`
-              : `${process.env.REACT_APP_BACKEND2_URL}/addInspector`;
+              ? `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateInspector/${combinedId}`
+              : `${process.env.REACT_APP_BLOCKCHAIN_URL}/addInspector`;
             const method = toUpdate ? axios.put : axios.post;
             const batch = res?.data?.batch;
             farmdata = await method(url, {
@@ -628,8 +628,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Exporter') {
             const url = toUpdate
-              ? `${process.env.REACT_APP_BACKEND2_URL}/updateExporter/${combinedId}`
-              : `${process.env.REACT_APP_BACKEND2_URL}/addExporter`;
+              ? `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateExporter/${combinedId}`
+              : `${process.env.REACT_APP_BLOCKCHAIN_URL}/addExporter`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -651,8 +651,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Harvester') {
             const url = toUpdate
-              ? `${process.env.REACT_APP_BACKEND2_URL}/updateHarvester/${combinedId}`
-              : `${process.env.REACT_APP_BACKEND2_URL}/addHarvester`;
+              ? `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateHarvester/${combinedId}`
+              : `${process.env.REACT_APP_BLOCKCHAIN_URL}/addHarvester`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -671,8 +671,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Importer') {
             const url = toUpdate
-              ? `${process.env.REACT_APP_BACKEND2_URL}/updateImporter/${combinedId}`
-              : `${process.env.REACT_APP_BACKEND2_URL}/addImporter`;
+              ? `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateImporter/${combinedId}`
+              : `${process.env.REACT_APP_BLOCKCHAIN_URL}/addImporter`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {
@@ -694,8 +694,8 @@ function UserDashBoard() {
 
           else if (user?.role?.label === 'Processor') {
             const url = toUpdate
-              ? `${process.env.REACT_APP_BACKEND2_URL}/updateProcessor/${combinedId}`
-              : `${process.env.REACT_APP_BACKEND2_URL}/addProcessor`;
+              ? `${process.env.REACT_APP_BLOCKCHAIN_URL}/updateProcessor/${combinedId}`
+              : `${process.env.REACT_APP_BLOCKCHAIN_URL}/addProcessor`;
             const method = toUpdate ? axios.put : axios.post;
 
             farmdata = await method(url, {

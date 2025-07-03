@@ -439,7 +439,7 @@ router.post('/adminregister', async (req, res) => {
 
     await newUser.save();
     console.log(newUser, 'this is new user')
-     const userdata = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/addUser`, {
+     const userdata = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/addUser`, {
                         userId: newUser?._id,
                         userType: newUser?.userType,
                         userRole: newUser?.role,

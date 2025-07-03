@@ -33,8 +33,8 @@ router.post('/create-checkout-session', async (req, res) => {
                     quantity: 1,
                 },
             ],
-            success_url: `${process.env.FRONTEND_URL2}/invoice?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL2}`,
+            success_url: `${process.env.FRONTEND_URL}/invoice?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.FRONTEND_URL}`,
             metadata: {
                 batchId,
                 quantity,

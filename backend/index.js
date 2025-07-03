@@ -14,7 +14,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use("/uploads", express.static('uploads'));
+app.use("/api/uploads", express.static('uploads'));
 app.use(helmet());
 
 app.use('/api',require('./Routes/Routes.js'))

@@ -74,7 +74,7 @@ function View() {
   const fetchHistory = async () => {
     if (user?.userType === 'admin') {
       try {
-        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/viewbuy/${product?.batchId}`,
+        const resp = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/viewbuy/${product?.batchId}`,
           {
             params: {
               page: currentPage,
@@ -98,7 +98,7 @@ function View() {
     } else {
 
       try {
-        const resp = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${user?._id}`,
+        const resp = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${user?._id}`,
           // {
           // params: {
           //   productId: product?._id,
@@ -107,7 +107,7 @@ function View() {
           // }
           // }
         );
-        const resp2 = await api.get(`${process.env.REACT_APP_BACKEND2_URL}/user/${product?.processorId?.processorId.split("_")[1]}`)
+        const resp2 = await api.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/user/${product?.processorId?.processorId.split("_")[1]}`)
         setProcessorContact(resp2?.data?.userPhone)
 
         if (resp?.data?.userBuyProducts) {
@@ -252,7 +252,7 @@ function View() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/batch/${product?.batchId}`);
+      const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/batch/${product?.batchId}`);
       if (response.data) {
         setProductsData(response.data);
       } else {
@@ -459,7 +459,7 @@ function View() {
                 productData?.processorId?.image?.length > 0 && productData.processorId?.image[0] !== ''
                   ? productData?.processorId?.image?.map((img, index) => (
                     <div className="imagecontainerview" key={index}>
-                      <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${img}`} alt={`product-${index}`} />
+                      <img src={`${process.env.REACT_APP_BACKEND_URL}${img}`} alt={`product-${index}`} />
                     </div>
                   )) :
                   <div className="imagecontainerview">

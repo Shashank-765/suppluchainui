@@ -117,7 +117,7 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
               {
-                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[0]}`} alt='images' />
+                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${inspectedImages[0]}`} alt='images' />
                   : <img src={image1} alt='images' />
               }
 
@@ -126,7 +126,7 @@ function Home() {
           </div>
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>{
-              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[1]}`} alt='images' />
+              inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${inspectedImages[1]}`} alt='images' />
                 : <img src={image2} alt='images' />
             }
             </div>
@@ -135,7 +135,7 @@ function Home() {
           <div className='boxessecond'>
             <div className='boxessecondimgcontainer'>
               {
-                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${inspectedImages[2]}`} alt='images' />
+                inspectedImages?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${inspectedImages[2]}`} alt='images' />
                   : <img src={image3} alt='images' />
               }
             </div>
@@ -199,20 +199,20 @@ function Home() {
             <div className='section-6imgcontainer'>
 
               {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[0]}`} alt='images' />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${images[0]}`} alt='images' />
                   : <img src={image5} alt='images' />
               }
 
             </div>
             <div className='section-6imgcontainer'>
               {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[1]}`} alt='images' />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${images[1]}`} alt='images' />
                   : <img src={image6} alt='images' />
               }
             </div>
             <div className='section-6imgcontainer'>
               {
-                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_IMAGE_URL}${images[2]}`} alt='images' />
+                images?.length > 0 ? <img src={`${process.env.REACT_APP_BACKEND_URL}${images[2]}`} alt='images' />
                   : <img src={image7} alt='images' />
               }
             </div>

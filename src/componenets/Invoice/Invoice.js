@@ -25,7 +25,7 @@ function Invoice() {
 
     const fetchprocessordetails = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND2_URL}/processor/${invoiceData.batchId + '_' + invoiceData.sellerId}`);
+        const response = await axios.get(`${process.env.REACT_APP_BLOCKCHAIN_URL}/processor/${invoiceData.batchId + '_' + invoiceData.sellerId}`);
         setProcessordata(response.data);
       } catch (error) {
         console.log(error);
@@ -54,7 +54,7 @@ function Invoice() {
           },
         }).then(res => res.data);
         try {
-          const data = await axios.post(`${process.env.REACT_APP_BACKEND2_URL}/buy`, {
+          const data = await axios.post(`${process.env.REACT_APP_BLOCKCHAIN_URL}/buy`, {
             transactionId: session.payment_intent,
             buyerId: invoiceData.buyerId,
             batchId: invoiceData.batchId,
@@ -79,7 +79,7 @@ function Invoice() {
         const storeQuantity = processordata.quantity - purchaseQuantity;
 
         try {
-          const processorquantity = await axios.put(`${process.env.REACT_APP_BACKEND2_URL}/updateProcessor/${invoiceData.batchId}_${invoiceData.sellerId}`, {
+          const processorquantity = await axios.put(`${process.env.REACT_APP_BLOCKCHAIN_URL}/updateProcessor/${invoiceData.batchId}_${invoiceData.sellerId}`, {
             batchId: invoiceData.batchId,
             processorId: invoiceData.sellerId,
             processorName: processordata.processorName,
